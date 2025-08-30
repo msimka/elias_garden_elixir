@@ -565,4 +565,55 @@ defmodule EliasServer.Manager.UFM do
     # Would collect from actual operations
     95.0 + :rand.uniform(5)  # 95-100% range
   end
+  
+  # Missing helper functions for rollup node operations
+  
+  defp submit_to_rollup_node(node_info, transaction) do
+    Logger.debug("UFM: Submitting transaction to rollup node #{node_info.node_id}")
+    
+    # Simulate rollup submission
+    case :rand.uniform(10) do
+      n when n > 8 -> {:error, :node_timeout}  # 20% failure rate
+      _ -> {:ok, %{transaction_id: generate_tx_id(), node: node_info.node_id}}
+    end
+  end
+  
+  defp try_fallback_rollup_nodes(transaction, attempted_nodes) do
+    case find_available_rollup_node() do
+      {:ok, node_info} ->
+        if node_info.node_id in attempted_nodes do
+          Logger.warn("UFM: All rollup nodes exhausted for transaction")
+          {:error, :all_nodes_failed}
+        else
+          case submit_to_rollup_node(node_info, transaction) do
+            {:ok, result} -> {:ok, result}
+            {:error, _} -> try_fallback_rollup_nodes(transaction, [node_info.node_id | attempted_nodes])
+          end
+        end
+      {:error, reason} -> {:error, reason}
+    end
+  end
+  
+  defp find_healthy_rollup_node([]), do: {:error, :no_healthy_nodes}
+  
+  defp find_healthy_rollup_node([node | remaining]) do
+    case health_check_rollup_node(node) do
+      :ok -> {:ok, node}
+      {:error, _} -> find_healthy_rollup_node(remaining)
+    end
+  end
+  
+  defp health_check_rollup_node(node) do
+    Logger.debug("UFM: Health checking rollup node #{node.node_id}")
+    
+    # Simulate health check
+    case :rand.uniform(10) do
+      n when n > 8 -> {:error, :unhealthy}  # 20% unhealthy rate
+      _ -> :ok
+    end
+  end
+  
+  defp generate_tx_id do
+    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
+  end
 end

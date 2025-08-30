@@ -192,7 +192,7 @@ defmodule MultiFormatConverter.Blockchain.ApeHarmonyRollup do
       component_id: component_id,
       total_tests: length(component_transactions),
       transactions: component_transactions,
-      last_test: if length(component_transactions) > 0, do: List.first(component_transactions).timestamp, else: nil
+      last_test: (if length(component_transactions) > 0, do: List.first(component_transactions).timestamp, else: nil)
     }
     
     {:reply, history, state}
