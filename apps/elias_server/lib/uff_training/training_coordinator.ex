@@ -35,13 +35,15 @@ defmodule UFFTraining.TrainingCoordinator do
     case gpu_count do
       count when count >= 2 ->
         %{
-          training_batch_size: 32,
+          training_batch_size: 64,
           rl_learning_rate: 0.0001,
           supervised_learning_rate: 0.00005,
           deepspeed_config: "priv/deepspeed_configs/uff_dual_gpu_config.json",
           gpu_count: count,
-          micro_batch_size: 2,
-          gradient_accumulation_steps: 8
+          micro_batch_size: 4,
+          gradient_accumulation_steps: 4,
+          total_vram_gb: 32,
+          memory_efficiency: "high"
         }
       1 ->
         %{
