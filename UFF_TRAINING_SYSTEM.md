@@ -19,7 +19,7 @@
 ## **UFF Training System Overview**
 
 ### **Model Specifications**
-- **Model**: UFF (UFM Federation Framework) deep-seq 6.7B-FP16
+- **Model**: UFF (UFM Federation Framework) DeepSeek 6.7B-FP16
 - **Training Method**: Reinforcement Learning + Supervised Fine-tuning
 - **Supervisor**: Claude Code (architectural guidance and quality assurance)
 - **Domain**: Component building in ELIAS federation and Apemacs ecosystem
@@ -113,7 +113,7 @@ Train UFF to autonomously build hierarchical atomic components following Tank Bu
 {
   "format_version": "1.0.0",
   "generated_at": "2025-08-29T22:58:49Z",
-  "model_target": "UFF deep-seq 6.7B-FP16",
+  "model_target": "UFF DeepSeek 6.7B-FP16",
   "training_type": "RL with supervised fine-tuning",
   "sessions": [
     {
@@ -188,7 +188,7 @@ Train UFF to autonomously build hierarchical atomic components following Tank Bu
 
 5. **Data Pipeline**: Optimal training data preprocessing and batching strategies?
 
-6. **Model Architecture**: Any modifications needed to base deep-seq architecture for component generation?
+6. **Model Architecture**: Any modifications needed to base DeepSeek architecture for component generation?
 
 7. **Evaluation Framework**: Comprehensive model evaluation and validation protocols?
 

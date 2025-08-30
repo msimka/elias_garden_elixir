@@ -2,7 +2,7 @@ defmodule UFFTraining.TrainingCoordinator do
   @moduledoc """
   UFF Training Coordinator for UFM Federation Framework
   
-  RESPONSIBILITY: Coordinate UFF deep-seq 6.7B-FP16 model training
+  RESPONSIBILITY: Coordinate UFF DeepSeek 6.7B-FP16 model training
   
   This module coordinates:
   - Daily Tank Building session capture
@@ -12,7 +12,7 @@ defmodule UFFTraining.TrainingCoordinator do
   - UFM federation integration for distributed training
   
   Training Architecture:
-  - Model: UFF deep-seq 6.7B-FP16 
+  - Model: UFF DeepSeek 6.7B-FP16 
   - Training: Reinforcement Learning + Supervised Fine-tuning
   - Supervision: Claude Code architectural guidance
   - Domain: Component building in ELIAS federation and Apemacs
@@ -158,7 +158,7 @@ defmodule UFFTraining.TrainingCoordinator do
   
   @impl true
   def handle_call(:initialize_training, _from, state) do
-    Logger.info("UFFTraining: Initializing UFF deep-seq #{@uff_model_size} training pipeline")
+    Logger.info("UFFTraining: Initializing UFF DeepSeek #{@uff_model_size} training pipeline")
     
     # Get GPU-adaptive training configuration
     gpu_config = get_training_config()
@@ -173,7 +173,7 @@ defmodule UFFTraining.TrainingCoordinator do
         
         # Initialize training infrastructure with adaptive config
         training_config = %{
-          model_architecture: "UFF deep-seq #{@uff_model_size}",
+          model_architecture: "UFF DeepSeek #{@uff_model_size}",
           training_type: "RL + Supervised Fine-tuning",
           gpu_count: config.gpu_count,
           batch_size: config.training_batch_size,
@@ -211,7 +211,7 @@ defmodule UFFTraining.TrainingCoordinator do
     # Start immediate capture session
     {:ok, session_id} = SessionCapture.start_session(:stage_3, :daily_capture, %{
       purpose: "UFF training data collection",
-      training_target: "UFF deep-seq #{@uff_model_size}",
+      training_target: "UFF DeepSeek #{@uff_model_size}",
       supervision_level: :claude_supervised
     })
     

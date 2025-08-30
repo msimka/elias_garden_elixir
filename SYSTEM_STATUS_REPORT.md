@@ -22,7 +22,7 @@ Tier 2: ELIAS Federation Nodes (8GB+ VRAM GPU)
 ├── Cloud training integration (Kaggle/SageMaker)
 
 Tier 3: ELIAS Training + Inference Nodes (Dual RTX 5060 Ti)
-├── Full UFF deep-seq 6.7B-FP16 model training
+├── Full UFF DeepSeek 6.7B-FP16 model training
 ├── Advanced inference capabilities
 ├── Federation leadership and coordination
 ```

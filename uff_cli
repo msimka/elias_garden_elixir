@@ -1,7 +1,7 @@
 #!/usr/bin/env elixir
 
 # UFF Training System CLI
-# Demonstrates UFF deep-seq 6.7B-FP16 model for component generation
+# Demonstrates UFF DeepSeek 6.7B-FP16 model for component generation
 # Integrates with Tank Building methodology and Claude supervision
 
 # Load UFF training system
@@ -19,7 +19,7 @@ defmodule UFFTrainingCLI do
   @moduledoc """
   UFF Training System Command Line Interface
   
-  Demonstrates UFF (UFM Federation Framework) deep-seq 6.7B-FP16 model
+  Demonstrates UFF (UFM Federation Framework) DeepSeek 6.7B-FP16 model
   for autonomous component generation using Tank Building methodology.
   """
   
@@ -44,7 +44,7 @@ defmodule UFFTrainingCLI do
   defp print_header do
     IO.puts("")
     IO.puts("🤖 UFF Training System v1.0.0-alpha")
-    IO.puts("🧠 UFM Federation Framework - Deep-seq 6.7B-FP16")
+    IO.puts("🧠 UFM Federation Framework - DeepSeek 6.7B-FP16")
     IO.puts("🏗️  Tank Building Methodology + Claude Supervision")
     IO.puts("🔗 ELIAS Federation Integration Ready")
     IO.puts("=" |> String.duplicate(60))

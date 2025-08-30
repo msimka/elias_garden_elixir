@@ -2,7 +2,7 @@ defmodule UFFTraining.ModelServer do
   @moduledoc """
   UFF Model Inference Server
   
-  RESPONSIBILITY: Host and serve UFF deep-seq 6.7B-FP16 model for inference
+  RESPONSIBILITY: Host and serve UFF DeepSeek 6.7B-FP16 model for inference
   
   This server provides:
   - UFF model inference endpoints
@@ -156,7 +156,7 @@ defmodule UFFTraining.ModelServer do
   
   @impl true
   def handle_info(:load_model, state) do
-    Logger.info("UFFTraining.ModelServer: Loading UFF deep-seq 6.7B-FP16 model")
+    Logger.info("UFFTraining.ModelServer: Loading UFF DeepSeek 6.7B-FP16 model")
     
     # In a real implementation, this would load the actual model
     # For now, we'll simulate the model loading process
@@ -229,7 +229,7 @@ defmodule UFFTraining.ModelServer do
     component_code = generate_sample_component(specification, tank_building_stage)
     
     metadata = %{
-      generation_method: "UFF deep-seq 6.7B-FP16",
+      generation_method: "UFF DeepSeek 6.7B-FP16",
       tank_building_stage: tank_building_stage,
       supervision_level: supervision_level,
       specification: specification,

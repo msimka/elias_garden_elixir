@@ -11,7 +11,7 @@ defmodule UFFTraining.SessionCapture do
   - Success/failure patterns for RL training
   - Claude supervision feedback loops
   
-  Training Target: UFF deep-seq 6.7B-FP16 model
+  Training Target: UFF DeepSeek 6.7B-FP16 model
   Training Type: RL-based with supervised fine-tuning
   """
   
@@ -476,7 +476,7 @@ defmodule UFFTraining.SessionCapture do
     training_data = %{
       format_version: "1.0.0",
       generated_at: DateTime.utc_now() |> DateTime.to_iso8601(),
-      model_target: "UFF deep-seq 6.7B-FP16",
+      model_target: "UFF DeepSeek 6.7B-FP16",
       training_type: "RL with supervised fine-tuning",
       sessions: Enum.map(completed_sessions, &format_session_for_training/1)
     }

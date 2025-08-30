@@ -6,7 +6,7 @@
 
 ## Training System Specifications
 
-**Model**: UFF deep-seq 6.7B-FP16  
+**Model**: UFF DeepSeek 6.7B-FP16  
 **Training Type**: RL-based with supervised fine-tuning (Claude supervision)  
 **Training Domain**: Component building in ELIAS federation and Apemacs ecosystem  
 
@@ -88,4 +88,4 @@
 
 ---
 
-**Architect**: Please provide the complete training system architecture, file paths, and implementation instructions for UFF deep-seq 6.7B-FP16 training system.
+**Architect**: Please provide the complete training system architecture, file paths, and implementation instructions for UFF DeepSeek 6.7B-FP16 training system.
