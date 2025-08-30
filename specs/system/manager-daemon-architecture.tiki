@@ -1,0 +1,206 @@
+== Manager Daemon Architecture - Deterministic Always-On Daemons ==
+
+ID: MDA-001
+VERSION: 1.0.0
+DATE: 2025-08-28
+
+== Core Philosophy ==
+
+ID: MDA-001.PHIL
+CONCEPT: Deterministic Daemons with Rule Files
+PATTERN: Always On + Rule-Driven + Claude Integration
+
+PRINCIPLE.ALWAYS_ON {
+  STATUS: persistent
+  BEHAVIOR: hide/show but never stop
+  RESTART: automatic on crash
+  MEMORY: maintains state across restarts
+}
+
+PRINCIPLE.DETERMINISTIC {
+  INPUT: .md specification files
+  PROCESSING: rule-based logic
+  OUTPUT: deterministic responses
+  STATE: predictable and reproducible
+}
+
+PRINCIPLE.CLAUDE_MANAGED {
+  UPDATE_SOURCE: Claude via user requests
+  UPDATE_TARGET: individual .md files (e.g., UPM.md, UAM.md)
+  UPDATE_METHOD: hot-reload without daemon restart
+  VALIDATION: checksum verification like APEMACS.md
+}
+
+== Manager Types ==
+
+ID: MDA-001.TYPES
+TOTAL_COUNT: 5 (consolidated from 7)
+
+TYPE.UAM {
+  NAME: Universal Asset Manager
+  SPEC_FILE: UAM.md
+  PURPOSE: AI model and creative asset management
+  DAEMON: persistent GenServer
+  RESPONSIBILITIES: [model_downloads, version_tracking, asset_organization]
+}
+
+TYPE.UCM {
+  NAME: Universal Communication Manager  
+  SPEC_FILE: UCM.md
+  PURPOSE: AI orchestration and P2P coordination
+  DAEMON: persistent GenServer
+  RESPONSIBILITIES: [request_routing, ai_coordination, communication_protocols]
+}
+
+TYPE.UFM {
+  NAME: Universal Federation Manager
+  SPEC_FILE: UFM.md  
+  PURPOSE: Network and P2P coordination (merged UNM functionality)
+  DAEMON: persistent GenServer
+  RESPONSIBILITIES: [node_discovery, network_health, p2p_protocols]
+}
+
+TYPE.UIM {
+  NAME: Universal Interface Manager
+  SPEC_FILE: UIM.md
+  PURPOSE: MacGyver system and application interfaces
+  DAEMON: persistent GenServer
+  RESPONSIBILITIES: [interface_generation, app_integration, automation]
+}
+
+TYPE.URM {
+  NAME: Universal Resource Manager  
+  SPEC_FILE: URM.md
+  PURPOSE: Resource management and intelligent downloading (merged UPM functionality)
+  DAEMON: persistent GenServer
+  RESPONSIBILITIES: [resource_allocation, intelligent_downloads, dependency_management]
+}
+
+== Daemon Implementation Pattern ==
+
+ID: MDA-001.IMPL
+PATTERN: Rule-Driven GenServer
+
+GENSERVER_TEMPLATE {
+  defmodule Elias.Manager.{NAME} do
+    use GenServer
+    require Logger
+
+    # State includes loaded .md rules
+    defstruct rules: %{}, last_updated: nil, checksum: nil
+
+    def start_link(_opts) do
+      GenServer.start_link(__MODULE__, %__MODULE__{}, name: __MODULE__)
+    end
+
+    def init(state) do
+      # Load .md file on startup
+      {:ok, load_rules(state)}
+    end
+
+    # Hot reload .md files
+    def reload_rules do
+      GenServer.cast(__MODULE__, :reload_rules)
+    end
+
+    defp load_rules(state) do
+      # Parse {NAME}.md file into rules
+      # Update checksum
+      # Return updated state
+    end
+  end
+}
+
+== Rule File Format ==
+
+ID: MDA-001.RULES
+FORMAT: Markdown with YAML frontmatter
+
+TEMPLATE {
+  ---
+  version: "1.0.0"
+  updated: "2025-08-28T20:00:00Z"
+  source: "claude@user-session"
+  checksum: "sha256:abc123..."
+  ---
+
+  # {MANAGER_NAME} Rules and Configuration
+
+  ## Core Rules
+  - Rule 1: Description
+  - Rule 2: Description
+
+  ## Behaviors
+  ### On Request Type X
+  1. Step 1
+  2. Step 2
+
+  ## Parameters
+  ```yaml
+  setting1: value1
+  setting2: value2
+  ```
+}
+
+== Integration with ELIAS ==
+
+ID: MDA-001.INTEG
+
+SUPERVISION_TREE {
+  Elias.Application
+    ├── Elias.Daemon (core)
+    ├── Elias.ApeHarmony (blockchain)
+    ├── Elias.RequestPool (requests)
+    ├── Elias.ManagerSupervisor
+    │   ├── Elias.Manager.UAM
+    │   ├── Elias.Manager.UCM  
+    │   ├── Elias.Manager.UFM
+    │   ├── Elias.Manager.UIM
+    │   └── Elias.Manager.URM
+    └── Elias.RuleDistributor (for .md updates)
+}
+
+RULE_DISTRIBUTION {
+  TRIGGER: Claude updates manager .md file
+  PROCESS: RuleDistributor broadcasts to all nodes
+  TARGET: specific manager daemon reloads its rules
+  VALIDATION: checksum verification before application
+}
+
+== Advantages ==
+
+ID: MDA-001.ADVANTAGES
+
+BENEFIT.CONSISTENCY {
+  DESCRIPTION: All managers follow same daemon + .md pattern
+  RESULT: Predictable behavior and maintenance
+}
+
+BENEFIT.ALWAYS_ON {
+  DESCRIPTION: Managers never stop, just reload rules
+  RESULT: Zero downtime updates and persistent operations
+}
+
+BENEFIT.CLAUDE_INTEGRATION {  
+  DESCRIPTION: Claude can update any manager via .md files
+  RESULT: Easy management and evolution of manager behavior
+}
+
+BENEFIT.DETERMINISTIC {
+  DESCRIPTION: Same .md file produces same manager behavior
+  RESULT: Reproducible system behavior across nodes
+}
+
+== Implementation Priority ==
+
+ID: MDA-001.PRIORITY
+ORDER: Based on core system dependencies
+
+PRIORITY.1: UFM (network/P2P critical for distribution)
+PRIORITY.2: UCM (request routing critical for operations)  
+PRIORITY.3: UAM (AI model management for Geppetto)
+PRIORITY.4: UIM (MacGyver system for interfaces)
+PRIORITY.5: URM (resource management least critical initially)
+
+This architecture maintains the "always on" philosophy while making managers deterministic, 
+Claude-manageable, and following the proven APEMACS.md pattern.

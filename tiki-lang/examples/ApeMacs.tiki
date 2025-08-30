@@ -1,0 +1,115 @@
+ApeMacs Multi-Window Terminal Application with tmux-Multiplexed Buffer Architecture
+
+*1 tmux Server Management
+*1**1 Server Initialization
+*1**1***1 Check for existing tmux session named "apemacs"
+*1**1***2 Create new detached session if none exists  
+*1**1***3 Handle session persistence across app restarts
+*1**1***4 Provide error handling and graceful fallbacks
+
+*1**2 Window Creation
+*1**2***1 Generate unique window IDs for each ApeMacs buffer
+*1**2***2 Create tmux windows with specific names for identification
+*1**2***3 Return window ID for client connection targeting
+*1**2***4 Maintain window counter for sequential numbering
+
+*1**3 Pane Management
+*1**3***1 Create tmux panes for ApeMacs window splits
+*1**3***2 Calculate split direction based on parent window geometry
+*1**3***3 Use tmux split-window command with proper orientation flags
+*1**3***4 Generate unique pane IDs for tracking and connection
+
+*2 Application Architecture
+*2**1 Custom NSApplication Event Handling
+*2**1***1 Intercept Cmd+N globally before SwiftTerm captures it
+*2**1***2 Route window creation through buffer system instead of terminal default
+*2**1***3 Prevent conflicts with SwiftTerm's internal key handling
+*2**1***4 Stop event propagation after handling split commands
+
+*2**2 View Controller Design
+*2**2***1 Initialize with tmux target identifiers (window ID and optional pane ID)
+*2**2***2 Create terminal view container with proper frame and background
+*2**2***3 Connect LocalProcessTerminalView to specific tmux window/pane
+*2**2***4 Handle focus management and tmux selection commands
+
+*2**3 Window Management
+*2**3***1 Configure borderless windows for terminal experience
+*2**3***2 Set minimum size constraints to prevent unusable splits
+*2**3***3 Handle window activation and focus properly
+*2**3***4 Support keyboard input and responder chain management
+
+*3 Window Splitting Logic
+*3**1 Split Direction Calculation
+*3**1***1 Determine split direction using height > width rule for horizontal splits
+*3**1***2 Clamp parent frame to screen bounds to prevent off-screen positioning
+*3**1***3 Apply Architect's algorithm for consistent split behavior
+*3**1***4 Handle edge cases and screen boundary constraints
+
+*3**2 Frame Geometry
+*3**2***1 Calculate 50/50 split frames with integer pixel alignment
+*3**2***2 Use floor() for consistent rounding and gap prevention
+*3**2***3 Resize parent window first to free screen real estate
+*3**2***4 Create new window with calculated frame for perfect splits
+
+*3**3 tmux Integration
+*3**3***1 Create tmux pane in parent's tmux window for shared context
+*3**3***2 Match tmux split direction with ApeMacs split calculation
+*3**3***3 Connect new ApeMacs window to newly created tmux pane
+*3**3***4 Maintain parent-child relationship through tmux window grouping
+
+*4 Terminal Integration
+*4**1 tmux Client Connection
+*4**1***1 Start LocalProcessTerminalView with tmux attach-session command
+*4**1***2 Target specific tmux window or pane for each ApeMacs window
+*4**1***3 Configure terminal environment variables for proper emulation
+*4**1***4 Handle connection errors and provide fallback mechanisms
+
+*4**2 Input/Output Routing
+*4**2***1 Route keyboard input directly to tmux client PTY
+*4**2***2 Let SwiftTerm handle terminal emulation and rendering per view
+*4**2***3 Send tmux select commands to focus active window/pane
+*4**2***4 Maintain independent terminal state per ApeMacs window
+
+*4**3 Focus Management
+*4**3***1 Set terminal view as first responder when window becomes active
+*4**3***2 Send tmux selection commands to focus correct pane in server
+*4**3***3 Enable proper keyboard input routing and session switching
+*4**3***4 Handle window activation without async timing issues
+
+*5 Menu System and Navigation
+*5**1 Application Menu Structure
+*5**1***1 Create New Window item (Cmd+N) for triggering splits
+*5**1***2 Close Window item (Cmd+W) for window management
+*5**1***3 Navigation items for cycling between windows (Cmd+`, Cmd+Shift+`)
+*5**1***4 Standard Quit item (Cmd+Q) for application termination
+
+*5**2 Window Navigation
+*5**2***1 Track all ApeMacs windows in application delegate
+*5**2***2 Support cycling to next/previous window with keyboard shortcuts
+*5**2***3 Handle focus switching between multiple terminal windows
+*5**2***4 Maintain window array consistency during creation and destruction
+
+*5**3 Keyboard Shortcuts
+*5**3***1 Configure menu item key equivalents and modifier masks
+*5**3***2 Target delegate methods for proper action routing
+*5**3***3 Follow standard terminal application conventions
+*5**3***4 Ensure shortcuts work consistently across all windows
+
+*6 Application Lifecycle
+*6**1 Startup Process
+*6**1***1 Configure app as regular application (not LSUIElement)
+*6**1***2 Initialize tmux server before creating any windows
+*6**1***3 Create first window with unique tmux window for initial interaction
+*6**1***4 Exit gracefully if tmux setup fails as it's required for operation
+
+*6**2 Error Handling
+*6**2***1 Provide comprehensive logging with emoji indicators for visibility
+*6**2***2 Handle tmux command failures with appropriate fallbacks
+*6**2***3 Validate tmux installation and provide user feedback
+*6**2***4 Ensure graceful degradation when components fail
+
+*6**3 Persistence and Cleanup
+*6**3***1 Leave tmux server running for session persistence across restarts
+*6**3***2 Handle application termination and window cleanup
+*6**3***3 Support reconnection to existing tmux sessions on restart
+*6**3***4 Maintain window state and allow user to continue previous sessions

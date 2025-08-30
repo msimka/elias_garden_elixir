@@ -1,0 +1,511 @@
+# Multi-Format Text Converter Root Specification
+
+id: "multi_format_converter_root"
+name: "MultiFormatTextConverter"
+version: "1.0.0"
+type: "root_component"
+phase: "tank_building_stage_1"
+
+metadata:
+  description: "Converts multiple text formats (PDF, RTF, DOCX, HTML, TXT) to Markdown"
+  inputs:
+    - file_path: "string - Path to input file"
+    - output_path: "string - Path for output markdown file"
+  outputs:
+    - markdown_content: "string - Generated markdown content"
+    - conversion_metadata: "map - File info, processing stats, quality metrics"
+  blockchain_verification: true
+  real_testing_required: true
+
+# Hierarchical Component Tree
+children:
+  - id: "1.0"
+    name: "FileOperations"
+    type: "component_group"
+    
+    children:
+      - id: "1.1"
+        name: "FileReader"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["read_file_bytes_from_filesystem"]
+        
+        metadata:
+          inputs: [file_path: "string"]
+          outputs: [content: "binary", size: "integer"] 
+          dependencies: []
+          python_ports: []
+          
+        testing:
+          real_verification: true
+          test_types: ["unit", "integration", "edge_cases"]
+          test_requirements:
+            - "must_read_actual_files_from_disk"
+            - "must_verify_byte_count_matches_filesystem"
+            - "must_handle_large_files_up_to_100MB"
+            - "must_fail_gracefully_on_missing_files"
+          
+        blockchain_verification:
+          component_hash_required: true
+          test_result_signing: true
+          level_2_rollup_submission: true
+
+      - id: "1.2"
+        name: "FileValidator"  
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["validate_file_existence_and_permissions"]
+        
+        metadata:
+          inputs: [file_path: "string"]
+          outputs: [valid: "boolean", error_reason: "string | nil"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_test_with_nonexistent_files"
+            - "must_test_with_permission_denied_files"
+            - "must_test_with_oversized_files"
+            - "must_return_specific_error_reasons"
+
+      - id: "1.3"
+        name: "OutputWriter"
+        type: "atomic_component"  
+        granularity: "atomic"
+        responsibilities: ["write_markdown_content_to_file"]
+        
+        metadata:
+          inputs: [content: "string", output_path: "string"]
+          outputs: [success: "boolean", bytes_written: "integer"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_write_to_actual_filesystem"
+            - "must_verify_written_content_matches_input_exactly"
+            - "must_handle_write_permission_errors"
+            - "must_create_parent_directories_if_needed"
+
+  - id: "2.0"
+    name: "FormatDetection"
+    type: "component_group"
+    
+    children:
+      - id: "2.1"
+        name: "FormatDetector"
+        type: "atomic_component"
+        granularity: "atomic" 
+        responsibilities: ["identify_file_format_via_magic_bytes"]
+        
+        metadata:
+          inputs: [file_content: "binary"]
+          outputs: [format: ":pdf | :rtf | :docx | :txt | :html | :unknown"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_test_with_known_file_samples_of_each_format"
+            - "must_achieve_95_percent_accuracy_on_test_corpus"
+            - "must_handle_corrupted_files_gracefully"
+            - "must_not_rely_on_file_extensions"
+
+      - id: "2.2"
+        name: "MimeTypeAnalyzer"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["extract_mime_type_and_charset_information"]
+        
+        metadata:
+          inputs: [file_content: "binary"]
+          outputs: [mime_type: "string", charset: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_match_system_file_command_output"
+            - "must_detect_encoding_correctly"
+            - "must_handle_binary_files_without_crashing"
+
+  - id: "3.0"
+    name: "ContentExtraction"
+    type: "component_group"
+    
+    children:
+      - id: "3.1"
+        name: "PdfTextExtractor"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["extract_text_content_from_pdf_files"]
+        
+        metadata:
+          inputs: [pdf_content: "binary"]
+          outputs: [text: "string", metadata: "map"]
+          dependencies: []
+          python_ports: ["PyMuPDF"]
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_extract_from_known_pdf_samples"
+            - "must_preserve_text_content_accurately"
+            - "must_handle_password_protected_pdfs"
+            - "must_extract_metadata_title_author_etc"
+            - "must_verify_against_manual_text_extraction"
+
+      - id: "3.2"
+        name: "RtfTextExtractor"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["extract_text_content_from_rtf_files"]
+        
+        metadata:
+          inputs: [rtf_content: "binary"]
+          outputs: [text: "string", metadata: "map"]
+          dependencies: []
+          python_ports: ["striprtf", "pypandoc"]
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_extract_from_known_rtf_samples"
+            - "must_preserve_basic_formatting_structure"
+            - "must_handle_rtf_with_embedded_images"
+
+      - id: "3.3"
+        name: "DocxTextExtractor"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["extract_text_content_from_docx_files"]
+        
+        metadata:
+          inputs: [docx_content: "binary"]
+          outputs: [text: "string", metadata: "map"]
+          dependencies: []
+          python_ports: ["python-docx"]
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_extract_from_known_docx_samples"  
+            - "must_handle_docx_with_tables_and_lists"
+            - "must_preserve_document_structure"
+
+      - id: "3.4"
+        name: "PlainTextExtractor"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["process_plain_text_with_encoding_detection"]
+        
+        metadata:
+          inputs: [text_content: "binary"]
+          outputs: [text: "string", encoding: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_handle_utf8_latin1_ascii_encodings"
+            - "must_detect_encoding_automatically"
+            - "must_preserve_special_characters"
+
+      - id: "3.5" 
+        name: "HtmlTextExtractor"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["extract_text_from_html_strip_tags"]
+        
+        metadata:
+          inputs: [html_content: "binary"]
+          outputs: [text: "string", links: "list"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_strip_html_tags_completely"
+            - "must_extract_links_with_anchor_text" 
+            - "must_preserve_readable_text_structure"
+
+  - id: "4.0"
+    name: "StructureAnalysis" 
+    type: "component_group"
+    
+    children:
+      - id: "4.1"
+        name: "HeadingDetector"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["identify_headings_in_extracted_text"]
+        
+        metadata:
+          inputs: [text: "string"]
+          outputs: [headings: "list({level: integer, text: string, position: integer})"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_detect_headings_in_structured_text"
+            - "must_identify_heading_levels_correctly"
+            - "must_preserve_heading_text_exactly"
+
+      - id: "4.2"
+        name: "ListDetector"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["identify_ordered_and_unordered_lists"]
+        
+        metadata:
+          inputs: [text: "string"]
+          outputs: [lists: "list({type: :ordered | :unordered, items: list, position: integer})"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_detect_numbered_and_bulleted_lists"
+            - "must_preserve_list_item_order"
+            - "must_handle_nested_lists"
+
+      - id: "4.3"
+        name: "ParagraphSeparator"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["separate_text_into_logical_paragraphs"]
+        
+        metadata:
+          inputs: [text: "string"]
+          outputs: [paragraphs: "list(string)"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_identify_paragraph_boundaries_correctly"
+            - "must_preserve_paragraph_content"
+            - "must_handle_various_line_ending_formats"
+
+      - id: "4.4"
+        name: "TableDetector"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["identify_tabular_data_in_text"]
+        
+        metadata:
+          inputs: [text: "string"]
+          outputs: [tables: "list({rows: list(list), headers: list, position: integer})"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_detect_table_structures"
+            - "must_identify_table_headers"
+            - "must_parse_rows_and_columns_correctly"
+
+  - id: "5.0"
+    name: "MarkdownGeneration"
+    type: "component_group"
+    
+    children:
+      - id: "5.1"
+        name: "HeadingFormatter"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["convert_headings_to_markdown_format"]
+        
+        metadata:
+          inputs: [headings: "list({level: integer, text: string})"]
+          outputs: [markdown: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_generate_correct_hash_symbols"
+            - "must_maintain_proper_spacing"
+            - "must_handle_all_heading_levels_1_to_6"
+
+      - id: "5.2"
+        name: "ListFormatter"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["convert_lists_to_markdown_format"]
+        
+        metadata:
+          inputs: [lists: "list({type: :ordered | :unordered, items: list})"]
+          outputs: [markdown: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_use_correct_bullet_and_number_formatting"
+            - "must_handle_nested_list_indentation"
+            - "must_preserve_list_item_content"
+
+      - id: "5.3"
+        name: "ParagraphFormatter" 
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["format_paragraphs_for_markdown"]
+        
+        metadata:
+          inputs: [paragraphs: "list(string)"]
+          outputs: [markdown: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_maintain_proper_line_spacing"
+            - "must_preserve_paragraph_content"
+            - "must_handle_empty_paragraphs"
+
+      - id: "5.4"
+        name: "TableFormatter"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["convert_tables_to_markdown_format"]
+        
+        metadata:
+          inputs: [tables: "list({rows: list(list), headers: list})"]
+          outputs: [markdown: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_use_correct_pipe_table_syntax"
+            - "must_align_columns_properly"
+            - "must_handle_empty_cells"
+
+      - id: "5.5"
+        name: "LinkFormatter"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["convert_links_to_markdown_format"]
+        
+        metadata:
+          inputs: [links: "list({url: string, text: string})"]
+          outputs: [markdown: "string"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_use_correct_markdown_link_syntax"
+            - "must_escape_special_characters"
+            - "must_handle_relative_and_absolute_urls"
+
+  - id: "6.0"
+    name: "QualityAssurance"
+    type: "component_group"
+    
+    children:
+      - id: "6.1"
+        name: "MarkdownValidator"
+        type: "atomic_component"
+        granularity: "atomic"
+        responsibilities: ["validate_generated_markdown_syntax"]
+        
+        metadata:
+          inputs: [markdown: "string"]
+          outputs: [valid: "boolean", errors: "list(string)"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_validate_markdown_syntax_correctness"
+            - "must_identify_specific_syntax_errors"
+            - "must_pass_valid_markdown_samples"
+
+      - id: "6.2"
+        name: "ContentVerifier"
+        type: "atomic_component"
+        granularity: "atomic" 
+        responsibilities: ["verify_content_preservation_from_input_to_output"]
+        
+        metadata:
+          inputs: [original_text: "string", markdown: "string"]
+          outputs: [preservation_score: "float", missing_content: "list"]
+          dependencies: []
+          
+        testing:
+          real_verification: true
+          test_requirements:
+            - "must_calculate_content_preservation_percentage"
+            - "must_identify_missing_or_altered_content"
+            - "must_achieve_90_percent_preservation_minimum"
+
+# Tank Building Evolution Stages
+stages:
+  stage_1:
+    name: "BRUTE_FORCE_PDF_ONLY"
+    status: "IN_PROGRESS" 
+    components: ["1.1", "1.2", "1.3", "2.1", "3.1", "5.3", "6.2"]
+    success_criteria:
+      - "convert_one_pdf_to_readable_markdown"
+      - "all_atomic_components_tested_and_blockchain_verified"
+      - "basic_cli_interface_functional"
+      
+  stage_2:
+    name: "EXTEND_MULTI_FORMAT"
+    status: "PLANNED"
+    components: ["3.2", "3.3", "3.4", "3.5", "2.2"]
+    success_criteria:
+      - "convert_pdf_rtf_docx_txt_html_with_same_interface"
+      - "no_regression_in_pdf_functionality"
+      - "format_detection_95_percent_accuracy"
+      
+  stage_3:
+    name: "OPTIMIZE_STRUCTURE_RECOGNITION"
+    status: "PLANNED"  
+    components: ["4.1", "4.2", "4.3", "4.4", "5.1", "5.2", "5.4", "5.5"]
+    success_criteria:
+      - "high_quality_markdown_with_proper_structure"
+      - "heading_list_table_detection_functional"
+      - "markdown_formatting_compliance"
+      
+  stage_4:
+    name: "ITERATE_QUALITY_PERFORMANCE"
+    status: "PLANNED"
+    components: ["6.1", "performance_monitoring", "edge_case_handling"]
+    success_criteria:
+      - "production_ready_converter"
+      - "90_percent_content_preservation"
+      - "blockchain_verified_quality_metrics"
+
+# Blockchain Verification Configuration
+blockchain_verification:
+  level_1_chain: "ape_harmony_primary"
+  level_2_rollups: "user_specific_per_account"
+  signing_algorithm: "ECDSA"
+  test_result_structure:
+    component_id: "string"
+    test_id: "string"
+    input_hash: "sha256"
+    output_hash: "sha256"
+    success: "boolean"
+    timestamp: "datetime"
+    signature: "hex_string"
+  
+  verification_requirements:
+    all_atomic_components_must_be_signed: true
+    test_replay_verification_required: true
+    fraud_proof_challenge_period: "24_hours"
+    minimum_test_coverage: "100_percent"
+
+# Integration with ELIAS Managers
+elias_integration:
+  UIM: "cli_interface_and_component_supervision"
+  UFM: "federated_rollup_node_discovery_and_load_balancing"
+  URM: "python_dependency_management_and_resource_allocation"
+  ULM: "learning_from_conversion_patterns_and_quality_metrics"
+  UCM: "distributed_component_communication"
+  UAM: "blockchain_signature_verification_and_user_authentication"

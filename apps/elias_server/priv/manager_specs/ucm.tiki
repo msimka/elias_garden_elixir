@@ -1,0 +1,177 @@
+# UCM.tiki - Universal Coordination Manager Hierarchical Specification
+# Following Architect-recommended Tiki Language Methodology
+
+id: root
+name: "Universal Coordination Manager"
+version: "2.0.0"
+architecture: "distributed_communication_engine"
+metadata:
+  dependencies: ["UFM.federation_daemon", "elias_core.distributed_erlang", "network_connectivity"]
+  performance:
+    latency_ms: 150
+    memory_mb: 512
+    cpu_percent: 25
+    scalability: "distributed_request_routing"
+    message_throughput: 1000
+  input_types: ["ai_requests", "manager_broadcasts", "federation_messages"]
+  output_types: ["routed_requests", "broadcast_confirmations", "routing_statistics"]
+  failure_modes: ["node_disconnection", "request_timeout", "circuit_breaker_open", "federation_split"]
+  tags: ["communication", "routing", "distributed", "coordination"]
+  routing_config:
+    default_timeout_ms: 30000
+    max_retry_attempts: 3
+    circuit_breaker_enabled: true
+    priority_levels: ["critical", "high", "medium", "low"]
+
+children:
+  # 1.0 - Request Routing Engine
+  - id: "1.0"
+    name: "request_routing_engine"
+    module: "EliasServer.Manager.UCM.RequestRouter"
+    code_ref: "lib/elias_server/manager/ucm.ex:250-350"
+    metadata:
+      dependencies: ["UFM.node_selection", "circuit_breaker_logic"]
+      performance: {latency_ms: 75, memory_mb: 128}
+      inputs: ["ai_request_type", "data", "routing_options"]
+      outputs: ["request_id", "target_node", "routing_status"]
+    children:
+      - id: "1.1"
+        name: "priority_queue_manager"
+        functions: ["route_ai_request/3", "process_request_queue/2"]
+        code_ref: "lib/elias_server/manager/ucm.ex:67-107"
+        metadata:
+          performance: {latency_ms: 20}
+          queue_types: ["high", "medium", "low"]
+      
+      - id: "1.2"
+        name: "node_selection_optimizer"
+        functions: ["select_optimal_node/2", "get_required_capabilities/2"]
+        code_ref: "lib/elias_server/manager/ucm.ex:291-320"
+        metadata:
+          performance: {latency_ms: 30}
+          selection_criteria: ["capability_match", "load_balance", "latency"]
+
+  # 2.0 - Message Broadcasting System
+  - id: "2.0"
+    name: "message_broadcasting_system"
+    module: "EliasServer.Manager.UCM.MessageBroadcaster"
+    code_ref: "lib/elias_server/manager/ucm.ex:350-400"
+    metadata:
+      dependencies: ["manager_processes", "message_prioritization"]
+      performance: {latency_ms: 50, memory_mb: 64}
+      broadcast_targets: ["all", "specific_managers", "filtered_groups"]
+    children:
+      - id: "2.1"
+        name: "manager_discovery"
+        functions: ["broadcast_to_managers/3", "get_manager_processes/1"]
+        code_ref: "lib/elias_server/manager/ucm.ex:355-378"
+        
+      - id: "2.2"
+        name: "priority_delivery"
+        functions: ["handle_broadcast_message/3", "process_priority/2"]
+        code_ref: "lib/elias_server/manager/ucm.ex:120-139"
+        metadata:
+          priority_handling: ["critical", "high", "medium", "low"]
+
+  # 3.0 - Network Health Monitoring
+  - id: "3.0"
+    name: "network_health_monitoring"
+    module: "EliasServer.Manager.UCM.NetworkMonitor"
+    code_ref: "lib/elias_server/manager/ucm.ex:380-420"
+    metadata:
+      dependencies: ["distributed_erlang", "node_connectivity"]
+      performance: {latency_ms: 100, memory_mb: 96}
+      monitoring_interval_ms: 10000
+    children:
+      - id: "3.1"
+        name: "node_health_tracker"
+        functions: ["update_node_health/1", "schedule_health_check/0"]
+        code_ref: "lib/elias_server/manager/ucm.ex:384-400"
+        metadata:
+          health_indicators: ["ping_response", "last_seen", "connection_status"]
+        
+      - id: "3.2"
+        name: "connectivity_validator"
+        functions: ["check_federation_connectivity/0", "validate_node_ping/1"]
+        code_ref: "lib/elias_server/manager/ucm.ex:547-551"
+
+  # 4.0 - Circuit Breaker & Retry Logic
+  - id: "4.0"
+    name: "circuit_breaker_system"
+    module: "EliasServer.Manager.UCM.CircuitBreaker"
+    code_ref: "lib/elias_server/manager/ucm.ex:170-220"
+    metadata:
+      dependencies: ["retry_logic", "failure_tracking"]
+      performance: {latency_ms: 10, memory_mb: 32}
+      circuit_states: ["closed", "open", "half_open"]
+    children:
+      - id: "4.1"
+        name: "retry_coordinator"
+        functions: ["handle_info/retry_request", "calculate_backoff_time/2"]
+        code_ref: "lib/elias_server/manager/ucm.ex:178-219"
+        metadata:
+          backoff_strategy: "exponential"
+          max_attempts: 3
+        
+      - id: "4.2"
+        name: "failure_tracker"
+        functions: ["track_request_failure/2", "update_failure_stats/2"]
+        code_ref: "lib/elias_server/manager/ucm.ex:270-287"
+
+# Cross-References and Dependencies
+cross_dependencies:
+  - source: "1.0.request_routing_engine"
+    target: "UFM.federation_daemon"
+    type: "node_selection_coordination"
+    
+  - source: "2.0.message_broadcasting_system"
+    target: "all_managers"
+    type: "inter_manager_communication"
+    
+  - source: "3.0.network_health_monitoring"
+    target: "distributed_erlang_nodes"
+    type: "network_connectivity_monitoring"
+    
+  - source: "4.0.circuit_breaker_system"
+    target: "1.0.request_routing_engine"
+    type: "failure_handling_integration"
+
+# Testing Configuration
+testing:
+  continuous_suites: ["routing_tests", "broadcast_tests", "network_health_tests", "circuit_breaker_tests"]
+  critical_paths: ["1.0.request_routing_engine", "2.0.message_broadcasting_system", "3.0.network_health_monitoring"]
+  performance_benchmarks:
+    - id: "1.1.priority_queue_manager"
+      max_latency_ms: 50
+      min_throughput_rps: 100
+    - id: "2.1.manager_discovery" 
+      max_broadcast_time_ms: 100
+    - id: "3.1.node_health_tracker"
+      max_health_check_time_ms: 200
+
+# Integration Validation Rules for System Harmonizer
+harmonizer_rules:
+  impact_radius: 3  # Communication affects most systems
+  required_tests: ["unit", "integration", "network_connectivity", "federation_coordination"]
+  approval_thresholds:
+    test_success_rate: 95.0
+    performance_degradation_max: 10.0  # Communication should be fast
+    network_connectivity: 100.0  # Critical for distributed coordination
+  rollback_triggers: ["node_isolation", "broadcast_failure", "routing_deadlock", "circuit_breaker_cascade"]
+
+# Communication-Specific Configuration
+communication_workflows:
+  ai_request_routing:
+    supported_types: ["claude_query", "geppetto_query", "rule_processing"]
+    timeout_ranges: {min: 15000, max: 120000}
+    retry_strategies: ["immediate", "exponential_backoff", "circuit_break"]
+  
+  manager_broadcasting:
+    priority_handling: true
+    target_selection: ["all", "filtered", "specific"]
+    delivery_guarantees: ["best_effort", "at_least_once"]
+  
+  network_monitoring:
+    health_check_interval_ms: 10000
+    failure_detection_threshold: 3
+    recovery_validation_checks: 5

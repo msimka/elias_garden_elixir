@@ -1,0 +1,338 @@
+# ULM (Universal Learning Manager) - TIKI Specification
+# 6th Core Manager - Learning and Harmonization Hub
+
+metadata:
+  manager_id: "ULM"
+  version: "1.0.0"
+  created_at: "2025-08-29T01:00:00Z"
+  last_modified: "2025-08-29T01:00:00Z"
+  development_stage: "stage_1_singular_focus"
+  architecture_type: "always_on_genserver"
+  priority_level: 6
+  dependencies: ["UFM", "UCM", "UAM", "UIM", "URM", "tiki_engine", "multi_format_text_converter"]
+  owned_systems: ["learning_sandbox", "text_conversion_utilities", "pseudo_compilation", "system_harmonization"]
+
+# Tank Building Development Stages
+stages:
+  stage_1:
+    name: "Singular Focus - Basic ULM Implementation"
+    objective: "Create ULM GenServer with learning sandbox management and text conversion"
+    status: "completed"
+    completed_at: "2025-08-29T01:00:00Z"
+    success_criteria:
+      - "ULM GenServer starts and runs as 6th manager"
+      - "Learning sandbox ownership established"  
+      - "Text conversion integration functional"
+      - "Basic TIKI validation implemented"
+    test_results:
+      - "GenServer supervision: PASS"
+      - "Learning sandbox detection: PASS"
+      - "Multi-format text converter integration: PASS"
+      - "Tiki.Validatable behavior: PASS"
+  
+  stage_2:
+    name: "Additive Extension - Pseudo-Compilation and Harmonization"
+    objective: "Add pseudo-compilation validation and system harmonization WITHOUT breaking stage 1"
+    status: "pending"
+    planned_features:
+      - "TIKI pseudo-compilation engine integration"
+      - "Cross-manager harmonization protocols"
+      - "Advanced learning pattern recognition"
+      - "System-wide optimization coordination"
+    success_criteria:
+      - "All Stage 1 functionality still works perfectly"
+      - "Pseudo-compilation validates new components"
+      - "System harmonization detects optimization opportunities"
+      - "Cross-manager communication protocols active"
+  
+  stage_3:
+    name: "Optimization - Code Golf and Performance Tuning"
+    objective: "Optimize and consolidate functionality after Stage 2 proven"
+    status: "future"
+    optimization_targets:
+      - "Merge redundant learning functions"
+      - "Optimize memory usage for knowledge base"
+      - "Improve harmonization algorithm efficiency"
+      - "Consolidate TIKI integration patterns"
+  
+  stage_4:
+    name: "Iterate - AI Model Integration"
+    objective: "Add local AI model for enhanced learning capabilities"
+    status: "future"
+    iteration_features:
+      - "DeepSeek 6.7B FP16 model integration"
+      - "Advanced pattern recognition via AI"
+      - "Automated documentation generation"
+      - "Intelligent system optimization suggestions"
+
+# Core Manager Specification
+manager:
+  name: "Universal Learning Manager"
+  abbreviation: "ULM"
+  type: "always_on_genserver"
+  supervision_strategy: "one_for_one"
+  restart_policy: "permanent"
+  priority: 6
+  
+  # Core Responsibilities
+  responsibilities:
+    primary:
+      - "TIKI Learning Engine: .tiki → .ex generation and pseudo-compilation validation"
+      - "Documentation Synchronization: .md ↔ .ex consistency maintenance"
+      - "Pseudo-Compilation Intelligence: Component validation and quality gates"
+      - "System Harmonization: Cross-manager optimization and coordination"
+      - "Testing & Debugging Intelligence: Failure analysis and pattern recognition"
+      - "Learning Sandbox Management: Research papers, transcripts, experimentation"
+    
+    secondary:
+      - "Text conversion utilities ownership and coordination"
+      - "Knowledge base construction and maintenance"
+      - "System-wide learning pattern identification"
+      - "Manager coordination protocol optimization"
+
+# Pseudo-Compilation System (Guardrails)
+pseudo_compilation:
+  description: "Rigorous validation system for new component integration into ELIAS"
+  
+  validation_pipeline:
+    - name: "Specification Validation"
+      description: "Validate .tiki specifications against ELIAS standards"
+      timeout: 30000
+      
+    - name: "Hierarchical Testing" 
+      description: "Test every leaf on the TIKI specification tree"
+      method: "tree_traversal"
+      coverage_requirement: "100%"
+      
+    - name: "Integration Analysis"
+      description: "Analyze component compatibility with existing managers"
+      dependencies_check: true
+      conflict_detection: true
+      
+    - name: "Quality Gate Enforcement"
+      description: "Ensure component meets ELIAS quality standards"
+      requirements:
+        - "Zero critical vulnerabilities"
+        - "Complete test coverage"
+        - "Documentation completeness"
+        - "Performance benchmarks met"
+  
+  failure_handling:
+    - "Isolate failed component from system"
+    - "Generate detailed failure analysis report"  
+    - "Provide remediation recommendations"
+    - "Block integration until issues resolved"
+
+# System Harmonization (Optimization)
+harmonization:
+  description: "Ongoing cross-manager optimization and coordination"
+  
+  analysis_targets:
+    - "Inter-manager communication patterns"
+    - "Resource usage optimization opportunities"
+    - "Performance bottleneck identification"
+    - "Load balancing improvements"
+    - "Federation coordination efficiency"
+  
+  optimization_methods:
+    - "Pattern recognition across manager behaviors"
+    - "Performance metrics analysis and trending"
+    - "Communication protocol optimization"
+    - "Resource allocation prediction and adjustment"
+    - "Coordination workflow streamlining"
+  
+  coordination_protocols:
+    - "UCM broadcast subscription for system events"
+    - "Manager capability registration and discovery"
+    - "Optimization recommendation distribution"
+    - "Harmonization session coordination"
+
+# Learning Sandbox Management
+learning_sandbox:
+  directory: "/Users/mikesimka/elias_garden_elixir/learning_sandbox"
+  
+  structure:
+    raw_materials: "Staging area for unconverted documents (RTFD, PDF, DOCX)"
+    notes:
+      raw_ideas: "Initial converted documents and brainstorming"
+      synthesized: "Processed and organized knowledge"
+    papers:
+      by_date: "Academic papers organized chronologically"
+      by_topic: "Papers grouped by research area"
+    transcripts:
+      by_source: "Transcripts organized by original source"
+      by_topic: "Transcripts grouped by subject matter"  
+    tools: "Experimental utilities and prototypes"
+  
+  ingestion_pipeline:
+    - name: "Document Detection"
+      description: "Monitor raw_materials for new documents"
+      
+    - name: "Format Recognition" 
+      description: "Identify document format and select appropriate converter"
+      
+    - name: "Text Conversion"
+      description: "Convert to Markdown using Multi-Format Text Converter"
+      
+    - name: "Metadata Extraction"
+      description: "Extract and structure document metadata"
+      
+    - name: "Knowledge Categorization"
+      description: "Route processed documents to appropriate sandbox areas"
+      
+    - name: "Index Updates"
+      description: "Update searchable knowledge base index"
+
+# Text Conversion System
+text_conversion:
+  primary_converter: "EliasUtils.MultiFormatTextConverter"
+  
+  supported_formats:
+    input: ["rtf", "rtfd", "pdf", "docx", "html", "txt", "doc", "odt", "epub"]
+    output: ["markdown"]
+  
+  conversion_pipeline:
+    - "Format detection and validation"
+    - "Dependency checking (textutil, pandoc, pdftotext)"
+    - "Document processing and text extraction"
+    - "Markdown formatting and cleanup"
+    - "Metadata extraction and frontmatter generation"
+    - "Output validation and quality checks"
+  
+  integration_approach:
+    - "ULM owns text conversion for learning and knowledge processing"
+    - "UIM provides interface wrappers for user-facing conversion tools"
+    - "Mix tasks serve as thin wrappers sending requests to ULM daemon"
+    - "All conversion execution happens through ULM GenServer messages"
+
+# TIKI Learning Engine
+tiki_learning:
+  description: "Advanced learning system for TIKI specification management and evolution"
+  
+  capabilities:
+    - "Specification pattern recognition across managers"
+    - ".tiki → .ex code generation and validation"
+    - "Cross-manager specification consistency checking"
+    - "Template generation for new components"
+    - "Specification evolution and versioning"
+  
+  learning_sources:
+    - "Manager .tiki specifications"
+    - "Implementation .ex files"
+    - "Documentation .md files"
+    - "System behavior metrics and logs"
+    - "Integration success/failure patterns"
+  
+  knowledge_outputs:
+    - "Best practice patterns and templates"
+    - "Integration compatibility matrices"
+    - "Performance optimization recommendations"
+    - "System evolution roadmaps and predictions"
+
+# Performance and Resource Management
+performance:
+  resource_allocation:
+    memory_target: "100-200MB base usage"
+    cpu_usage: "5-15% during active processing"
+    storage: "Learning sandbox and knowledge base expansion"
+    
+  scaling_considerations:
+    - "On-demand text conversion processing"
+    - "Batch document ingestion capabilities"
+    - "Knowledge base indexing and search optimization"
+    - "Cross-manager harmonization session management"
+  
+  monitoring_metrics:
+    - "Documents processed per hour"
+    - "Components pseudo-compiled successfully"
+    - "Harmonization optimization opportunities identified"
+    - "Learning pattern recognition accuracy"
+    - "System-wide performance improvements achieved"
+
+# Integration Protocols
+integration:
+  manager_communication:
+    - "Subscribe to UCM broadcasts for system events"
+    - "Register learning capabilities with UFM global registry"
+    - "Coordinate with URM for resource allocation"
+    - "Provide optimization recommendations to all managers"
+  
+  daemon_coordination:
+    - "Follow always-on daemon philosophy"
+    - "All execution via GenServer message handling"
+    - "No direct code execution - only daemon modification"
+    - "Fault-tolerant supervision and restart policies"
+  
+  external_interfaces:
+    - "Learning sandbox directory structure"
+    - "Multi-format text conversion utilities"
+    - "TIKI specification files and validation"
+    - "Knowledge base and search interfaces"
+
+# Testing and Validation Framework  
+testing:
+  unit_tests:
+    - "Learning sandbox management functions"
+    - "Text conversion integration"
+    - "Pseudo-compilation validation logic"
+    - "System harmonization algorithms"
+    
+  integration_tests:
+    - "End-to-end document ingestion pipeline"
+    - "Cross-manager harmonization sessions"
+    - "TIKI specification learning and validation"
+    - "Knowledge base construction and search"
+    
+  regression_tests:
+    - "Jakob Uszkoreit interview conversion (baseline)"
+    - "Previous document processing capabilities"
+    - "Manager coordination and communication"
+    - "System performance and resource usage"
+    
+  federation_tests:
+    - "Distributed learning sandbox synchronization"
+    - "Cross-node harmonization coordination"
+    - "Federated pseudo-compilation validation"
+    - "Multi-node knowledge base consistency"
+
+# Future Evolution and AI Integration
+evolution:
+  local_ai_model:
+    model: "DeepSeek 6.7B FP16"
+    specialization: "Learning and harmonization domain expertise"
+    responsibilities:
+      - "Advanced pattern recognition and analysis"
+      - "Automated .md documentation generation and updates"
+      - "Intelligent optimization recommendation generation"
+      - "Cross-manager behavior prediction and modeling"
+  
+  4_component_architecture:
+    ulm_ex: "GenServer code (Claude's domain)"
+    ulm_tiki: "This specification (Claude's domain)"  
+    ulm_md: "Documentation and instructions (Local model's domain)"
+    ulm_model: "DeepSeek fine-tuned model (On-demand inference)"
+  
+  responsibility_matrix:
+    claude_domain: [".ex code", ".tiki specifications", "system architecture"]
+    local_model_domain: [".md documentation", "pattern analysis", "optimization suggestions"]
+    coordination: "Apply Manager mediates between Claude and local model"
+
+# Compliance and Quality Assurance
+compliance:
+  tank_building_methodology:
+    - "Follow mandatory 4-stage iterative development"
+    - "Maintain complete Stage 1 functionality during all extensions"
+    - "Document development history and evolution"
+    - "Enforce quality gates and regression prevention"
+  
+  elias_architecture_standards:
+    - "Always-on GenServer daemon pattern"
+    - "Tiki.Validatable behavior implementation"
+    - "UCM broadcast message handling"
+    - "Manager supervision and fault tolerance"
+  
+  pseudo_compilation_requirements:
+    - "All new components must pass ULM validation"
+    - "Hierarchical specification testing mandatory"
+    - "Integration analysis and conflict detection"
+    - "Quality gate enforcement before system integration"

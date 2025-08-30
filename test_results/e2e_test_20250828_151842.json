@@ -1,0 +1,311 @@
+{
+  "test_run": {
+    "id": "20250828_151842",
+    "timestamp": "2025-08-28T15:18:42-07:00",
+    "elias_version": "2.0.0",
+    "test_suite": "end_to_end"
+  },
+  "environment": {
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "elixir_version": "28",
+    "erlang_version": "16.0.2"
+  },
+  "tests": [
+    {
+      "name": "system_prerequisites",
+      "description": "Check Elixir/Erlang installation",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "Erlang/OTP 28 [erts-16.0.2] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit] [dtrace]\n\nElixir 1.18.4 (compiled with Erlang/OTP 27)\nErlang/OTP 28 [erts-16.0.2] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit] [dtrace]\n\nMix 1.18.4 (compiled with Erlang/OTP 27)\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:43-07:00"
+    },
+    {
+      "name": "project_structure",
+      "description": "Verify ELIAS project structure",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:43-07:00"
+    },
+    {
+      "name": "dependency_compilation",
+      "description": "Test dependency compilation",
+      "status": "failed",
+      "duration_seconds": 1,
+      "output": "==> apemacs_client\nCompiling 2 files (.ex)\nGenerated apemacs_client app\n==> elias_server\nCompiling 9 files (.ex)\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 289 │       Logger.warn(\"UAM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ lib/elias_server/manager/uam.ex:289:14: EliasServer.Manager.UAM.load_uam_config/0\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 203 │           Logger.warn(\"UCM request #{request_id} exceeded max retries\")\n     │                  ~\n     │\n     └─ lib/elias_server/manager/ucm.ex:203:18: EliasServer.Manager.UCM.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 346 │       Logger.warn(\"UIM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ lib/elias_server/manager/uim.ex:346:14: EliasServer.Manager.UIM.load_uim_config/0\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 350 │     Logger.warn(\"URM handling #{length(alerts)} resource alerts\")\n     │            ~\n     │\n     └─ lib/elias_server/manager/urm.ex:350:12: EliasServer.Manager.URM.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 353 │       Logger.warn(\"Resource Alert: #{alert.type} - #{alert.message}\")\n     │              ~\n     │\n     └─ lib/elias_server/manager/urm.ex:353:14: EliasServer.Manager.URM.handle_info/2\n\n     warning: variable \"timeout\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 226 │     timeout = Map.get(rules, :node_timeout, 30000)\n     │     ~~~~~~~\n     │\n     └─ lib/elias_server/manager/ufm.ex:226:5: EliasServer.Manager.UFM.perform_heartbeat_checks/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 251 │       Logger.warn(\"UCM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ lib/elias_server/manager/ucm.ex:251:14: EliasServer.Manager.UCM.load_ucm_config/0\n\n     warning: variable \"request_type\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 287 │   defp select_optimal_node(request_type, requirements, state) do\n     │                            ~~~~~~~~~~~~\n     │\n     └─ lib/elias_server/manager/ufm.ex:287:28: EliasServer.Manager.UFM.select_optimal_node/3\n\n     warning: variable \"config\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 393 │   defp perform_application_discovery(config) do\n     │                                      ~~~~~~\n     │\n     └─ lib/elias_server/manager/uim.ex:393:38: EliasServer.Manager.UIM.perform_application_discovery/1\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 355 │         Logger.warn(\"UAM: MLPythonPort not available, using simulation\")\n     │                ~\n     │\n     └─ lib/elias_server/manager/uam.ex:355:16: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"topology\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 326 │   defp broadcast_topology_update(topology) do\n     │                                  ~~~~~~~~\n     │\n     └─ lib/elias_server/manager/ufm.ex:326:34: EliasServer.Manager.UFM.broadcast_topology_update/1\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 367 │           Logger.warn(\"URM no specific mitigation for alert type: #{alert.type}\")\n     │                  ~\n     │\n     └─ lib/elias_server/manager/urm.ex:367:18: EliasServer.Manager.URM.handle_info/2\n\n     warning: variable \"interface_type\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 465 │   defp select_interface_template(app_category, interface_type, state) do\n     │                                                ~~~~~~~~~~~~~~\n     │\n     └─ lib/elias_server/manager/uim.ex:465:48: EliasServer.Manager.UIM.select_interface_template/3\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 384 │                 Logger.warn(\"UAM: Failed to load ML model #{model_name}, using simulation\")\n     │                        ~\n     │\n     └─ lib/elias_server/manager/uam.ex:384:24: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 371 │           Logger.warn(\"UCM cannot broadcast to #{manager} - not running\")\n     │                  ~\n     │\n     └─ lib/elias_server/manager/ucm.ex:371:18: EliasServer.Manager.UCM.broadcast_to_managers/3\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 433 │       Logger.warn(\"URM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ lib/elias_server/manager/urm.ex:433:14: EliasServer.Manager.URM.load_urm_config/0\n\n     warning: variable \"error\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 383 │               error ->\n     │               ~\n     │\n     └─ lib/elias_server/manager/uam.ex:383:15: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"state\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 342 │   defp process_media_swap(source_media, target_media, swap_type, state) do\n     │                                                                  ~~~~~\n     │\n     └─ lib/elias_server/manager/uam.ex:342:66: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"history\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 595 │   defp generate_resource_optimizations(current_metrics, history) do\n     │                                                         ~~~~~~~\n     │\n     └─ lib/elias_server/manager/urm.ex:595:57: EliasServer.Manager.URM.generate_resource_optimizations/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 495 │     Logger.warn(\"UAM handling creative app crash: #{app_name}\")\n     │            ~\n     │\n     └─ lib/elias_server/manager/uam.ex:495:12: EliasServer.Manager.UAM.handle_app_crash/2\n\n     warning: the following clause will never match:\n\n         {:error, reason}\n\n     because it attempts to match on the result of:\n\n         apply_interface_optimizations(interface_record, optimization_data, state)\n\n     which has type:\n\n         dynamic({:ok, %{..., customizations: term()}})\n\n     typing violation found at:\n     │\n 182 │           {:error, reason} ->\n     │           ~~~~~~~~~~~~~~~~~~~\n     │\n     └─ lib/elias_server/manager/uim.ex:182: EliasServer.Manager.UIM.handle_call/3\n\n     warning: the following clause will never match:\n\n         {:error, reason}\n\n     because it attempts to match on the result of:\n\n         perform_dependency_update(dependency_name, current_info, target_version)\n\n     which has type:\n\n         dynamic(\n           {:ok,\n            %{\n              ...,\n              current_version: term(),\n              last_checked: %DateTime{\n                calendar: term(),\n                day: term(),\n                hour: term(),\n                microsecond: term(),\n                minute: term(),\n                month: term(),\n                second: term(),\n                std_offset: term(),\n                time_zone: term(),\n                utc_offset: term(),\n                year: term(),\n                zone_abbr: term()\n              },\n              status: :up_to_date\n            }}\n         )\n\n     typing violation found at:\n     │\n 147 │           {:error, reason} ->\n     │           ~~~~~~~~~~~~~~~~~~~\n     │\n     └─ lib/elias_server/manager/urm.ex:147: EliasServer.Manager.URM.handle_call/3\n\n     warning: Jason.encode!/1 is undefined (module Jason is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 213 │       encoded_data = Jason.encode!(data)\n     │                            ~\n     │\n     └─ lib/elias_server/geppetto.ex:213:28: EliasServer.Geppetto.send_to_python_port/2\n\n     warning: YamlElixir.read_from_string/1 is undefined (module YamlElixir is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 165 │     frontmatter = YamlElixir.read_from_string(frontmatter_str)\n     │                              ~\n     │\n     └─ lib/elias_server/manager/ufm.ex:165:30: EliasServer.Manager.UFM.parse_md_rules/1\n\n     warning: EliasCore.ApeHarmony.record_event/2 is undefined (module EliasCore.ApeHarmony is not available or is yet to be defined)\n     │\n 334 │     EliasCore.ApeHarmony.record_event(\"ufm_#{event_type}\", %{\n     │                          ~\n     │\n     └─ lib/elias_server/manager/ufm.ex:334:26: EliasServer.Manager.UFM.log_to_blockchain/2\n\n     warning: Jason.decode!/1 is undefined (module Jason is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 227 │       response = Jason.decode!(data)\n     │                        ~\n     │\n     └─ lib/elias_server/geppetto.ex:227:24: EliasServer.Geppetto.decode_python_response/1\n\n     warning: EliasCore.MLPythonPort.infer/3 is undefined (module EliasCore.MLPythonPort is not available or is yet to be defined)\n     │\n 367 │         case EliasCore.MLPythonPort.infer(model_name, input_data, 60_000) do\n     │                                     ~\n     │\n     └─ lib/elias_server/manager/uam.ex:367:37: EliasServer.Manager.UAM.process_media_swap/4\n     └─ lib/elias_server/manager/uam.ex:378:45: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: EliasCore.MLPythonPort.load_model/2 is undefined (module EliasCore.MLPythonPort is not available or is yet to be defined)\n     │\n 375 │             case EliasCore.MLPythonPort.load_model(model_name, model_path) do\n     │                                         ~\n     │\n     └─ lib/elias_server/manager/uam.ex:375:41: EliasServer.Manager.UAM.process_media_swap/4\n\nGenerated elias_server app\n==> elias_core\nCompiling 23 files (.ex)\n    warning: variable \"opts\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    │\n 39 │   def init(opts) do\n    │            ~~~~\n    │\n    └─ lib/elias_core/ml_python_port.ex:39:12: EliasCore.MLPythonPort.init/1\n\n     warning: function start_http_server/1 is unused\n     │\n 465 │   defp start_http_server(port) do\n     │        ~\n     │\n     └─ lib/apemacs.ex:465:8: Elias.ApeMacs (module)\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 225 │         Logger.warn(\"Heartbeat failed - Python port may be unresponsive\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:225:16: EliasCore.MLPythonPort.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 237 │         Logger.warn(\"Request #{request_id} timed out\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:237:16: EliasCore.MLPythonPort.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 494 │         Logger.warn(\"Received response for unknown request: #{request_id}\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:494:16: EliasCore.MLPythonPort.handle_python_response/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 547 │     Logger.warn(\"Received unhandled Python response: #{inspect(response)}\")\n     │            ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:547:12: EliasCore.MLPythonPort.handle_python_response/2\n\n    warning: variable \"opts\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    │\n 47 │   def init(opts) do\n    │            ~~~~\n    │\n    └─ lib/elias_core/p2p.ex:47:12: EliasCore.P2P.init/1\n\n    error: module Plug.Router is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n 12 │   use Plug.Router\n    │   ^^^^^^^^^^^^^^^\n    │\n    └─ lib/router.ex:12: Elias.Router (module)\n\n    error: module Quantum is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n 12 │   use Quantum, otp_app: :elias\n    │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    │\n    └─ lib/scheduler.ex:12: Elias.Scheduler (module)\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  7 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/elias_core/request_pool.ex:7: EliasCore.RequestPool (module)\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  9 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/request_pool.ex:9: Elias.RequestPool (module)\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  9 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/request_consumer.ex:9: Elias.RequestConsumer (module)\n\n    error: module Plug.Router is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  7 │   use Plug.Router\n    │   ^^^^^^^^^^^^^^^\n    │\n    └─ lib/apemacs_router.ex:7: Elias.ApeMacsRouter (module)\n\n\n== Compilation error in file lib/scheduler.ex ==\n** (CompileError) lib/scheduler.ex: cannot compile module Elias.Scheduler (errors have been logged)\n    (elixir 1.18.4) expanding macro: Kernel.use/2\n    lib/scheduler.ex:12: Elias.Scheduler (module)\n",
+      "error": "Command failed with exit code 0",
+      "timestamp": "2025-08-28T15:18:44-07:00"
+    },
+    {
+      "name": "manager_modules_exist",
+      "description": "Check all manager modules exist",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:44-07:00"
+    },
+    {
+      "name": "manager_compilation",
+      "description": "Test manager module compilation",
+      "status": "failed",
+      "duration_seconds": 1,
+      "output": "==> apemacs_client\nCompiling 2 files (.ex)\nGenerated apemacs_client app\n==> elias_server\nCompiling 9 files (.ex)\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 346 │       Logger.warn(\"UIM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uim.ex:346:14: EliasServer.Manager.UIM.load_uim_config/0\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 350 │     Logger.warn(\"URM handling #{length(alerts)} resource alerts\")\n     │            ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:350:12: EliasServer.Manager.URM.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 203 │           Logger.warn(\"UCM request #{request_id} exceeded max retries\")\n     │                  ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ucm.ex:203:18: EliasServer.Manager.UCM.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 289 │       Logger.warn(\"UAM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:289:14: EliasServer.Manager.UAM.load_uam_config/0\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 353 │       Logger.warn(\"Resource Alert: #{alert.type} - #{alert.message}\")\n     │              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:353:14: EliasServer.Manager.URM.handle_info/2\n\n     warning: variable \"timeout\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 226 │     timeout = Map.get(rules, :node_timeout, 30000)\n     │     ~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ufm.ex:226:5: EliasServer.Manager.UFM.perform_heartbeat_checks/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 251 │       Logger.warn(\"UCM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ucm.ex:251:14: EliasServer.Manager.UCM.load_ucm_config/0\n\n     warning: variable \"request_type\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 287 │   defp select_optimal_node(request_type, requirements, state) do\n     │                            ~~~~~~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ufm.ex:287:28: EliasServer.Manager.UFM.select_optimal_node/3\n\n     warning: variable \"config\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 393 │   defp perform_application_discovery(config) do\n     │                                      ~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uim.ex:393:38: EliasServer.Manager.UIM.perform_application_discovery/1\n\n     warning: variable \"topology\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 326 │   defp broadcast_topology_update(topology) do\n     │                                  ~~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ufm.ex:326:34: EliasServer.Manager.UFM.broadcast_topology_update/1\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 367 │           Logger.warn(\"URM no specific mitigation for alert type: #{alert.type}\")\n     │                  ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:367:18: EliasServer.Manager.URM.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 355 │         Logger.warn(\"UAM: MLPythonPort not available, using simulation\")\n     │                ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:355:16: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"interface_type\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 465 │   defp select_interface_template(app_category, interface_type, state) do\n     │                                                ~~~~~~~~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uim.ex:465:48: EliasServer.Manager.UIM.select_interface_template/3\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 384 │                 Logger.warn(\"UAM: Failed to load ML model #{model_name}, using simulation\")\n     │                        ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:384:24: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 433 │       Logger.warn(\"URM spec file not found, using default configuration\")\n     │              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:433:14: EliasServer.Manager.URM.load_urm_config/0\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 371 │           Logger.warn(\"UCM cannot broadcast to #{manager} - not running\")\n     │                  ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ucm.ex:371:18: EliasServer.Manager.UCM.broadcast_to_managers/3\n\n     warning: variable \"error\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 383 │               error ->\n     │               ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:383:15: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"state\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 342 │   defp process_media_swap(source_media, target_media, swap_type, state) do\n     │                                                                  ~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:342:66: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: variable \"history\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n     │\n 595 │   defp generate_resource_optimizations(current_metrics, history) do\n     │                                                         ~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:595:57: EliasServer.Manager.URM.generate_resource_optimizations/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 495 │     Logger.warn(\"UAM handling creative app crash: #{app_name}\")\n     │            ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:495:12: EliasServer.Manager.UAM.handle_app_crash/2\n\n     warning: the following clause will never match:\n\n         {:error, reason}\n\n     because it attempts to match on the result of:\n\n         perform_dependency_update(dependency_name, current_info, target_version)\n\n     which has type:\n\n         dynamic(\n           {:ok,\n            %{\n              ...,\n              current_version: term(),\n              last_checked: %DateTime{\n                calendar: term(),\n                day: term(),\n                hour: term(),\n                microsecond: term(),\n                minute: term(),\n                month: term(),\n                second: term(),\n                std_offset: term(),\n                time_zone: term(),\n                utc_offset: term(),\n                year: term(),\n                zone_abbr: term()\n              },\n              status: :up_to_date\n            }}\n         )\n\n     typing violation found at:\n     │\n 147 │           {:error, reason} ->\n     │           ~~~~~~~~~~~~~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/urm.ex:147: EliasServer.Manager.URM.handle_call/3\n\n     warning: the following clause will never match:\n\n         {:error, reason}\n\n     because it attempts to match on the result of:\n\n         apply_interface_optimizations(interface_record, optimization_data, state)\n\n     which has type:\n\n         dynamic({:ok, %{..., customizations: term()}})\n\n     typing violation found at:\n     │\n 182 │           {:error, reason} ->\n     │           ~~~~~~~~~~~~~~~~~~~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uim.ex:182: EliasServer.Manager.UIM.handle_call/3\n\n     warning: YamlElixir.read_from_string/1 is undefined (module YamlElixir is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 165 │     frontmatter = YamlElixir.read_from_string(frontmatter_str)\n     │                              ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ufm.ex:165:30: EliasServer.Manager.UFM.parse_md_rules/1\n\n     warning: Jason.encode!/1 is undefined (module Jason is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 213 │       encoded_data = Jason.encode!(data)\n     │                            ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/geppetto.ex:213:28: EliasServer.Geppetto.send_to_python_port/2\n\n     warning: Jason.decode!/1 is undefined (module Jason is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)\n     │\n 227 │       response = Jason.decode!(data)\n     │                        ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/geppetto.ex:227:24: EliasServer.Geppetto.decode_python_response/1\n\n     warning: EliasCore.ApeHarmony.record_event/2 is undefined (module EliasCore.ApeHarmony is not available or is yet to be defined)\n     │\n 334 │     EliasCore.ApeHarmony.record_event(\"ufm_#{event_type}\", %{\n     │                          ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/ufm.ex:334:26: EliasServer.Manager.UFM.log_to_blockchain/2\n\n     warning: EliasCore.MLPythonPort.infer/3 is undefined (module EliasCore.MLPythonPort is not available or is yet to be defined)\n     │\n 367 │         case EliasCore.MLPythonPort.infer(model_name, input_data, 60_000) do\n     │                                     ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:367:37: EliasServer.Manager.UAM.process_media_swap/4\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:378:45: EliasServer.Manager.UAM.process_media_swap/4\n\n     warning: EliasCore.MLPythonPort.load_model/2 is undefined (module EliasCore.MLPythonPort is not available or is yet to be defined)\n     │\n 375 │             case EliasCore.MLPythonPort.load_model(model_name, model_path) do\n     │                                         ~\n     │\n     └─ (elias_server 0.1.0) lib/elias_server/manager/uam.ex:375:41: EliasServer.Manager.UAM.process_media_swap/4\n\nGenerated elias_server app\n==> elias_core\nCompiling 23 files (.ex)\n    warning: variable \"opts\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    │\n 39 │   def init(opts) do\n    │            ~~~~\n    │\n    └─ lib/elias_core/ml_python_port.ex:39:12: EliasCore.MLPythonPort.init/1\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 225 │         Logger.warn(\"Heartbeat failed - Python port may be unresponsive\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:225:16: EliasCore.MLPythonPort.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 237 │         Logger.warn(\"Request #{request_id} timed out\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:237:16: EliasCore.MLPythonPort.handle_info/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 494 │         Logger.warn(\"Received response for unknown request: #{request_id}\")\n     │                ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:494:16: EliasCore.MLPythonPort.handle_python_response/2\n\n     warning: Logger.warn/1 is deprecated. Use Logger.warning/2 instead\n     │\n 547 │     Logger.warn(\"Received unhandled Python response: #{inspect(response)}\")\n     │            ~\n     │\n     └─ lib/elias_core/ml_python_port.ex:547:12: EliasCore.MLPythonPort.handle_python_response/2\n\n     warning: function start_http_server/1 is unused\n     │\n 465 │   defp start_http_server(port) do\n     │        ~\n     │\n     └─ lib/apemacs.ex:465:8: Elias.ApeMacs (module)\n\n    warning: variable \"opts\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    │\n 47 │   def init(opts) do\n    │            ~~~~\n    │\n    └─ lib/elias_core/p2p.ex:47:12: EliasCore.P2P.init/1\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  9 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/request_consumer.ex:9: Elias.RequestConsumer (module)\n\n    error: module Quantum is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n 12 │   use Quantum, otp_app: :elias\n    │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    │\n    └─ lib/scheduler.ex:12: Elias.Scheduler (module)\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  9 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/request_pool.ex:9: Elias.RequestPool (module)\n\n    error: module Plug.Router is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n 12 │   use Plug.Router\n    │   ^^^^^^^^^^^^^^^\n    │\n    └─ lib/router.ex:12: Elias.Router (module)\n\n    error: module Plug.Router is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  7 │   use Plug.Router\n    │   ^^^^^^^^^^^^^^^\n    │\n    └─ lib/apemacs_router.ex:7: Elias.ApeMacsRouter (module)\n\n    error: module GenStage is not loaded and could not be found. This may be happening because the module you are trying to load directly or indirectly depends on the current module\n    │\n  7 │   use GenStage\n    │   ^^^^^^^^^^^^\n    │\n    └─ lib/elias_core/request_pool.ex:7: EliasCore.RequestPool (module)\n\n\n== Compilation error in file lib/request_consumer.ex ==\n** (CompileError) lib/request_consumer.ex: cannot compile module Elias.RequestConsumer (errors have been logged)\n    (elixir 1.18.4) expanding macro: Kernel.use/1\n    lib/request_consumer.ex:9: Elias.RequestConsumer (module)\n",
+      "error": "Command failed with exit code 0",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "manager_syntax_check",
+      "description": "Check manager module syntax",
+      "status": "failed",
+      "duration_seconds": 0,
+      "output": "No file named -c\n",
+      "error": "Command failed with exit code 0",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "ml_python_available",
+      "description": "Check Python3 availability",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "Python 3.13.5\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "ml_script_exists",
+      "description": "Check ML interface script exists",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "ml_python_basic_test",
+      "description": "Test ML Python script basic functionality",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "{\"action\": \"heartbeat_response\", \"timestamp\": \"2025-08-28T15:18:45.639347\", \"loaded_models\": []}\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "ml_port_module_compilation",
+      "description": "Test MLPythonPort module compilation",
+      "status": "failed",
+      "duration_seconds": 0,
+      "output": "No file named -c\n",
+      "error": "Command failed with exit code 0",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "erlang_cookie_exists",
+      "description": "Check Erlang cookie exists",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:45-07:00"
+    },
+    {
+      "name": "hostname_resolution",
+      "description": "Test hostname resolution",
+      "status": "passed",
+      "duration_seconds": 5,
+      "output": "ping: cannot resolve gracey.local: Unknown host\nPING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.160 ms\n\n--- 127.0.0.1 ping statistics ---\n1 packets transmitted, 1 packets received, 0.0% packet loss\nround-trip min/avg/max/stddev = 0.160/0.160/0.160/0.000 ms\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:50-07:00"
+    },
+    {
+      "name": "epmd_functionality",
+      "description": "Test EPMD daemon functionality",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "epmd: up and running on port 4369 with data:\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:50-07:00"
+    },
+    {
+      "name": "node_name_format",
+      "description": "Verify node name format",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "elias@gracey.local\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:50-07:00"
+    },
+    {
+      "name": "local_cluster_dependency",
+      "description": "Check LocalCluster dependency",
+      "status": "passed",
+      "duration_seconds": 1,
+      "output": "LocalCluster not in deps (may be dev only)\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "federation_config",
+      "description": "Check federation configuration",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "ufm_manager_exists",
+      "description": "Check UFM (Federation Manager) exists",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "deployment_scripts_exist",
+      "description": "Check deployment scripts exist",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "deployment_scripts_executable",
+      "description": "Check deployment scripts are executable",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "monitoring_system_exists",
+      "description": "Check monitoring system exists",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "tiki_specs_exist",
+      "description": "Check Tiki specification files exist",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "mix_config_valid",
+      "description": "Test Mix configuration validity",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "Failed to write log message to stdout, trying stderr\n\n15:18:51.753 [error] Writer crashed (:epipe)\n** (ErlangError) Erlang error: :terminated\n    (stdlib 7.0.2) io.erl:202: :io.put_chars(:standard_io, [[[], \"mix app.config        # Configures all registered apps\"], 10])\n    (elixir 1.18.4) lib/enum.ex:987: Enum.\"-each/2-lists^foreach/1-0-\"/2\n    (mix 1.18.4) lib/mix/tasks/help.ex:53: Mix.Tasks.Help.run/1\n    (mix 1.18.4) lib/mix/task.ex:495: anonymous fn/3 in Mix.Task.run_task/5\n    (mix 1.18.4) lib/mix/cli.ex:107: Mix.CLI.run_task/2\n    /opt/homebrew/bin/mix:2: (file)\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "environment_configs",
+      "description": "Check environment configurations",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "cookie_permissions",
+      "description": "Check Erlang cookie has correct permissions",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "no_hardcoded_secrets",
+      "description": "Check for hardcoded secrets in code",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "secure_ml_interface",
+      "description": "Check ML interface security",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:51-07:00"
+    },
+    {
+      "name": "compilation_time",
+      "description": "Test compilation performance",
+      "status": "failed",
+      "duration_seconds": 1,
+      "output": "\nreal\t0m0.632s\nuser\t0m1.653s\nsys\t0m0.764s\n",
+      "error": "Command failed with exit code 0",
+      "timestamp": "2025-08-28T15:18:52-07:00"
+    },
+    {
+      "name": "memory_usage_check",
+      "description": "Check basic memory requirements",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "Memory test OK\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:52-07:00"
+    },
+    {
+      "name": "disk_space_check",
+      "description": "Check disk space usage",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:52-07:00"
+    },
+    {
+      "name": "uam_ml_integration_test",
+      "description": "Test UAM-ML integration test script",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:52-07:00"
+    },
+    {
+      "name": "test_suite_execution",
+      "description": "Execute built-in test suite",
+      "status": "passed",
+      "duration_seconds": 1,
+      "output": "==> elias_server\n==> elias_core\nCompiling 23 files (.ex)\nTests completed with warnings\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:53-07:00"
+    },
+    {
+      "name": "distributed_test_existence",
+      "description": "Check distributed test files exist",
+      "status": "passed",
+      "duration_seconds": 0,
+      "output": "\n",
+      "error": "",
+      "timestamp": "2025-08-28T15:18:53-07:00"
+    },
+  ],
+  "summary": {
+    "total_tests": 0,
+    "passed_tests": 0,
+    "failed_tests": 0,
+    "test_duration_seconds": 0,
+    "overall_status": "unknown"
+  }
+}

@@ -1,0 +1,616 @@
+#!/usr/bin/env elixir
+
+# UFF Training System CLI
+# Demonstrates UFF deep-seq 6.7B-FP16 model for component generation
+# Integrates with Tank Building methodology and Claude supervision
+
+# Load UFF training system
+Code.require_file("apps/elias_server/lib/uff_training/uff_supervisor.ex")
+Code.require_file("apps/elias_server/lib/uff_training/session_capture.ex")
+Code.require_file("apps/elias_server/lib/uff_training/training_coordinator.ex")
+Code.require_file("apps/elias_server/lib/uff_training/model_server.ex")
+Code.require_file("apps/elias_server/lib/uff_training/ufm_integration.ex")
+Code.require_file("apps/elias_server/lib/uff_training/metrics_collector.ex")
+
+# Load existing converter components for compatibility
+Code.require_file("apps/elias_server/lib/multi_format_converter/atomic_component.ex")
+
+defmodule UFFTrainingCLI do
+  @moduledoc """
+  UFF Training System Command Line Interface
+  
+  Demonstrates UFF (UFM Federation Framework) deep-seq 6.7B-FP16 model
+  for autonomous component generation using Tank Building methodology.
+  """
+  
+  require Logger
+  
+  def main(args \\ []) do
+    print_header()
+    
+    case parse_args(args) do
+      {:ok, command, options} ->
+        execute_command(command, options)
+        
+      {:error, :no_command} ->
+        print_usage()
+        
+      {:error, reason} ->
+        IO.puts("❌ Error: #{reason}")
+        print_usage()
+    end
+  end
+  
+  defp print_header do
+    IO.puts("")
+    IO.puts("🤖 UFF Training System v1.0.0-alpha")
+    IO.puts("🧠 UFM Federation Framework - Deep-seq 6.7B-FP16")
+    IO.puts("🏗️  Tank Building Methodology + Claude Supervision")
+    IO.puts("🔗 ELIAS Federation Integration Ready")
+    IO.puts("=" |> String.duplicate(60))
+  end
+  
+  defp parse_args([]), do: {:error, :no_command}
+  
+  defp parse_args([command | rest]) do
+    case command do
+      "start" -> {:ok, :start, parse_start_options(rest)}
+      "generate" -> {:ok, :generate, parse_generate_options(rest)}
+      "train" -> {:ok, :train, parse_train_options(rest)}
+      "status" -> {:ok, :status, []}
+      "metrics" -> {:ok, :metrics, parse_metrics_options(rest)}
+      "deploy" -> {:ok, :deploy, parse_deploy_options(rest)}
+      "help" -> {:ok, :help, []}
+      unknown -> {:error, "Unknown command: #{unknown}"}
+    end
+  end
+  
+  defp execute_command(:start, options) do
+    IO.puts("🚀 Starting UFF Training System...")
+    
+    # Start the training system supervisor
+    {:ok, _pid} = UFFTraining.UFFSupervisor.start_link([])
+    
+    # Initialize UFF training
+    UFFTraining.UFFSupervisor.start_uff_training()
+    
+    IO.puts("✅ UFF Training System started successfully")
+    IO.puts("📊 Training data capture: Active")
+    IO.puts("🧠 UFF Model Server: Loading...")
+    IO.puts("🔗 UFM Integration: Connecting...")
+    IO.puts("📈 Metrics Collection: Active")
+    
+    # Wait for model to load
+    :timer.sleep(3000)
+    
+    performance = UFFTraining.ModelServer.get_model_performance()
+    IO.puts("🧠 UFF Model: #{if performance.model_loaded, do: "Ready", else: "Loading"}")
+    
+    if Keyword.get(options, :interactive, false) do
+      run_interactive_mode()
+    else
+      IO.puts("\n💡 Use 'uff_cli generate' to create components or 'uff_cli help' for more options")
+    end
+  end
+  
+  defp execute_command(:generate, options) do
+    component_type = Keyword.get(options, :type, "FileProcessor")
+    stage = Keyword.get(options, :stage, :stage_1)
+    supervision = Keyword.get(options, :supervision, :claude_guided)
+    
+    IO.puts("🧠 Generating #{component_type} component (#{stage}) with #{supervision}...")
+    
+    # Start training system if not running
+    ensure_training_system_started()
+    
+    specification = %{
+      name: component_type,
+      responsibility: "Process #{String.downcase(component_type)} data atomically",
+      stage: stage,
+      requirements: ["single responsibility", "error handling", "real verification testing"]
+    }
+    
+    case UFFTraining.ModelServer.generate_component(specification, stage, supervision) do
+      {:ok, component_code, metadata} ->
+        IO.puts("✅ Component generated successfully!")
+        IO.puts("📊 Generation metadata:")
+        IO.puts("  • Generation method: #{metadata.generation_method}")
+        IO.puts("  • Tank Building stage: #{metadata.tank_building_stage}")
+        IO.puts("  • Supervision level: #{metadata.supervision_level}")
+        IO.puts("  • Generated at: #{metadata.generated_at}")
+        
+        if Keyword.get(options, :show_code, false) do
+          IO.puts("\n📄 Generated Component Code:")
+          IO.puts("=" |> String.duplicate(50))
+          IO.puts(component_code)
+          IO.puts("=" |> String.duplicate(50))
+        end
+        
+        # Save component to file
+        filename = "generated_#{String.downcase(component_type)}_#{stage}.ex"
+        File.write!(filename, component_code)
+        IO.puts("💾 Component saved to: #{filename}")
+        
+      {:error, :model_not_loaded} ->
+        IO.puts("❌ UFF Model not loaded. Please run 'uff_cli start' first.")
+        
+      {:error, reason} ->
+        IO.puts("❌ Generation failed: #{inspect(reason)}")
+    end
+  end
+  
+  defp execute_command(:train, options) do
+    IO.puts("🏋️  Starting UFF Training Session...")
+    
+    ensure_training_system_started()
+    
+    session_type = Keyword.get(options, :type, :component_generation)
+    stage = Keyword.get(options, :stage, :stage_3)
+    
+    {:ok, session_id} = UFFTraining.SessionCapture.start_session(stage, session_type, %{
+      purpose: "CLI-initiated training session",
+      training_focus: "component generation improvement"
+    })
+    
+    IO.puts("📋 Training session started: #{session_id}")
+    
+    # Simulate training activities
+    simulate_training_session(session_id, options)
+    
+    # Complete session
+    final_metrics = %{
+      components_generated: 3,
+      quality_improvement: 0.15,
+      supervision_effectiveness: 0.92
+    }
+    
+    {:ok, reward_signals} = UFFTraining.SessionCapture.complete_session(session_id, final_metrics)
+    
+    IO.puts("✅ Training session completed!")
+    IO.puts("🎯 Total Reward Score: #{Float.round(reward_signals.total_reward, 1)}")
+    IO.puts("📊 Component Atomicity: #{Float.round(reward_signals.component_atomicity_score, 2)}")
+    IO.puts("📋 TIKI Compliance: #{Float.round(reward_signals.tiki_compliance_score, 2)}")
+    IO.puts("🔗 Pipeline Integration: #{Float.round(reward_signals.pipeline_integration_score, 2)}")
+    
+    # Export training data
+    {:ok, training_data_path} = UFFTraining.SessionCapture.export_training_data(:json)
+    IO.puts("📁 Training data exported to: #{training_data_path}")
+  end
+  
+  defp execute_command(:status, _options) do
+    IO.puts("📊 UFF Training System Status")
+    IO.puts("-" |> String.duplicate(40))
+    
+    ensure_training_system_started()
+    
+    # Get training coordinator status
+    training_status = UFFTraining.TrainingCoordinator.get_training_status()
+    
+    IO.puts("🧠 Model Status:")
+    IO.puts("  • Version: #{training_status.model_version}")
+    IO.puts("  • Training Active: #{training_status.training_active}")
+    IO.puts("  • Pipeline Status: #{training_status.pipeline_status}")
+    IO.puts("  • Sessions Captured: #{training_status.sessions_captured}")
+    IO.puts("  • Model Checkpoints: #{training_status.model_checkpoints}")
+    
+    # Get model performance
+    model_performance = UFFTraining.ModelServer.get_model_performance()
+    
+    IO.puts("\n⚡ Model Performance:")
+    IO.puts("  • Model Loaded: #{model_performance.model_loaded}")
+    IO.puts("  • Inference Count: #{model_performance.inference_count}")
+    IO.puts("  • Avg Inference Time: #{Float.round(model_performance.avg_inference_time_ms, 1)}ms")
+    
+    # Get UFM status
+    ufm_status = UFFTraining.UFMIntegration.get_ufm_status()
+    
+    IO.puts("\n🔗 UFM Federation Status:")
+    IO.puts("  • Federation ID: #{ufm_status.federation_id}")
+    IO.puts("  • Registered Nodes: #{ufm_status.registered_nodes}")
+    IO.puts("  • Active Deployments: #{ufm_status.active_deployments}")
+    IO.puts("  • Sync Status: #{ufm_status.sync_status}")
+    
+    # Get training statistics
+    training_stats = UFFTraining.SessionCapture.get_training_stats()
+    
+    IO.puts("\n📈 Training Statistics:")
+    IO.puts("  • Total Sessions: #{training_stats.total_sessions}")
+    IO.puts("  • Successful Sessions: #{training_stats.successful_sessions}")
+    IO.puts("  • Average Reward: #{Float.round(training_stats.avg_reward_score, 1)}")
+    IO.puts("  • Components Built: #{training_stats.total_components_built}")
+  end
+  
+  defp execute_command(:metrics, options) do
+    IO.puts("📊 UFF Training Metrics")
+    IO.puts("-" |> String.duplicate(30))
+    
+    ensure_training_system_started()
+    
+    time_range = Keyword.get(options, :range, :last_24h)
+    
+    case Keyword.get(options, :type, :dashboard) do
+      :dashboard ->
+        show_dashboard_metrics()
+        
+      :report ->
+        show_metrics_report(time_range)
+        
+      :export ->
+        export_metrics_data(options)
+        
+      _ ->
+        show_dashboard_metrics()
+    end
+  end
+  
+  defp execute_command(:deploy, options) do
+    model_version = Keyword.get(options, :version, "latest")
+    
+    IO.puts("🚀 Deploying UFF Model #{model_version} to UFM Federation...")
+    
+    ensure_training_system_started()
+    
+    deployment_config = %{
+      replicas: Keyword.get(options, :replicas, 3),
+      resource_allocation: %{
+        memory_gb: 16,
+        gpu_memory_gb: 14,
+        cpu_cores: 4
+      },
+      load_balancing: :round_robin
+    }
+    
+    case UFFTraining.TrainingCoordinator.deploy_to_ufm_federation(model_version) do
+      {:ok, deployment_info} ->
+        IO.puts("✅ Deployment successful!")
+        IO.puts("📊 Deployment Details:")
+        IO.puts("  • Model Version: #{deployment_info.model_version}")
+        IO.puts("  • Deployed At: #{deployment_info.deployed_at}")
+        IO.puts("  • UFM Nodes: #{Enum.join(deployment_info.ufm_nodes, ", ")}")
+        IO.puts("  • Status: #{deployment_info.deployment_status}")
+        IO.puts("  • Endpoint: #{deployment_info.model_endpoint}")
+        
+      {:error, reason} ->
+        IO.puts("❌ Deployment failed: #{inspect(reason)}")
+    end
+  end
+  
+  defp execute_command(:help, _options) do
+    print_header()
+    print_usage()
+    print_detailed_help()
+  end
+  
+  defp print_usage do
+    IO.puts("\n📖 Usage:")
+    IO.puts("  uff_cli <command> [options]")
+    IO.puts("")
+    IO.puts("🔧 Available Commands:")
+    IO.puts("  start        - Start UFF training system")
+    IO.puts("  generate     - Generate component using UFF model")
+    IO.puts("  train        - Run training session")
+    IO.puts("  status       - Show system status")
+    IO.puts("  metrics      - Display training metrics")
+    IO.puts("  deploy       - Deploy model to UFM federation")
+    IO.puts("  help         - Show this help")
+  end
+  
+  defp print_detailed_help do
+    IO.puts("\n📋 Command Details:")
+    IO.puts("")
+    
+    IO.puts("start [--interactive]")
+    IO.puts("  Start the UFF training system with all components")
+    IO.puts("  --interactive: Run in interactive mode")
+    IO.puts("")
+    
+    IO.puts("generate --type <ComponentType> [--stage <stage>] [--supervision <level>] [--show-code]")
+    IO.puts("  Generate a component using UFF model")
+    IO.puts("  --type: Component type (e.g., FileProcessor, DataValidator)")
+    IO.puts("  --stage: Tank Building stage (stage_1, stage_2, stage_3, stage_4)")
+    IO.puts("  --supervision: Claude supervision level (claude_guided, claude_supervised)")
+    IO.puts("  --show-code: Display generated code in terminal")
+    IO.puts("")
+    
+    IO.puts("train [--type <session_type>] [--stage <stage>]")
+    IO.puts("  Run a UFF training session")
+    IO.puts("  --type: Training session type (component_generation, architectural_decisions)")
+    IO.puts("  --stage: Tank Building stage focus")
+    IO.puts("")
+    
+    IO.puts("metrics [--type <metrics_type>] [--range <time_range>]")
+    IO.puts("  Display training metrics and performance data")
+    IO.puts("  --type: dashboard, report, export")
+    IO.puts("  --range: last_hour, last_24h, last_week, last_month")
+    IO.puts("")
+    
+    IO.puts("deploy [--version <model_version>] [--replicas <count>]")
+    IO.puts("  Deploy UFF model to UFM federation")
+    IO.puts("  --version: Model version to deploy (default: latest)")
+    IO.puts("  --replicas: Number of replicas (default: 3)")
+    IO.puts("")
+    
+    IO.puts("💡 Examples:")
+    IO.puts("  uff_cli start --interactive")
+    IO.puts("  uff_cli generate --type DataProcessor --stage stage_2 --show-code")
+    IO.puts("  uff_cli train --type component_generation --stage stage_3")
+    IO.puts("  uff_cli metrics --type report --range last_week")
+    IO.puts("  uff_cli deploy --version 0.2.0 --replicas 5")
+    IO.puts("")
+    
+    IO.puts("🎯 Tank Building Integration:")
+    IO.puts("  • Stage 1: Brute force atomic components")
+    IO.puts("  • Stage 2: Extended functionality")
+    IO.puts("  • Stage 3: Production optimizations")  
+    IO.puts("  • Stage 4: Iterative improvements")
+    IO.puts("")
+    
+    IO.puts("🧠 Claude Supervision:")
+    IO.puts("  • Architectural review and guidance")
+    IO.puts("  • Code quality assessment")
+    IO.puts("  • Tank Building methodology compliance")
+    IO.puts("  • Component atomicity validation")
+  end
+  
+  # Helper Functions
+  
+  defp ensure_training_system_started do
+    # Check if system is already running, start if needed
+    case Process.whereis(UFFTraining.UFFSupervisor) do
+      nil ->
+        {:ok, _pid} = UFFTraining.UFFSupervisor.start_link([])
+        UFFTraining.UFFSupervisor.start_uff_training()
+        :timer.sleep(1000)  # Give it time to initialize
+        
+      _pid ->
+        :ok  # Already running
+    end
+  end
+  
+  defp run_interactive_mode do
+    IO.puts("\n🎮 Interactive Mode - UFF Training System")
+    IO.puts("Type 'help' for commands or 'exit' to quit")
+    
+    interactive_loop()
+  end
+  
+  defp interactive_loop do
+    input = IO.gets("uff> ") |> String.trim()
+    
+    case input do
+      "exit" -> 
+        IO.puts("👋 Goodbye!")
+        
+      "help" ->
+        print_interactive_help()
+        interactive_loop()
+        
+      "status" ->
+        execute_command(:status, [])
+        interactive_loop()
+        
+      "generate" <> rest ->
+        options = parse_interactive_generate(rest)
+        execute_command(:generate, options)
+        interactive_loop()
+        
+      _ ->
+        IO.puts("❓ Unknown command: #{input}")
+        IO.puts("💡 Type 'help' for available commands")
+        interactive_loop()
+    end
+  end
+  
+  defp print_interactive_help do
+    IO.puts("\n📋 Interactive Commands:")
+    IO.puts("  status       - Show system status")
+    IO.puts("  generate     - Generate component (basic)")
+    IO.puts("  help         - Show this help")
+    IO.puts("  exit         - Exit interactive mode")
+  end
+  
+  defp parse_interactive_generate(args_string) do
+    # Simple parsing for interactive mode
+    [type: "InteractiveComponent", stage: :stage_1, supervision: :claude_guided, show_code: true]
+  end
+  
+  defp simulate_training_session(session_id, _options) do
+    IO.puts("🔄 Simulating training activities...")
+    
+    # Simulate architectural decisions
+    UFFTraining.SessionCapture.log_architectural_decision(
+      session_id,
+      "Use GenServer for stateful component",
+      "GenServer provides robust state management and OTP supervision",
+      ["Agent", "raw process", "ETS table"]
+    )
+    
+    :timer.sleep(1000)
+    IO.puts("  ✅ Architectural decision logged")
+    
+    # Simulate code pattern learning
+    UFFTraining.SessionCapture.log_code_pattern(
+      session_id,
+      :error_handling,
+      "try/rescue with detailed logging",
+      0.85
+    )
+    
+    :timer.sleep(1000)
+    IO.puts("  ✅ Code pattern logged")
+    
+    # Simulate success metrics
+    UFFTraining.SessionCapture.log_success_metric(
+      session_id,
+      :component_quality,
+      0.92,
+      0.80
+    )
+    
+    :timer.sleep(1000)
+    IO.puts("  ✅ Success metric logged")
+    
+    # Simulate Claude supervision
+    UFFTraining.SessionCapture.log_claude_feedback(
+      session_id,
+      :architectural_review,
+      "Component follows Tank Building principles well, consider adding more comprehensive error messages",
+      :architectural
+    )
+    
+    :timer.sleep(1000)
+    IO.puts("  ✅ Claude feedback logged")
+  end
+  
+  defp show_dashboard_metrics do
+    dashboard_data = UFFTraining.MetricsCollector.get_dashboard_metrics()
+    
+    IO.puts("📊 Real-time Dashboard:")
+    IO.puts("  🏋️  Training: #{dashboard_data.training_status.active_sessions} active sessions")
+    IO.puts("  ⚡ Inference: #{dashboard_data.inference_status.requests_per_minute} req/min")
+    IO.puts("  🎯 Quality: #{Float.round(dashboard_data.quality_status.avg_component_quality, 2)} avg score")
+    IO.puts("  🧠 Supervision: #{dashboard_data.supervision_status.supervision_requests} requests/hour")
+    IO.puts("  🔗 Federation: #{dashboard_data.federation_health.healthy_nodes}/#{dashboard_data.federation_health.total_nodes} nodes healthy")
+    IO.puts("  🚨 Alerts: #{dashboard_data.alert_summary.active_alerts} active (#{dashboard_data.alert_summary.critical_alerts} critical)")
+  end
+  
+  defp show_metrics_report(time_range) do
+    report = UFFTraining.MetricsCollector.get_metrics_report(time_range)
+    
+    IO.puts("📋 Metrics Report (#{time_range}):")
+    IO.puts("  Generated: #{report.report_generated_at}")
+    IO.puts("")
+    IO.puts("  🏋️  Training Summary:")
+    IO.puts("    • Sessions: #{report.training_summary.total_training_sessions}")
+    IO.puts("    • Avg Loss: #{report.training_summary.avg_loss}")
+    IO.puts("    • Training Hours: #{report.training_summary.training_time_hours}")
+    IO.puts("")
+    IO.puts("  ⚡ Inference Summary:")  
+    IO.puts("    • Requests: #{report.inference_summary.total_requests}")
+    IO.puts("    • Avg Latency: #{report.inference_summary.avg_latency_ms}ms")
+    IO.puts("    • Success Rate: #{Float.round(report.inference_summary.success_rate * 100, 1)}%")
+    IO.puts("")
+    IO.puts("  🎯 Quality Summary:")
+    IO.puts("    • Components Analyzed: #{report.quality_summary.components_analyzed}")
+    IO.puts("    • Avg Quality Score: #{report.quality_summary.avg_quality_score}")
+    IO.puts("    • Tank Building Compliance: #{Float.round(report.quality_summary.tank_building_compliance * 100, 1)}%")
+  end
+  
+  defp export_metrics_data(options) do
+    format = Keyword.get(options, :format, :json)
+    time_range = Keyword.get(options, :range, :last_week)
+    
+    case UFFTraining.MetricsCollector.export_metrics(format, time_range) do
+      {:ok, filepath} ->
+        IO.puts("✅ Metrics exported to: #{filepath}")
+        
+      {:error, reason} ->
+        IO.puts("❌ Export failed: #{inspect(reason)}")
+    end
+  end
+  
+  # Option parsing helpers
+  
+  defp parse_start_options(options) do
+    parse_options(options, [interactive: false])
+  end
+  
+  defp parse_generate_options(options) do
+    parse_options(options, [
+      type: "GeneratedComponent",
+      stage: :stage_1,
+      supervision: :claude_guided,
+      show_code: false
+    ])
+  end
+  
+  defp parse_train_options(options) do
+    parse_options(options, [
+      type: :component_generation,
+      stage: :stage_3
+    ])
+  end
+  
+  defp parse_metrics_options(options) do
+    parse_options(options, [
+      type: :dashboard,
+      range: :last_24h,
+      format: :json
+    ])
+  end
+  
+  defp parse_deploy_options(options) do
+    parse_options(options, [
+      version: "latest",
+      replicas: 3
+    ])
+  end
+  
+  defp parse_options([], defaults), do: defaults
+  
+  defp parse_options([option | rest], defaults) do
+    case option do
+      "--interactive" -> parse_options(rest, Keyword.put(defaults, :interactive, true))
+      "--show-code" -> parse_options(rest, Keyword.put(defaults, :show_code, true))
+      "--type" -> parse_option_value(rest, defaults, :type)
+      "--stage" -> parse_option_value(rest, defaults, :stage, &parse_stage/1)
+      "--supervision" -> parse_option_value(rest, defaults, :supervision, &parse_supervision/1)
+      "--range" -> parse_option_value(rest, defaults, :range, &parse_time_range/1)
+      "--format" -> parse_option_value(rest, defaults, :format, &parse_format/1)
+      "--version" -> parse_option_value(rest, defaults, :version)
+      "--replicas" -> parse_option_value(rest, defaults, :replicas, &String.to_integer/1)
+      _ -> parse_options(rest, defaults)
+    end
+  end
+  
+  defp parse_option_value([value | rest], defaults, key, parser \\ &(&1)) do
+    parsed_value = try do
+      parser.(value)
+    rescue
+      _ -> value
+    end
+    
+    parse_options(rest, Keyword.put(defaults, key, parsed_value))
+  end
+  
+  defp parse_stage(stage_string) do
+    case stage_string do
+      "stage_1" -> :stage_1
+      "stage_2" -> :stage_2
+      "stage_3" -> :stage_3
+      "stage_4" -> :stage_4
+      _ -> :stage_1
+    end
+  end
+  
+  defp parse_supervision(supervision_string) do
+    case supervision_string do
+      "claude_guided" -> :claude_guided
+      "claude_supervised" -> :claude_supervised
+      "autonomous" -> :autonomous
+      _ -> :claude_guided
+    end
+  end
+  
+  defp parse_time_range(range_string) do
+    case range_string do
+      "last_hour" -> :last_hour
+      "last_24h" -> :last_24h
+      "last_week" -> :last_week
+      "last_month" -> :last_month
+      _ -> :last_24h
+    end
+  end
+  
+  defp parse_format(format_string) do
+    case format_string do
+      "json" -> :json
+      "csv" -> :csv
+      "elixir" -> :elixir
+      _ -> :json
+    end
+  end
+end
+
+# Run the CLI
+UFFTrainingCLI.main(System.argv())

@@ -1,0 +1,268 @@
+# URM.tiki - Universal Resource Manager Hierarchical Specification
+# Following Architect-recommended Tiki Language Methodology
+
+id: root
+name: "Universal Resource Manager"
+version: "2.0.0"
+architecture: "intelligent_resource_optimization_engine"
+metadata:
+  dependencies: ["system_resources", "network_connectivity", "file_system", "package_managers"]
+  performance:
+    latency_ms: 60
+    memory_mb: 1024
+    cpu_percent: 30
+    scalability: "concurrent_resource_monitoring"
+    monitoring_cycle_ms: 30000
+  input_types: ["resource_metrics", "download_requests", "dependency_updates", "optimization_commands"]
+  output_types: ["resource_alerts", "download_status", "dependency_reports", "optimization_results"]
+  failure_modes: ["resource_exhaustion", "download_failure", "dependency_conflict", "monitoring_disruption"]
+  tags: ["resources", "monitoring", "optimization", "dependencies"]
+  resource_config:
+    monitoring_interval_ms: 30000
+    max_concurrent_downloads: 5
+    resource_alert_enabled: true
+    prediction_window_hours: 24
+
+children:
+  # 1.0 - Resource Monitoring Engine
+  - id: "1.0"
+    name: "resource_monitoring_engine"
+    module: "EliasServer.Manager.URM.ResourceMonitor"
+    code_ref: "lib/elias_server/manager/urm.ex:210-240"
+    metadata:
+      dependencies: ["system_metrics", "alert_thresholds", "trend_analysis"]
+      performance: {latency_ms: 50, memory_mb: 128}
+      monitoring_targets: ["cpu", "memory", "storage", "network", "load_average"]
+    children:
+      - id: "1.1"
+        name: "metrics_collector"
+        functions: ["collect_resource_metrics/0", "monitor_resources/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:210-238"
+        metadata:
+          collection_frequency_ms: 5000
+          metrics: ["cpu_usage", "memory_usage", "storage_usage", "network_utilization"]
+      
+      - id: "1.2"
+        name: "alert_generator"
+        functions: ["check_resource_alerts/2", "handle_resource_alerts/2"]
+        code_ref: "lib/elias_server/manager/urm.ex:485-508"
+        metadata:
+          alert_types: ["high_cpu", "high_memory", "low_storage", "network_congestion"]
+          thresholds: {cpu: 80, memory: 85, storage: 90, network: 75}
+
+  # 2.0 - Download Management System
+  - id: "2.0"
+    name: "download_management_system"
+    module: "EliasServer.Manager.URM.DownloadManager"
+    code_ref: "lib/elias_server/manager/urm.ex:255-350"
+    metadata:
+      dependencies: ["network_connectivity", "storage_system", "priority_queuing"]
+      performance: {latency_ms: 100, memory_mb: 256}
+      concurrent_limit: 5
+    children:
+      - id: "2.1"
+        name: "download_queue_processor"
+        functions: ["request_download/3", "process_download_queue/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:86-119"
+        metadata:
+          queue_management: ["priority_based", "fifo_within_priority"]
+          priority_levels: ["critical", "high", "medium", "low"]
+        
+      - id: "2.2"
+        name: "download_executor"
+        functions: ["process_download/2", "track_download_progress/2"]
+        code_ref: "lib/elias_server/manager/urm.ex:298-346"
+        metadata:
+          progress_tracking: true
+          retry_logic: "exponential_backoff"
+          timeout_handling: 1800000
+
+  # 3.0 - Dependency Management System
+  - id: "3.0"
+    name: "dependency_management_system"
+    module: "EliasServer.Manager.URM.DependencyTracker"
+    code_ref: "lib/elias_server/manager/urm.ex:120-151"
+    metadata:
+      dependencies: ["package_repositories", "version_control", "security_scanning"]
+      performance: {latency_ms: 200, memory_mb: 192}
+      supported_systems: ["elixir_hex", "erlang_packages", "system_packages"]
+    children:
+      - id: "3.1"
+        name: "dependency_scanner"
+        functions: ["load_system_dependencies/0", "scan_dependency_health/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:438-463"
+        metadata:
+          scan_targets: ["elixir", "erlang", "system_libs", "security_vulnerabilities"]
+        
+      - id: "3.2"
+        name: "update_coordinator"
+        functions: ["update_dependency/2", "perform_dependency_update/3"]
+        code_ref: "lib/elias_server/manager/urm.ex:122-151"
+        metadata:
+          update_strategies: ["latest", "compatible", "security_only"]
+          rollback_capability: true
+
+  # 4.0 - Resource Optimization Engine
+  - id: "4.0"
+    name: "resource_optimization_engine"
+    module: "EliasServer.Manager.URM.OptimizationEngine"
+    code_ref: "lib/elias_server/manager/urm.ex:189-207"
+    metadata:
+      dependencies: ["resource_analysis", "optimization_algorithms", "system_tuning"]
+      performance: {latency_ms: 500, memory_mb: 128}
+      optimization_types: ["memory_cleanup", "cpu_throttle", "storage_cleanup", "network_tuning"]
+    children:
+      - id: "4.1"
+        name: "optimization_analyzer"
+        functions: ["generate_resource_optimizations/2", "analyze_resource_trends/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:595-613"
+        metadata:
+          analysis_algorithms: ["trend_detection", "anomaly_identification", "pattern_recognition"]
+        
+      - id: "4.2"
+        name: "optimization_executor"
+        functions: ["apply_resource_optimizations/2", "optimize_resources/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:615-634"
+        metadata:
+          execution_safety: "gradual_rollout"
+          rollback_on_failure: true
+
+  # 5.0 - Predictive Analytics System
+  - id: "5.0"
+    name: "predictive_analytics_system"
+    module: "EliasServer.Manager.URM.TrendAnalyzer"
+    code_ref: "lib/elias_server/manager/urm.ex:242-252"
+    metadata:
+      dependencies: ["historical_data", "trend_algorithms", "prediction_models"]
+      performance: {latency_ms: 1000, memory_mb: 256}
+      prediction_accuracy_target: 0.85
+    children:
+      - id: "5.1"
+        name: "trend_calculator"
+        functions: ["analyze_trends/1", "calculate_trend/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:541-553"
+        metadata:
+          trend_types: ["increasing", "decreasing", "stable", "cyclical"]
+          analysis_window: "10_data_points"
+        
+      - id: "5.2"
+        name: "prediction_generator"
+        functions: ["update_resource_predictions/1", "predict_resource_exhaustion/1"]
+        code_ref: "lib/elias_server/manager/urm.ex:510-524"
+        metadata:
+          prediction_horizons: ["1_hour", "24_hours", "7_days"]
+          confidence_levels: ["high", "medium", "low"]
+
+# Cross-References and Dependencies
+cross_dependencies:
+  - source: "1.0.resource_monitoring_engine"
+    target: "4.0.resource_optimization_engine"
+    type: "monitoring_data_provision"
+    
+  - source: "2.0.download_management_system"
+    target: "1.0.resource_monitoring_engine"
+    type: "bandwidth_usage_reporting"
+    
+  - source: "5.0.predictive_analytics_system"
+    target: "1.0.resource_monitoring_engine"
+    type: "historical_data_consumption"
+    
+  - source: "4.0.resource_optimization_engine"
+    target: "3.0.dependency_management_system"
+    type: "dependency_optimization_coordination"
+
+# Testing Configuration
+testing:
+  continuous_suites: ["monitoring_tests", "download_tests", "dependency_tests", "optimization_tests"]
+  critical_paths: ["1.0.resource_monitoring_engine", "2.0.download_management_system", "3.0.dependency_management_system"]
+  performance_benchmarks:
+    - id: "1.1.metrics_collector"
+      max_collection_time_ms: 100
+      min_accuracy: 0.95
+    - id: "2.1.download_queue_processor"
+      max_queue_processing_time_ms: 50
+      concurrent_downloads: 5
+    - id: "3.1.dependency_scanner"
+      max_scan_time_ms: 5000
+      vulnerability_detection_rate: 0.98
+    - id: "4.1.optimization_analyzer"
+      max_analysis_time_ms: 1000
+      optimization_effectiveness: 0.8
+    - id: "5.1.trend_calculator"
+      max_calculation_time_ms: 500
+      prediction_accuracy: 0.85
+
+# Integration Validation Rules for System Harmonizer
+harmonizer_rules:
+  impact_radius: 4  # Resource management affects entire system performance
+  required_tests: ["unit", "integration", "performance", "resource_exhaustion", "dependency_resolution"]
+  approval_thresholds:
+    test_success_rate: 98.0  # High reliability required for system stability
+    performance_degradation_max: 5.0  # Must maintain system efficiency
+    resource_monitoring_accuracy: 95.0  # Critical for system health
+    download_success_rate: 95.0  # Network reliability varies
+    dependency_resolution_rate: 100.0  # Must resolve all dependencies correctly
+  rollback_triggers: ["system_resource_exhaustion", "critical_dependency_failure", "monitoring_system_failure", "optimization_regression"]
+
+# Resource-Specific Configuration
+resource_workflows:
+  monitoring_strategy:
+    collection_interval_ms: 5000
+    retention_period_days: 90
+    alert_escalation: ["warn", "critical", "emergency"]
+    auto_mitigation: true
+  
+  download_management:
+    bandwidth_limits: {max_mbps: 100, throttle_threshold: 75}
+    storage_allocation: {temp_dir: "/tmp/downloads", cleanup_policy: "7_days"}
+    concurrent_limits: {max_downloads: 5, max_per_domain: 2}
+    retry_policies: {max_attempts: 3, backoff_multiplier: 2.0}
+  
+  dependency_tracking:
+    update_frequency: "weekly"
+    security_scan_frequency: "daily"
+    compatibility_checking: "strict"
+    auto_update_policy: "security_patches_only"
+
+# Resource Monitoring Thresholds
+resource_thresholds:
+  cpu_usage_percent: 80
+  memory_usage_percent: 85
+  storage_usage_percent: 90
+  network_utilization_percent: 75
+  inode_usage_percent: 90
+  load_average_threshold: 2.0
+
+# Optimization Strategies
+optimization_strategies:
+  memory_management:
+    cleanup_frequency: "on_high_usage"
+    garbage_collection_tuning: true
+    memory_pool_optimization: true
+  
+  cpu_optimization:
+    process_priority_adjustment: true
+    background_task_throttling: true
+    cpu_affinity_optimization: false
+  
+  storage_optimization:
+    temporary_file_cleanup: true
+    log_rotation_management: true
+    disk_space_prediction: true
+
+# Predictive Analytics Configuration
+analytics_configuration:
+  trend_analysis:
+    minimum_data_points: 10
+    analysis_window_hours: 24
+    trend_sensitivity: 0.1
+  
+  prediction_models:
+    resource_exhaustion: "linear_regression"
+    usage_patterns: "seasonal_decomposition"
+    anomaly_detection: "isolation_forest"
+  
+  alert_generation:
+    prediction_confidence_threshold: 0.8
+    early_warning_hours: 4
+    escalation_policy: "tiered_alerts"

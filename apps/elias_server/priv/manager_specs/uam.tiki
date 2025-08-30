@@ -1,0 +1,184 @@
+# UAM.tiki - Universal Arts Manager Hierarchical Specification
+# Following Architect-recommended Tiki Language Methodology
+
+id: root
+name: "Universal Arts Manager"
+version: "2.0.0"
+architecture: "creative_workflow_engine"
+metadata:
+  dependencies: ["URM.ml_models", "UCM.workflow_coordination", "UIM.creative_interfaces", "elias_core.ml_python_port"]
+  performance:
+    latency_ms: 250
+    memory_mb: 1024
+    cpu_percent: 50
+    scalability: "parallel_creative_workflows"
+    ml_inference_time_ms: 500
+  input_types: ["creative_workflow_request", "media_files", "design_specifications"]
+  output_types: ["processed_media", "generated_content", "workflow_results"]
+  failure_modes: ["ml_model_unavailable", "creative_app_crash", "memory_exhaustion", "gpu_unavailable"]
+  tags: ["creative", "ml_intensive", "multimedia", "workflow_coordination"]
+  creative_config:
+    default_quality: "high"
+    parallel_processing: true
+    ml_acceleration: true
+    gpu_required: true
+
+children:
+  # 1.0 - Creative Workflow Engine
+  - id: "1.0"
+    name: "creative_workflow_engine"
+    module: "EliasServer.Manager.UAM.WorkflowEngine"
+    code_ref: "lib/elias_server/manager/uam.ex:100-200"
+    metadata:
+      dependencies: ["UCM.workflow_coordination", "URM.resource_allocation"]
+      performance: {latency_ms: 100, memory_mb: 256}
+      inputs: ["workflow_name", "workflow_parameters"]
+      outputs: ["workflow_id", "execution_status"]
+    children:
+      - id: "1.1"
+        name: "workflow_orchestration"
+        functions: ["execute_creative_workflow/2", "manage_workflow_state/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:120-150"
+        metadata:
+          performance: {latency_ms: 50}
+      
+      - id: "1.2"
+        name: "workflow_monitoring"
+        functions: ["get_active_workflows/0", "monitor_workflow_progress/1"]
+        code_ref: "lib/elias_server/manager/uam.ex:151-180"
+        metadata:
+          performance: {latency_ms: 20}
+
+  # 2.0 - Creative Application Integration
+  - id: "2.0"
+    name: "creative_app_integration"
+    module: "EliasServer.Manager.UAM.AppIntegration"
+    code_ref: "lib/elias_server/manager/uam.ex:200-350"
+    metadata:
+      dependencies: ["UIM.application_interfaces", "system_applications"]
+      performance: {latency_ms: 200, memory_mb: 512}
+      external_apps: ["photoshop", "logic_pro", "blender", "figma"]
+    children:
+      - id: "2.1"
+        name: "photoshop_integration"
+        functions: ["launch_photoshop/2", "execute_photoshop_script/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:250-280"
+        
+      - id: "2.2"
+        name: "logic_pro_integration"
+        functions: ["launch_logic_pro/2", "process_audio/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:281-310"
+        
+      - id: "2.3"
+        name: "design_tool_integration"
+        functions: ["launch_design_app/2", "execute_design_workflow/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:311-340"
+
+  # 3.0 - ML Integration & Processing
+  - id: "3.0"
+    name: "ml_integration"
+    module: "EliasServer.Manager.UAM.MLProcessor"
+    code_ref: "lib/elias_server/manager/uam.ex:350-450"
+    metadata:
+      dependencies: ["EliasCore.MLPythonPort", "URM.ml_models"]
+      performance: {latency_ms: 500, memory_mb: 2048, gpu_vram_mb: 4096}
+      ml_models: ["face_swap", "voice_synthesis", "style_transfer", "image_generation"]
+      tags: ["ml_critical", "gpu_intensive"]
+    children:
+      - id: "3.1"
+        name: "face_voice_swap"
+        functions: ["request_face_voice_swap/3", "process_media_swap/4"]
+        code_ref: "lib/elias_server/manager/uam.ex:360-400"
+        metadata:
+          performance: {ml_inference_ms: 2000}
+          models: ["face_detection", "voice_cloning"]
+        
+      - id: "3.2"
+        name: "media_generation"
+        functions: ["generate_media_content/2", "apply_style_transfer/3"]
+        code_ref: "lib/elias_server/manager/uam.ex:401-430"
+        metadata:
+          performance: {ml_inference_ms: 3000}
+        
+      - id: "3.3"
+        name: "content_analysis"
+        functions: ["analyze_media_content/2", "extract_features/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:431-450"
+
+  # 4.0 - Web Content Generation
+  - id: "4.0"
+    name: "web_content_generation"
+    module: "EliasServer.Manager.UAM.WebGenerator"
+    code_ref: "lib/elias_server/manager/uam.ex:450-500"
+    metadata:
+      dependencies: ["UIM.web_interfaces", "design_frameworks"]
+      performance: {latency_ms: 150, memory_mb: 256}
+      outputs: ["html", "css", "javascript", "responsive_designs"]
+    children:
+      - id: "4.1"
+        name: "html_generation"
+        functions: ["generate_html_structure/2", "apply_accessibility_standards/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:460-480"
+        
+      - id: "4.2"
+        name: "css_framework_integration"
+        functions: ["generate_responsive_css/2", "optimize_for_performance/2"]
+        code_ref: "lib/elias_server/manager/uam.ex:481-500"
+
+# Cross-References and Dependencies
+cross_dependencies:
+  - source: "3.0.ml_integration"
+    target: "EliasCore.MLPythonPort"
+    type: "ml_processing"
+    
+  - source: "2.0.creative_app_integration"
+    target: "UIM.application_interfaces"
+    type: "external_app_control"
+    
+  - source: "1.0.creative_workflow_engine"
+    target: "UCM.workflow_coordination"
+    type: "cross_manager_orchestration"
+    
+  - source: "3.1.face_voice_swap"
+    target: "URM.ml_model_storage"
+    type: "model_loading"
+
+# Testing Configuration
+testing:
+  continuous_suites: ["creative_workflow_tests", "ml_integration_tests", "app_connectivity_tests"]
+  critical_paths: ["3.0.ml_integration", "1.0.creative_workflow_engine", "2.0.creative_app_integration"]
+  performance_benchmarks:
+    - id: "3.1.face_voice_swap"
+      max_inference_time_ms: 3000
+      min_success_rate: 90.0
+    - id: "1.1.workflow_orchestration"
+      max_latency_ms: 100
+    - id: "2.0.creative_app_integration"
+      max_startup_time_ms: 5000
+
+# Integration Validation Rules for System Harmonizer
+harmonizer_rules:
+  impact_radius: 2  # Creative operations affect fewer systems than federation
+  required_tests: ["unit", "ml_integration", "creative_app_connectivity"]
+  approval_thresholds:
+    test_success_rate: 90.0  # Lower threshold due to creative app variability
+    performance_degradation_max: 15.0  # Creative operations are resource intensive
+    ml_model_availability: 100.0  # Critical for creative workflows
+  rollback_triggers: ["ml_model_failure", "creative_app_crash", "gpu_memory_exhaustion"]
+  
+# Creative-Specific Configuration
+creative_workflows:
+  face_voice_swap:
+    required_models: ["face_detection", "voice_cloning"]
+    quality_levels: ["draft", "preview", "production"]
+    supported_formats: ["mp4", "mov", "wav", "mp3"]
+  
+  design_automation:
+    supported_tools: ["photoshop", "figma", "sketch"]
+    output_formats: ["psd", "svg", "png", "pdf"]
+    quality_presets: ["web", "print", "mobile"]
+  
+  multimedia_generation:
+    ai_models: ["stable_diffusion", "gpt_vision", "music_generation"]
+    render_quality: ["low", "medium", "high", "ultra"]
+    batch_processing: true

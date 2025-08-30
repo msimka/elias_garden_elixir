@@ -1,0 +1,26 @@
+This is a small test file for the MultiFormat Converter test framework.
+
+It contains multiple paragraphs to test paragraph detection and formatting.
+
+This paragraph has **bold text** and *italic text* to test formatting preservation.
+
+# Heading 1
+## Heading 2  
+### Heading 3
+
+- Unordered list item 1
+- Unordered list item 2
+- Unordered list item 3
+
+1. Ordered list item 1
+2. Ordered list item 2  
+3. Ordered list item 3
+
+This is a paragraph with a [link](http://example.com) to test link detection.
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+| More 1   | More 2   | More 3   |
+
+Final paragraph to complete the test file.

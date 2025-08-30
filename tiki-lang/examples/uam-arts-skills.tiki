@@ -1,0 +1,313 @@
+UAM Arts Skills Tree
+
+Complete hierarchical specification of User Arts Manager capabilities and skill progression. This demonstrates advanced Tiki syntax with metadata, linking, and executable code blocks.
+
+version: 1.2
+author: ELIAS System
+tags: [uam, arts, multimedia, skills]
+last_updated: 2025-01-27
+
+*1 Audio Generation Skills
+
+Core audio synthesis and processing capabilities with style specializations and technical implementations.
+
+*1**1 Synthesis Techniques
+
+*1**1***1 Subtractive Synthesis [priority: high, mastery: 85%]
+
+Classic analog-style synthesis using oscillators, filters, and envelopes.
+
+```python
+# UAM Audio Generation Prompt
+def generate_subtractive_synth(style="vintage", complexity="medium"):
+    return {
+        "oscillator": "sawtooth" if style == "vintage" else "square",
+        "filter": "low_pass_24db",
+        "envelope": "adsr",
+        "effects": ["reverb", "chorus"] if complexity == "high" else ["reverb"]
+    }
+```
+
+Technical Implementation:
+- Oscillator types: sine, square, sawtooth, triangle
+- Filter modes: low-pass, high-pass, band-pass
+- Envelope stages: attack, decay, sustain, release
+
+*1**1***2 FM Synthesis [priority: medium, mastery: 70%]
+
+Frequency modulation synthesis for complex harmonic textures and digital-style sounds.
+
+Specializations:
+- Classic DX-style electric pianos
+- Bell tones and metallic percussion
+- Complex evolving pads and textures
+
+*1**1***3 Granular Synthesis [priority: high, mastery: 60%]
+
+Advanced synthesis technique using grain clouds for textural and atmospheric sounds.
+
+Applications:
+- Ambient soundscapes
+- Vocal texture manipulation
+- Time-stretching and pitch-shifting
+
+*1**2 Musical Styles
+
+*1**2***1 Electronic Dance Music
+
+*1**2***1****1 House [mastery: 90%]
+
+Four-on-the-floor beats, filtered disco samples, and bassline-driven arrangements.
+
+Key Elements:
+- BPM range: 120-130
+- Signature sounds: filtered house, acid house, deep house
+- Arrangement: intro, build, drop, breakdown structure
+
+*1**2***1****2 Techno [mastery: 85%]
+
+Industrial and minimal electronic music with emphasis on rhythm and texture.
+
+Subgenres:
+- Detroit techno: soulful and futuristic
+- Berlin techno: dark and industrial
+- Minimal techno: sparse and hypnotic
+
+*1**2***1****3 Ambient Electronic [mastery: 75%]
+
+Atmospheric and textural electronic music focused on mood and space.
+
+Characteristics:
+- Emphasis on texture over melody
+- Extended time scales and evolving sounds
+- Integration with environmental audio
+
+*1**2***2 Jazz Styles [cross_reference: *1**3***2]
+
+*1**2***2****1 Bebop [mastery: 70%]
+
+Fast-paced jazz with complex harmonies and improvisation.
+
+*1**2***2****2 Modal Jazz [mastery: 65%]
+
+Scale-based approach to jazz harmony and improvisation.
+
+*1**2***3 Classical Orchestration
+
+*1**2***3****1 String Arrangements [mastery: 80%]
+
+Orchestral string writing and virtual instrument realization.
+
+*1**2***3****2 Brass Sections [mastery: 75%]
+
+Orchestral and jazz brass arrangement techniques.
+
+*1**3 Audio Processing
+
+Advanced audio manipulation and enhancement techniques.
+
+*1**3***1 Spectral Processing [priority: high, status: active]
+
+Frequency-domain audio manipulation for creative and corrective applications.
+
+```python
+# Spectral Processing Example
+def spectral_enhance(audio_input, enhancement_type="harmonic"):
+    """
+    UAM spectral processing function
+    Links to [*2**1***3] for visual spectrogram display
+    """
+    if enhancement_type == "harmonic":
+        return apply_harmonic_enhancement(audio_input)
+    elif enhancement_type == "noise_reduction":
+        return spectral_subtraction(audio_input)
+```
+
+*1**3***2 Spatial Audio [cross_reference: *2**3***1]
+
+3D audio positioning and immersive sound design.
+
+Capabilities:
+- Binaural audio rendering
+- Ambisonics encoding/decoding
+- HRTF-based positioning
+
+*2 Image Creation Skills
+
+Comprehensive visual arts capabilities from generation to manipulation.
+
+*2**1 Digital Art Generation
+
+*2**1***1 Style Transfer [mastery: 85%, model: stable-diffusion]
+
+Applying artistic styles to images using neural networks.
+
+Supported Styles:
+- Classical: Renaissance, Baroque, Impressionist
+- Modern: Abstract Expressionist, Pop Art, Minimalist
+- Digital: Cyberpunk, Vaporwave, Glitch Art
+
+*2**1***2 Concept Art Creation
+
+*2**1***2****1 Character Design [mastery: 80%]
+
+Creating original characters for games, animation, and illustration.
+
+Process:
+1. Initial sketches and exploration
+2. Refinement and detail development
+3. Color studies and final rendering
+
+*2**1***2****2 Environment Design [mastery: 75%]
+
+Designing spaces, landscapes, and architectural elements.
+
+*2**1***3 Technical Illustration [priority: medium]
+
+Precise visual communication of complex concepts and systems.
+
+*2**2 Image Manipulation
+
+*2**2***1 Color Correction [mastery: 90%]
+
+Professional-grade color grading and correction techniques.
+
+*2**2***2 Compositing [mastery: 85%]
+
+Combining multiple image elements into seamless final compositions.
+
+*2**2***3 Retouching [mastery: 80%]
+
+Detail-oriented image enhancement and restoration.
+
+*2**3 3D Rendering
+
+*2**3***1 Architectural Visualization [cross_reference: *1**3***2]
+
+Photorealistic rendering of architectural designs and spaces.
+
+Technical Stack:
+- Ray tracing engines
+- Material systems
+- Lighting simulation
+
+*2**3***2 Product Visualization
+
+Commercial product rendering for marketing and presentation.
+
+*3 Video Processing Skills
+
+Motion graphics, editing, and post-production capabilities.
+
+*3**1 Motion Graphics
+
+*3**1***1 2D Animation [mastery: 75%]
+
+Traditional and digital 2D animation techniques.
+
+*3**1***2 3D Animation [mastery: 70%]
+
+Character animation and motion graphics in 3D space.
+
+*3**1***3 Visual Effects [priority: high]
+
+Compositing and effects work for video content.
+
+*3**2 Video Editing
+
+*3**2***1 Narrative Editing [mastery: 80%]
+
+Story-driven editing for films and documentaries.
+
+*3**2***2 Music Video Editing [cross_reference: *1**2***1]
+
+Rhythm-based editing synchronized to musical content.
+
+*3**2***3 Commercial Editing [mastery: 85%]
+
+Fast-paced editing for advertising and promotional content.
+
+*4 Style Management System
+
+Comprehensive style coordination across all media types.
+
+*4**1 Style Databases
+
+*4**1***1 Historical Styles [database_size: 10000+]
+
+Comprehensive database of art historical movements and their characteristics.
+
+Query Example:
+```python
+# UAM Style Query System
+def get_style_characteristics(style_name, media_type="visual"):
+    """
+    Retrieve style parameters for consistent cross-media application
+    Links to Ariel naming system [*4**3] for consistent terminology
+    """
+    return style_db.query(style=style_name, media=media_type)
+```
+
+*4**1***2 Contemporary Trends [auto_update: weekly]
+
+Machine learning-driven analysis of current artistic trends.
+
+*4**1***3 Custom User Styles
+
+Personalized style profiles based on user preferences and history.
+
+*4**2 Cross-Media Style Translation
+
+*4**2***1 Audio-Visual Mapping [experimental: true]
+
+Translating musical characteristics to visual elements.
+
+Mapping Rules:
+- Rhythm → Motion speed and pattern
+- Harmony → Color relationships
+- Timbre → Texture and form
+
+*4**2***2 Visual-Audio Mapping
+
+Converting visual elements to musical parameters.
+
+*4**3 Style Consistency Engine [integration: ariel_naming]
+
+Ensuring consistent style application across projects and media types.
+
+Features:
+- Style inheritance hierarchies
+- Conflict detection and resolution
+- Version control for style evolution
+
+*5 Workflow Integration
+
+Seamless integration with other ELIAS models and external tools.
+
+*5**1 UIM Integration [model_link: geppetto_repl]
+
+Direct integration with Geppetto REPL for creative collaboration.
+
+*5**2 MacGyver Tool Discovery [model_link: uim_macgyver]
+
+Automatic discovery and integration of external creative tools.
+
+*5**3 Tulgey Wood Coordination [model_link: meta_brain]
+
+Strategic coordination of creative projects and resource allocation.
+
+*6 Training and Learning
+
+Continuous improvement through Miyagi training integration.
+
+*6**1 Skill Assessment [automated: true]
+
+Regular evaluation of capabilities and identification of improvement areas.
+
+*6**2 New Technique Integration [priority: high]
+
+Incorporation of emerging artistic techniques and technologies.
+
+*6**3 User Feedback Integration [feedback_loop: active]
+
+Learning from user interactions and creative outcomes.

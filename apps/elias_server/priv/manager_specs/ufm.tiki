@@ -1,0 +1,252 @@
+# UFM.tiki - Universal Federation Manager Hierarchical Specification
+# Following Architect-recommended Tiki Language Methodology
+
+id: root
+name: "Universal Federation Manager"
+version: "2.0.0"
+architecture: "supervised_process_tree"
+metadata:
+  dependencies: ["UCM.root", "URM.root", "elias_core.distributed_erlang"]
+  performance:
+    latency_ms: 100
+    scalability: "linear_with_nodes" 
+    max_concurrent_workflows: 50
+  input_types: ["atom", "map", "list"]
+  output_types: ["tuple", "map", "atom"]
+  failure_modes: ["supervisor_restart", "subdaemon_isolation", "graceful_degradation"]
+  tags: ["distributed", "always_on", "fault_tolerant", "hot_reloadable"]
+
+children:
+  # 1.0 - Lightweight Orchestration (Main UFM process)
+  - id: "1.0"
+    name: "orchestrator"
+    module: "EliasServer.Manager.UFM" 
+    code_ref: "lib/elias_server/manager/ufm.ex:1-306"
+    metadata:
+      dependencies: ["UFM.Supervisor"]
+      performance: {latency_ms: 10, memory_mb: 50}
+      inputs: ["{atom, any}"]
+      outputs: ["{:ok, any} | {:error, atom}"]
+      failure_modes: ["supervisor_tree_failure"]
+    children:
+      - id: "1.1"
+        name: "api_delegation"
+        functions: ["call_subdaemon/3", "cast_subdaemon/3", "get_subdaemon_module/1"]
+        code_ref: "lib/elias_server/manager/ufm.ex:219-271"
+        metadata:
+          dependencies: ["UFM.FederationDaemon", "UFM.MonitoringDaemon", "UFM.TestingDaemon", "UFM.OrchestrationDaemon", "UFM.ApeHarmonyDaemon"]
+          performance: {latency_ms: 5}
+      
+      - id: "1.2"
+        name: "rule_coordination"
+        functions: ["broadcast_rule_reload/0", "handle_info/2"]
+        code_ref: "lib/elias_server/manager/ufm.ex:273-287"
+        metadata:
+          dependencies: ["1.1.api_delegation"]
+          performance: {latency_ms: 20}
+      
+      - id: "1.3"
+        name: "health_monitoring"
+        functions: ["count_active_subdaemons/0", "subdaemon_alive?/1"]
+        code_ref: "lib/elias_server/manager/ufm.ex:289-305"
+        metadata:
+          performance: {latency_ms: 5}
+
+  # 2.0 - Supervisor Tree Management
+  - id: "2.0"
+    name: "supervision_tree"
+    module: "EliasServer.Manager.UFM.Supervisor"
+    code_ref: "lib/elias_server/manager/ufm/supervisor.ex:1-87"
+    metadata:
+      dependencies: ["SupervisorHelper"]
+      performance: {startup_time_ms: 1000}
+      supervision_strategy: "one_for_one"
+      restart_policy: "transient"
+    children:
+      - id: "2.1"
+        name: "subdaemon_registry"
+        functions: ["setup_registry/1", "get_subdaemon_status/0"]
+        code_ref: "lib/elias_server/manager/ufm/supervisor.ex:23-47"
+        
+      - id: "2.2"
+        name: "process_management"
+        functions: ["restart_subdaemon/1", "get_subdaemon_pid/1"]
+        code_ref: "lib/elias_server/manager/ufm/supervisor.ex:49-65"
+
+  # 3.0 - Federation Daemon (Network & P2P)
+  - id: "3.0"
+    name: "federation_daemon"
+    module: "EliasServer.Manager.UFM.FederationDaemon"
+    code_ref: "lib/elias_server/manager/ufm/federation_daemon.ex:1-400"
+    spec_file: "UFM_Federation.md"
+    metadata:
+      dependencies: ["distributed_erlang", "UCM.broadcast"]
+      performance: {heartbeat_interval_ms: 15000, node_timeout_ms: 30000}
+      inputs: ["node_name", "request_type", "requirements_map"]
+      outputs: ["topology_map", "{:ok, node} | {:error, reason}"]
+      failure_modes: ["network_partition", "node_timeout", "authentication_failure"]
+      tags: ["network_critical", "distributed"]
+    children:
+      - id: "3.1"
+        name: "topology_management"
+        functions: ["initialize_network_topology/0", "perform_heartbeat_checks/2", "topology_changed?/2"]
+        code_ref: "lib/elias_server/manager/ufm/federation_daemon.ex:210-294"
+        
+      - id: "3.2"
+        name: "node_discovery"
+        functions: ["discover_new_nodes/1", "integrate_discovered_nodes/2", "determine_node_type/1"]
+        code_ref: "lib/elias_server/manager/ufm/federation_daemon.ex:295-335"
+        
+      - id: "3.3"
+        name: "request_routing"
+        functions: ["select_optimal_node/3", "has_required_capabilities?/2"]
+        code_ref: "lib/elias_server/manager/ufm/federation_daemon.ex:336-358"
+
+  # 4.0 - Monitoring Daemon (Health & Metrics)  
+  - id: "4.0"
+    name: "monitoring_daemon"
+    module: "EliasServer.Manager.UFM.MonitoringDaemon"
+    code_ref: "lib/elias_server/manager/ufm/monitoring_daemon.ex:1-550"
+    metadata:
+      dependencies: ["system_metrics", "manager_health_checks"]
+      performance: {health_check_interval_ms: 30000, metrics_collection_interval_ms: 60000}
+      inputs: ["health_check_params", "alert_thresholds"]
+      outputs: ["health_status_map", "metrics_map", "alerts_list"]
+      tags: ["always_on", "continuous_monitoring"]
+    children:
+      - id: "4.1"
+        name: "health_checking"
+        functions: ["perform_comprehensive_health_check/1", "check_manager_health/0", "check_system_health/0"]
+        code_ref: "lib/elias_server/manager/ufm/monitoring_daemon.ex:200-280"
+        
+      - id: "4.2"
+        name: "metrics_collection"
+        functions: ["collect_system_metrics/1", "get_memory_usage/0", "get_cpu_usage/0"]
+        code_ref: "lib/elias_server/manager/ufm/monitoring_daemon.ex:290-350"
+        
+      - id: "4.3"
+        name: "alert_evaluation"
+        functions: ["evaluate_alerts/1", "check_cpu_alert/2", "check_memory_alert/2", "check_manager_alerts/2"]
+        code_ref: "lib/elias_server/manager/ufm/monitoring_daemon.ex:380-450"
+
+  # 5.0 - Testing Daemon (Continuous Validation)
+  - id: "5.0"
+    name: "testing_daemon"
+    module: "EliasServer.Manager.UFM.TestingDaemon"
+    code_ref: "lib/elias_server/manager/ufm/testing_daemon.ex:1-650"
+    metadata:
+      dependencies: ["test_suites", "system_validation"]
+      performance: {continuous_interval_ms: 300000, test_timeout_ms: 60000}
+      inputs: ["test_suite_name", "test_parameters"]
+      outputs: ["test_results_map", "test_history", "success_rate"]
+      failure_modes: ["test_timeout", "validation_failure"]
+      tags: ["always_on", "continuous_testing", "validation"]
+    children:
+      - id: "5.1" 
+        name: "test_orchestration"
+        functions: ["run_continuous_tests/1", "execute_scheduled_tests/2", "execute_test_suite/2"]
+        code_ref: "lib/elias_server/manager/ufm/testing_daemon.ex:200-300"
+        
+      - id: "5.2"
+        name: "test_implementation"
+        functions: ["run_system_health_tests/0", "run_manager_integration_tests/0", "run_federation_tests/0"]
+        code_ref: "lib/elias_server/manager/ufm/testing_daemon.ex:350-450"
+        
+      - id: "5.3"
+        name: "test_analysis"
+        functions: ["calculate_success_rate/1", "check_performance_regressions/1", "add_to_test_history/3"]
+        code_ref: "lib/elias_server/manager/ufm/testing_daemon.ex:500-580"
+
+  # 6.0 - Orchestration Daemon (Workflow Coordination)
+  - id: "6.0"
+    name: "orchestration_daemon"
+    module: "EliasServer.Manager.UFM.OrchestrationDaemon"
+    code_ref: "lib/elias_server/manager/ufm/orchestration_daemon.ex:1-700"
+    metadata:
+      dependencies: ["workflow_templates", "resource_allocations"]
+      performance: {workflow_timeout_mins: 60, max_concurrent_workflows: 10}
+      inputs: ["workflow_name", "parameters_map"]
+      outputs: ["workflow_id", "workflow_status", "execution_results"]
+      tags: ["workflow_coordination", "multi_manager"]
+    children:
+      - id: "6.1"
+        name: "workflow_management"
+        functions: ["create_workflow_instance/4", "begin_workflow_execution/2", "execute_workflow_step/3"]
+        code_ref: "lib/elias_server/manager/ufm/orchestration_daemon.ex:200-400"
+        
+      - id: "6.2"
+        name: "step_execution"
+        functions: ["execute_step_action/2", "call_manager_action/3", "advance_workflow_step/3"]
+        code_ref: "lib/elias_server/manager/ufm/orchestration_daemon.ex:450-550"
+        
+      - id: "6.3"
+        name: "workflow_monitoring"
+        functions: ["monitor_active_workflows/1", "complete_workflow/3", "fail_workflow/3"]
+        code_ref: "lib/elias_server/manager/ufm/orchestration_daemon.ex:600-680"
+
+  # 7.0 - APE HARMONY Daemon (Blockchain Operations)
+  - id: "7.0"
+    name: "ape_harmony_daemon" 
+    module: "EliasServer.Manager.UFM.ApeHarmonyDaemon"
+    code_ref: "lib/elias_server/manager/ufm/ape_harmony_daemon.ex:1-800"
+    metadata:
+      dependencies: ["blockchain_state", "consensus_algorithms"]
+      performance: {mining_interval_ms: 60000, block_reward: 10.0}
+      inputs: ["event_type", "transaction_data", "consensus_vote"]
+      outputs: ["blockchain_status", "transaction_id", "harmony_balance"]
+      tags: ["blockchain", "distributed_ledger", "consensus"]
+    children:
+      - id: "7.1"
+        name: "blockchain_management"
+        functions: ["initialize_blockchain/1", "create_genesis_block/1", "add_block_to_chain/3"]
+        code_ref: "lib/elias_server/manager/ufm/ape_harmony_daemon.ex:200-350"
+        
+      - id: "7.2"
+        name: "mining_operations"
+        functions: ["attempt_block_mining/1", "create_new_block/5", "mine_block/2"]
+        code_ref: "lib/elias_server/manager/ufm/ape_harmony_daemon.ex:400-500"
+        
+      - id: "7.3"
+        name: "consensus_coordination"
+        functions: ["run_consensus_round/1", "process_consensus_vote/3", "validate_incoming_blocks/1"]
+        code_ref: "lib/elias_server/manager/ufm/ape_harmony_daemon.ex:600-700"
+
+# Cross-References and Dependencies
+cross_dependencies:
+  - source: "3.0.federation_daemon"
+    target: "UCM.broadcast_system_event"
+    type: "notification"
+    
+  - source: "4.0.monitoring_daemon" 
+    target: "3.0.federation_daemon"
+    type: "event_recording"
+    
+  - source: "6.0.orchestration_daemon"
+    target: ["UAM.root", "URM.root", "ULM.root"]
+    type: "workflow_execution"
+    
+  - source: "7.0.ape_harmony_daemon"
+    target: "distributed_erlang_nodes"
+    type: "blockchain_sync"
+
+# Testing Configuration
+testing:
+  continuous_suites: ["system_health", "manager_integration", "federation_tests"]
+  critical_paths: ["1.0.orchestrator", "3.0.federation_daemon", "4.0.monitoring_daemon"]
+  performance_benchmarks:
+    - id: "3.1.topology_management"
+      max_latency_ms: 100
+    - id: "4.1.health_checking"
+      max_duration_ms: 5000
+    - id: "6.1.workflow_management"
+      max_execution_time_mins: 30
+
+# Integration Validation Rules for System Harmonizer
+harmonizer_rules:
+  impact_radius: 3  # Maximum dependency hops to analyze
+  required_tests: ["unit", "integration", "distributed"]
+  approval_thresholds:
+    test_success_rate: 95.0
+    performance_degradation_max: 10.0
+    dependency_conflicts: 0
+  rollback_triggers: ["supervisor_crash", "memory_leak", "network_partition"]

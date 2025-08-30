@@ -1,0 +1,31 @@
+#!/usr/bin/env elixir
+
+# Multi-Format Text Converter CLI Executable
+# Tank Building Stage 3: Production-optimized CLI with full performance features
+
+# Load all converter components (Stage 1 & 2)
+Code.require_file("apps/elias_server/lib/multi_format_converter/atomic_component.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/file_operations/file_reader.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/file_operations/file_validator.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/file_operations/output_writer.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/format_detection/format_detector.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/content_extraction/pdf_text_extractor.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/content_extraction/rtf_text_extractor.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/content_extraction/docx_text_extractor.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/pipeline/converter_orchestrator.ex")
+
+# Load Stage 3 optimization components
+Code.require_file("apps/elias_server/lib/multi_format_converter/optimization/performance_monitor.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/optimization/smart_cache.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/optimization/streaming_processor.ex")
+Code.require_file("apps/elias_server/lib/multi_format_converter/optimization/batch_processor.ex")
+
+# Load enhanced CLI
+Code.require_file("apps/elias_server/lib/multi_format_converter/cli/converter_cli.ex")
+
+# Start optimization systems
+{:ok, _} = MultiFormatConverter.Optimization.PerformanceMonitor.start_link()
+{:ok, _} = MultiFormatConverter.Optimization.SmartCache.start_link()
+
+# Run CLI with command line arguments
+MultiFormatConverter.CLI.ConverterCLI.main(System.argv())

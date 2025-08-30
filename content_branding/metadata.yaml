@@ -1,0 +1,96 @@
+# ELIAS Content Branding System Metadata
+# Following architect guidance for systematic content management
+
+version: "1.0-brand-launch"
+tank_building_stage: 1  # Stage 1: Core functional content
+last_updated: 2025-01-19
+owner_manager: ULM
+
+# Content Categories with Metadata
+truisms_and_taglines:
+  file: "truisms_and_taglines.md"
+  total_statements: 85
+  categories:
+    - tank_building_methodology
+    - ai_distributed_systems  
+    - quality_learning
+    - innovation_methodology
+    - brand_values_mission
+    - content_specific_taglines
+    - merchandise_categories
+  tags: [core, quotable, multi_channel, t_shirt_ready]
+  channels: [blog, youtube, podcast, merchandise, documentation]
+  
+blog_series:
+  directory: "blog/"
+  planned_articles: 6
+  series: "Tank Building Methodology"
+  status: "planned"
+  target_frequency: "bi-weekly"
+  tags: [technical, methodology, elias_examples]
+  channels: [blog, youtube_followup, podcast_discussion]
+
+merchandise:
+  directory: "merchandise/"  
+  t_shirt_designs: 13
+  collections: 4
+  status: "concepts_ready"
+  tags: [wearable_philosophy, developer_focused, conversation_starters]
+  channels: [merchandise, conferences, social_proof]
+
+brand_guidelines:
+  directory: "brand_guidelines/"
+  components: ["voice", "style", "palette", "messaging"]
+  consistency_enforcement: "ulm_harmonization"
+  tags: [standards, consistency, quality_gates]
+  channels: [all]
+
+# ULM Integration Specification
+ulm_integration:
+  learning_sandbox_symlink: true
+  auto_categorization: enabled
+  content_harmonization: enabled
+  quality_gates: 
+    - tiki_validation
+    - brand_consistency_check
+    - tank_building_stage_compliance
+  
+# Tank Building Evolution Plan
+evolution_stages:
+  stage_1:
+    status: "completed"
+    description: "Core functional content - truisms and basic structure"
+    success_criteria: ["85+ truisms", "brand voice defined", "basic structure"]
+    
+  stage_2:
+    status: "planned"
+    description: "Multi-channel extension without breaking stage 1"
+    tasks: ["blog series execution", "youtube scripts", "podcast planning"]
+    success_criteria: ["blog series launched", "cross-channel consistency"]
+    
+  stage_3:
+    status: "future"
+    description: "AI optimization and automation"
+    tasks: ["ulm content generation", "automated tagging", "engagement analysis"]
+    
+  stage_4:
+    status: "future"  
+    description: "Community feedback iteration"
+    tasks: ["feedback integration", "content refinement", "scale optimization"]
+
+# Integration Points with ELIAS Managers
+manager_integration:
+  ULM: "primary_owner"  # Content learning, categorization, harmonization
+  UAM: "creative_generation"  # Video scripts, merch design assistance
+  UIM: "interface_rendering"  # CLI tools, content queries
+  URM: "resource_optimization"  # Asset storage, download management
+  UFM: "federation_sync"  # Multi-node content consistency  
+  UCM: "dissemination"  # Content broadcasting, routing requests
+
+# Quality Standards (ELIAS-aligned)
+quality_standards:
+  tiki_compliance: required
+  brand_voice_consistency: required
+  tank_building_methodology: required
+  multi_channel_optimization: target
+  community_feedback_integration: continuous

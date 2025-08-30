@@ -1,0 +1,231 @@
+# UIM.tiki - Universal Interface Manager Hierarchical Specification
+# Following Architect-recommended Tiki Language Methodology
+
+id: root
+name: "Universal Interface Manager"
+version: "2.0.0"
+architecture: "macgyver_interface_engine"
+metadata:
+  dependencies: ["system_applications", "file_system", "ui_frameworks", "accessibility_apis"]
+  performance:
+    latency_ms: 2500
+    memory_mb: 768
+    cpu_percent: 35
+    scalability: "parallel_interface_generation"
+    interface_generation_time_ms: 1500
+  input_types: ["application_discovery", "interface_generation_requests", "optimization_data"]
+  output_types: ["generated_interfaces", "application_registry", "optimization_reports"]
+  failure_modes: ["application_inaccessible", "template_corruption", "generation_timeout", "accessibility_failure"]
+  tags: ["interface", "macgyver", "accessibility", "automation"]
+  interface_config:
+    default_style: "minimal"
+    accessibility_compliance: "WCAG-AA"
+    generation_timeout_ms: 30000
+    max_concurrent_generations: 3
+
+children:
+  # 1.0 - MacGyver Interface Engine
+  - id: "1.0"
+    name: "macgyver_interface_engine"
+    module: "EliasServer.Manager.UIM.MacGyverEngine"
+    code_ref: "lib/elias_server/manager/uim.ex:370-390"
+    metadata:
+      dependencies: ["template_system", "code_generation", "accessibility_validation"]
+      performance: {latency_ms: 1500, memory_mb: 256}
+      capabilities: ["ui_analysis", "template_matching", "code_generation", "accessibility_validation"]
+    children:
+      - id: "1.1"
+        name: "template_matcher"
+        functions: ["select_interface_template/3", "load_interface_templates/0"]
+        code_ref: "lib/elias_server/manager/uim.ex:465-479"
+        metadata:
+          template_types: ["creative_suite", "chat_client", "ide"]
+          matching_criteria: ["application_category", "interface_type", "complexity"]
+      
+      - id: "1.2"
+        name: "code_generator"
+        functions: ["generate_interface_code/2", "generate_accessibility_features/0"]
+        code_ref: "lib/elias_server/manager/uim.ex:481-514"
+        metadata:
+          output_formats: ["javascript", "html", "css"]
+          accessibility_features: ["keyboard_navigation", "screen_reader_support", "high_contrast_mode"]
+
+  # 2.0 - Application Discovery System
+  - id: "2.0"
+    name: "application_discovery_system"
+    module: "EliasServer.Manager.UIM.ApplicationDiscovery"
+    code_ref: "lib/elias_server/manager/uim.ex:390-440"
+    metadata:
+      dependencies: ["file_system", "application_paths", "category_classification"]
+      performance: {latency_ms: 5000, memory_mb: 128}
+      scan_paths: ["/Applications", "/usr/local/bin", "/opt/homebrew/bin", "~/Applications"]
+    children:
+      - id: "2.1"
+        name: "application_scanner"
+        functions: ["perform_application_discovery/1", "discover_applications/0"]
+        code_ref: "lib/elias_server/manager/uim.ex:77-104"
+        metadata:
+          scan_interval_ms: 86400000
+          supported_formats: [".app", "executable", ".jar"]
+        
+      - id: "2.2"
+        name: "category_classifier"
+        functions: ["update_application_registry/2", "classify_application/1"]
+        code_ref: "lib/elias_server/manager/uim.ex:425-436"
+        metadata:
+          categories: ["creative", "communication", "development", "system"]
+          classification_rules: ["name_matching", "path_analysis", "capability_detection"]
+
+  # 3.0 - Interface Generation Pipeline
+  - id: "3.0"
+    name: "interface_generation_pipeline"
+    module: "EliasServer.Manager.UIM.InterfaceGenerator"
+    code_ref: "lib/elias_server/manager/uim.ex:106-148"
+    metadata:
+      dependencies: ["MacGyverEngine", "template_system", "optimization_system"]
+      performance: {latency_ms: 2000, memory_mb: 192}
+      generation_stages: ["analysis", "template_selection", "code_generation", "optimization"]
+    children:
+      - id: "3.1"
+        name: "generation_coordinator"
+        functions: ["generate_interface/2", "generate_app_interface/3"]
+        code_ref: "lib/elias_server/manager/uim.ex:107-148"
+        metadata:
+          interface_types: ["default", "minimal", "accessible", "touch_optimized"]
+        
+      - id: "3.2"
+        name: "interface_storage"
+        functions: ["store_generated_interface/2", "track_interface_usage/2"]
+        code_ref: "lib/elias_server/manager/uim.ex:118-142"
+        metadata:
+          storage_format: "structured_metadata"
+          usage_tracking: ["generation_time", "usage_count", "optimization_applied"]
+
+  # 4.0 - Optimization & Learning System
+  - id: "4.0"
+    name: "optimization_learning_system"
+    module: "EliasServer.Manager.UIM.OptimizationEngine"
+    code_ref: "lib/elias_server/manager/uim.ex:150-186"
+    metadata:
+      dependencies: ["interaction_analysis", "pattern_recognition", "optimization_application"]
+      performance: {latency_ms: 1000, memory_mb: 192}
+      learning_threshold: 10
+    children:
+      - id: "4.1"
+        name: "interaction_analyzer"
+        functions: ["analyze_user_interactions/2", "analyze_interaction_patterns/1"]
+        code_ref: "lib/elias_server/manager/uim.ex:215-240"
+        metadata:
+          analysis_window: 100
+          pattern_detection: ["frequent_actions", "usage_patterns", "efficiency_opportunities"]
+        
+      - id: "4.2"
+        name: "optimization_applicator"
+        functions: ["optimize_interface/2", "apply_interface_optimizations/3"]
+        code_ref: "lib/elias_server/manager/uim.ex:150-186"
+        metadata:
+          optimization_types: ["create_shortcut", "layout_improvement", "accessibility_enhancement"]
+
+  # 5.0 - Template Management System
+  - id: "5.0"
+    name: "template_management_system"
+    module: "EliasServer.Manager.UIM.TemplateManager"
+    code_ref: "lib/elias_server/manager/uim.ex:351-370"
+    metadata:
+      dependencies: ["template_storage", "version_control", "validation_system"]
+      performance: {latency_ms: 100, memory_mb: 64}
+      template_categories: ["creative", "communication", "development"]
+    children:
+      - id: "5.1"
+        name: "template_loader"
+        functions: ["load_interface_templates/0", "validate_template_integrity/1"]
+        code_ref: "lib/elias_server/manager/uim.ex:351-370"
+        
+      - id: "5.2"
+        name: "template_updater"
+        functions: ["check_and_update_interfaces/1", "update_template_from_spec/1"]
+        code_ref: "lib/elias_server/manager/uim.ex:587-592"
+
+# Cross-References and Dependencies
+cross_dependencies:
+  - source: "1.0.macgyver_interface_engine"
+    target: "5.0.template_management_system"
+    type: "template_utilization"
+    
+  - source: "2.0.application_discovery_system"
+    target: "3.0.interface_generation_pipeline"
+    type: "application_metadata_provision"
+    
+  - source: "4.0.optimization_learning_system"
+    target: "3.0.interface_generation_pipeline"
+    type: "optimization_feedback_loop"
+    
+  - source: "3.1.generation_coordinator"
+    target: "1.2.code_generator"
+    type: "code_generation_orchestration"
+
+# Testing Configuration
+testing:
+  continuous_suites: ["discovery_tests", "generation_tests", "macgyver_tests", "optimization_tests"]
+  critical_paths: ["1.0.macgyver_interface_engine", "2.0.application_discovery_system", "3.0.interface_generation_pipeline"]
+  performance_benchmarks:
+    - id: "1.2.code_generator"
+      max_generation_time_ms: 2000
+      min_accessibility_score: 0.9
+    - id: "2.1.application_scanner"
+      max_discovery_time_ms: 10000
+      min_detection_rate: 0.95
+    - id: "3.1.generation_coordinator"
+      max_interface_creation_time_ms: 3000
+    - id: "4.1.interaction_analyzer"
+      max_analysis_time_ms: 500
+      min_pattern_detection_rate: 0.8
+
+# Integration Validation Rules for System Harmonizer
+harmonizer_rules:
+  impact_radius: 2  # Interface generation affects user interaction but not core systems
+  required_tests: ["unit", "integration", "accessibility", "template_integrity"]
+  approval_thresholds:
+    test_success_rate: 90.0  # Lower due to external app dependencies
+    performance_degradation_max: 20.0  # Interface generation can be resource intensive
+    accessibility_compliance: 100.0  # Must maintain accessibility standards
+    template_integrity: 100.0  # Templates must be valid
+  rollback_triggers: ["template_corruption", "accessibility_regression", "generation_failure_cascade", "application_discovery_failure"]
+
+# Interface-Specific Configuration
+interface_workflows:
+  application_discovery:
+    scan_frequency: "daily"
+    supported_platforms: ["macos", "linux", "windows"]
+    detection_methods: ["filesystem_scan", "registry_lookup", "process_analysis"]
+  
+  interface_generation:
+    supported_types: ["desktop_app", "web_interface", "mobile_optimized", "accessibility_focused"]
+    template_inheritance: true
+    real_time_preview: false
+    batch_generation: true
+  
+  optimization_learning:
+    data_retention_days: 90
+    learning_algorithms: ["pattern_recognition", "frequency_analysis", "efficiency_optimization"]
+    privacy_compliance: "local_only"
+
+# MacGyver Engine Configuration
+macgyver_configuration:
+  version: "2.0.0"
+  capabilities:
+    ui_analysis: true
+    template_matching: true
+    code_generation: true
+    accessibility_validation: true
+  
+  generation_modes:
+    rapid_prototype: {quality: "draft", speed: "fast"}
+    production_ready: {quality: "high", speed: "normal"}
+    accessibility_focused: {quality: "highest", speed: "slow"}
+  
+  supported_frameworks:
+    - "vanilla_js"
+    - "react_components" 
+    - "vue_templates"
+    - "angular_modules"
