@@ -35,7 +35,10 @@ defmodule UFFTraining.UFFSupervisor do
       {UFFTraining.UFMIntegration, []},
       
       # Performance tracking
-      {UFFTraining.MetricsCollector, []}
+      {UFFTraining.MetricsCollector, []},
+      
+      # Griffith manager model integration
+      {UFFTraining.GriffithIntegration, []}
     ]
 
     opts = [strategy: :one_for_one, name: UFFTraining.UFFSupervisor]

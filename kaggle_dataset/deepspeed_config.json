@@ -1,0 +1,50 @@
+{
+  "zero_optimization": {
+    "stage": 2,
+    "offload_optimizer": {
+      "device": "cpu",
+      "pin_memory": true
+    },
+    "reduce_bucket_size": 200000,
+    "allgather_bucket_size": 200000,
+    "overlap_comm": true,
+    "contiguous_gradients": true
+  },
+  "fp16": {
+    "enabled": true,
+    "auto_cast": false,
+    "loss_scale": 0,
+    "loss_scale_window": 100,
+    "hysteresis": 2,
+    "min_loss_scale": 1,
+    "initial_scale_power": 32
+  },
+  "gradient_accumulation_steps": 4,
+  "train_micro_batch_size_per_gpu": 2,
+  "gradient_clipping": 1.0,
+  "optimizer": {
+    "type": "AdamW",
+    "params": {
+      "lr": 3e-06,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "eps": 1e-08,
+      "weight_decay": 0.01
+    }
+  },
+  "scheduler": {
+    "type": "WarmupLR",
+    "params": {
+      "warmup_min_lr": 0,
+      "warmup_max_lr": 3e-06,
+      "warmup_num_steps": 100
+    }
+  },
+  "tensorboard": {
+    "enabled": true,
+    "output_path": "./kaggle_logs/",
+    "job_name": "uff_kaggle_training"
+  }
+}

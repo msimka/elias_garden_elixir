@@ -1,0 +1,24 @@
+{
+  "title": "UFF Tank Building Training Corpus",
+  "id": "elias-federation/uff-tank-building-corpus",
+  "licenses": [
+    {
+      "name": "MIT"
+    }
+  ],
+  "description": "\n        Training corpus for UFF (UFM Federation Framework) DeepSeek 6.7B-FP16 model.\n        Contains Tank Building methodology training data across 4 stages:\n        - Stage 1: Brute force component implementations\n        - Stage 2: Extended functionality patterns  \n        - Stage 3: Production optimizations\n        - Stage 4: Iterative improvements\n        \n        Includes Claude supervision data for architectural guidance and quality control.\n        ",
+  "resources": [
+    {
+      "path": "training_data.json",
+      "description": "Tank Building session capture data with reward signals"
+    },
+    {
+      "path": "deepspeed_config.json",
+      "description": "DeepSpeed configuration optimized for Kaggle P100"
+    },
+    {
+      "path": "model_config.json",
+      "description": "UFF DeepSeek model architecture configuration"
+    }
+  ]
+}

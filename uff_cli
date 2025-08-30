@@ -11,6 +11,8 @@ Code.require_file("apps/elias_server/lib/uff_training/training_coordinator.ex")
 Code.require_file("apps/elias_server/lib/uff_training/model_server.ex")
 Code.require_file("apps/elias_server/lib/uff_training/ufm_integration.ex")
 Code.require_file("apps/elias_server/lib/uff_training/metrics_collector.ex")
+Code.require_file("apps/elias_server/lib/uff_training/griffith_integration.ex")
+Code.require_file("apps/elias_server/lib/uff_training/manager_models.ex")
 
 # Load existing converter components for compatibility
 Code.require_file("apps/elias_server/lib/multi_format_converter/atomic_component.ex")
@@ -60,6 +62,8 @@ defmodule UFFTrainingCLI do
       "status" -> {:ok, :status, []}
       "metrics" -> {:ok, :metrics, parse_metrics_options(rest)}
       "deploy" -> {:ok, :deploy, parse_deploy_options(rest)}
+      "export" -> {:ok, :export, parse_export_options(rest)}
+      "griffith" -> {:ok, :griffith, parse_griffith_options(rest)}
       "help" -> {:ok, :help, []}
       unknown -> {:error, "Unknown command: #{unknown}"}
     end
@@ -275,6 +279,104 @@ defmodule UFFTrainingCLI do
     end
   end
   
+  defp execute_command(:griffith, options) do
+    action = Keyword.get(options, :action, "status")
+    
+    IO.puts("🔗 Griffith Manager Models - #{action}")
+    IO.puts("=" |> String.duplicate(40))
+    
+    ensure_training_system_started()
+    
+    case action do
+      "status" ->
+        show_griffith_status()
+        
+      "deploy" ->
+        deploy_griffith_models()
+        
+      "start" ->
+        start_griffith_models()
+        
+      "stop" ->
+        stop_griffith_models()
+        
+      "generate" ->
+        manager = Keyword.get(options, :manager, :ufm)
+        prompt = Keyword.get(options, :prompt, "Generate a simple component")
+        test_griffith_generation(manager, prompt)
+        
+      _ ->
+        IO.puts("❓ Unknown Griffith action: #{action}")
+        IO.puts("Available actions: status, deploy, start, stop, generate")
+    end
+  end
+  
+  defp execute_command(:export, options) do
+    format = Keyword.get(options, :format, "json")
+    output_file = Keyword.get(options, :output, "training_data.#{format}")
+    platform = Keyword.get(options, :platform, "all")
+    
+    IO.puts("📤 Exporting Tank Building training data...")
+    IO.puts("  • Format: #{format}")
+    IO.puts("  • Output: #{output_file}")
+    IO.puts("  • Platform: #{platform}")
+    
+    ensure_training_system_started()
+    
+    case UFFTraining.SessionCapture.export_training_data(String.to_atom(format)) do
+      {:ok, training_data} ->
+        # Write exported data
+        case format do
+          "json" ->
+            json_data = Jason.encode!(training_data, pretty: true)
+            File.write!(output_file, json_data)
+            
+          "kaggle" ->
+            # Create Kaggle-specific format
+            kaggle_data = prepare_kaggle_export(training_data)
+            json_data = Jason.encode!(kaggle_data, pretty: true)
+            File.write!(output_file, json_data)
+            
+          "sagemaker" ->
+            # Create SageMaker-specific format  
+            sagemaker_data = prepare_sagemaker_export(training_data)
+            json_data = Jason.encode!(sagemaker_data, pretty: true)
+            File.write!(output_file, json_data)
+            
+          _ ->
+            json_data = Jason.encode!(training_data, pretty: true)
+            File.write!(output_file, json_data)
+        end
+        
+        IO.puts("✅ Training data exported successfully!")
+        IO.puts("📊 Export Summary:")
+        IO.puts("  • Total Sessions: #{length(training_data)}")
+        IO.puts("  • File Size: #{File.stat!(output_file).size} bytes")
+        IO.puts("  • Tank Building Stages: #{count_stages(training_data)}")
+        
+        # Platform-specific instructions
+        case platform do
+          "kaggle" ->
+            IO.puts("\n🔥 Next Steps for Kaggle:")
+            IO.puts("  1. Run: python kaggle_training_setup.py")
+            IO.puts("  2. Upload to Kaggle dataset")
+            IO.puts("  3. Launch training notebook")
+            
+          "sagemaker" -> 
+            IO.puts("\n⚡ Next Steps for SageMaker:")
+            IO.puts("  1. Run: python sagemaker_training_setup.py")
+            IO.puts("  2. Upload to S3: aws s3 cp #{output_file} s3://uff-training-data/")
+            IO.puts("  3. Launch training job")
+            
+          _ ->
+            IO.puts("\n💡 Ready for cloud training platforms!")
+        end
+        
+      {:error, reason} ->
+        IO.puts("❌ Export failed: #{reason}")
+    end
+  end
+
   defp execute_command(:help, _options) do
     print_header()
     print_usage()
@@ -292,6 +394,8 @@ defmodule UFFTrainingCLI do
     IO.puts("  status       - Show system status")
     IO.puts("  metrics      - Display training metrics")
     IO.puts("  deploy       - Deploy model to UFM federation")
+    IO.puts("  export       - Export training data for cloud platforms")
+    IO.puts("  griffith     - Manage DeepSeek models on Griffith server")
     IO.puts("  help         - Show this help")
   end
   
@@ -543,6 +647,160 @@ defmodule UFFTrainingCLI do
     parse_options(options, [
       version: "latest",
       replicas: 3
+    ])
+  end
+  
+  defp parse_export_options(options) do
+    parse_options(options, [
+      format: "json",
+      output: "training_data.json",
+      platform: "all"
+    ])
+  end
+  
+  defp prepare_kaggle_export(training_data) do
+    %{
+      dataset_info: %{
+        title: "UFF Tank Building Training Corpus",
+        description: "Training sessions for UFF DeepSeek 6.7B-FP16 model with Tank Building methodology",
+        tags: ["machine-learning", "tank-building", "component-generation", "elixir"]
+      },
+      training_sessions: Enum.map(training_data, fn session ->
+        %{
+          session_id: session.session_id,
+          tank_building_stage: session.tank_building_stage,
+          component_code: session.component_code,
+          claude_feedback: session.claude_feedback,
+          reward_score: session.reward_signals.total_reward,
+          created_at: session.created_at,
+          kaggle_optimized: true
+        }
+      end),
+      model_config: %{
+        architecture: "DeepSeek 6.7B-FP16",
+        training_type: "RL + Supervised Fine-tuning",
+        gpu_type: "P100",
+        max_training_hours: 12
+      }
+    }
+  end
+  
+  defp prepare_sagemaker_export(training_data) do
+    %{
+      algorithm_specification: %{
+        training_image: "763104351884.dkr.ecr.us-west-2.amazonaws.com/pytorch-training:1.13.1-gpu-py39-cu117-ubuntu20.04-sagemaker",
+        training_input_mode: "File"
+      },
+      training_data: Enum.map(training_data, fn session ->
+        %{
+          session_id: session.session_id,
+          input_text: "Tank Building #{session.tank_building_stage}: #{session.component_code}",
+          target_text: session.component_code,
+          reward_signal: session.reward_signals.total_reward,
+          supervision_score: session.claude_supervision_score || 0.85,
+          metadata: %{
+            stage: session.tank_building_stage,
+            created_at: session.created_at
+          }
+        }
+      end),
+      hyperparameters: %{
+        model_name: "deepseek-ai/deepseek-coder-6.7b-base",
+        num_train_epochs: "3",
+        per_device_train_batch_size: "4",
+        gradient_accumulation_steps: "4",
+        learning_rate: "5e-6",
+        warmup_steps: "100"
+      },
+      resource_config: %{
+        instance_type: "ml.p3.2xlarge",
+        instance_count: 1,
+        volume_size_gb: 100
+      }
+    }
+  end
+  
+  defp count_stages(training_data) do
+    training_data
+    |> Enum.map(& &1.tank_building_stage)
+    |> Enum.group_by(& &1)
+    |> Enum.map(fn {stage, sessions} -> "#{stage}: #{length(sessions)}" end)
+    |> Enum.join(", ")
+  end
+  
+  # Griffith Integration Helper Functions
+  
+  defp show_griffith_status do
+    case UFFTraining.GriffithIntegration.get_manager_model_status() do
+      status ->
+        IO.puts("📡 Griffith Host: #{status.griffith_host}")
+        IO.puts("🔗 Connection: #{status.connection_status}")
+        IO.puts("🧠 Manager Models: #{Enum.join(status.manager_models, ", ")}")
+        IO.puts("📊 VRAM Usage: #{status.estimated_vram_usage}")
+        IO.puts("✅ Deployment Ready: #{status.deployment_ready}")
+    end
+  end
+  
+  defp deploy_griffith_models do
+    IO.puts("🚀 Deploying 6 manager models to Griffith...")
+    IO.puts("   UFM, UCM, URM, ULM, UIM, UAM")
+    
+    case UFFTraining.GriffithIntegration.deploy_manager_models() do
+      :ok ->
+        IO.puts("✅ All manager models deployed to Griffith!")
+        IO.puts("🧠 Each model: DeepSeek 6.7B-FP16 (5GB VRAM)")
+        
+      {:error, reason} ->
+        IO.puts("❌ Deployment failed: #{reason}")
+    end
+  end
+  
+  defp start_griffith_models do
+    IO.puts("🚀 Starting all manager models on Griffith...")
+    
+    case UFFTraining.GriffithIntegration.start_all_manager_models() do
+      :ok ->
+        IO.puts("✅ All 6 manager models started!")
+        
+      {:error, reason} ->
+        IO.puts("❌ Failed to start models: #{reason}")
+    end
+  end
+  
+  defp stop_griffith_models do
+    IO.puts("🛑 Stopping all manager models on Griffith...")
+    
+    case UFFTraining.GriffithIntegration.stop_all_manager_models() do
+      :ok ->
+        IO.puts("✅ All manager models stopped")
+        
+      {:error, reason} ->
+        IO.puts("❌ Failed to stop models: #{reason}")
+    end
+  end
+  
+  defp test_griffith_generation(manager, prompt) do
+    IO.puts("🧪 Testing #{manager} model generation on Griffith...")
+    IO.puts("📝 Prompt: #{prompt}")
+    
+    case UFFTraining.GriffithIntegration.generate_with_manager(manager, prompt) do
+      {:ok, response} ->
+        IO.puts("✅ Generation successful!")
+        IO.puts("📄 Response:")
+        IO.puts("=" |> String.duplicate(50))
+        IO.puts(response)
+        IO.puts("=" |> String.duplicate(50))
+        
+      {:error, reason} ->
+        IO.puts("❌ Generation failed: #{reason}")
+    end
+  end
+  
+  defp parse_griffith_options(options) do
+    parse_options(options, [
+      action: "status",
+      manager: :ufm,
+      prompt: "Generate a simple component"
     ])
   end
   
