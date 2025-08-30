@@ -25,11 +25,52 @@ defmodule UFFTraining.TrainingCoordinator do
   
   # Training configuration
   @uff_model_size "6.7B-FP16"
-  @training_batch_size 32
-  @rl_learning_rate 0.0001
-  @supervised_learning_rate 0.00005
   @training_epochs_per_cycle 100
-  @model_checkpoint_frequency 1000  # steps
+  @model_checkpoint_frequency 500  # steps (more frequent for longer epochs)
+  
+  # GPU-adaptive configuration
+  defp get_training_config do
+    gpu_count = detect_gpu_count()
+    
+    case gpu_count do
+      count when count >= 2 ->
+        %{
+          training_batch_size: 32,
+          rl_learning_rate: 0.0001,
+          supervised_learning_rate: 0.00005,
+          deepspeed_config: "priv/deepspeed_configs/uff_dual_gpu_config.json",
+          gpu_count: count,
+          micro_batch_size: 2,
+          gradient_accumulation_steps: 8
+        }
+      1 ->
+        %{
+          training_batch_size: 16,
+          rl_learning_rate: 0.00005,
+          supervised_learning_rate: 0.000025,
+          deepspeed_config: "priv/deepspeed_configs/uff_single_gpu_config.json",
+          gpu_count: 1,
+          micro_batch_size: 1,
+          gradient_accumulation_steps: 16
+        }
+      _ ->
+        Logger.error("UFFTraining: No GPUs detected - cannot proceed with training")
+        %{error: :no_gpus}
+    end
+  end
+  
+  defp detect_gpu_count do
+    case System.cmd("nvidia-smi", ["--list-gpus"]) do
+      {output, 0} ->
+        output
+        |> String.split("\n")
+        |> Enum.filter(&(String.trim(&1) != ""))
+        |> length()
+      _ ->
+        Logger.warn("UFFTraining: nvidia-smi not available, assuming no CUDA GPUs")
+        0
+    end
+  end
   
   defmodule TrainingState do
     defstruct [
@@ -117,29 +158,45 @@ defmodule UFFTraining.TrainingCoordinator do
   def handle_call(:initialize_training, _from, state) do
     Logger.info("UFFTraining: Initializing UFF deep-seq #{@uff_model_size} training pipeline")
     
-    # Initialize training infrastructure
-    training_config = %{
-      model_architecture: "UFF deep-seq #{@uff_model_size}",
-      training_type: "RL + Supervised Fine-tuning",
-      batch_size: @training_batch_size,
-      rl_learning_rate: @rl_learning_rate,
-      supervised_learning_rate: @supervised_learning_rate,
-      epochs_per_cycle: @training_epochs_per_cycle,
-      checkpoint_frequency: @model_checkpoint_frequency
-    }
+    # Get GPU-adaptive training configuration
+    gpu_config = get_training_config()
     
-    # Create initial model checkpoint
-    initial_checkpoint = create_model_checkpoint("0.1.0-alpha", training_config)
-    
-    new_state = %{state |
-      training_active: true,
-      model_checkpoints: [initial_checkpoint],
-      training_pipeline_status: :initialized
-    }
-    
-    Logger.info("UFFTraining: Training pipeline initialized")
-    
-    {:reply, {:ok, training_config}, new_state}
+    case gpu_config do
+      %{error: :no_gpus} ->
+        {:reply, {:error, :no_gpus_detected}, state}
+        
+      config ->
+        Logger.info("UFFTraining: Detected #{config.gpu_count} GPU(s) - using #{config.deepspeed_config}")
+        Logger.info("UFFTraining: Batch size: #{config.training_batch_size}, Micro-batch: #{config.micro_batch_size}")
+        
+        # Initialize training infrastructure with adaptive config
+        training_config = %{
+          model_architecture: "UFF deep-seq #{@uff_model_size}",
+          training_type: "RL + Supervised Fine-tuning",
+          gpu_count: config.gpu_count,
+          batch_size: config.training_batch_size,
+          micro_batch_size: config.micro_batch_size,
+          gradient_accumulation_steps: config.gradient_accumulation_steps,
+          rl_learning_rate: config.rl_learning_rate,
+          supervised_learning_rate: config.supervised_learning_rate,
+          epochs_per_cycle: @training_epochs_per_cycle,
+          checkpoint_frequency: @model_checkpoint_frequency,
+          deepspeed_config: config.deepspeed_config
+        }
+        
+        # Create initial model checkpoint
+        initial_checkpoint = create_model_checkpoint("0.1.0-alpha", training_config)
+        
+        new_state = %{state |
+          training_active: true,
+          model_checkpoints: [initial_checkpoint],
+          training_pipeline_status: :initialized
+        }
+        
+        Logger.info("UFFTraining: Training pipeline initialized with #{config.gpu_count} GPU(s)")
+        
+        {:reply, {:ok, training_config}, new_state}
+    end
   end
   
   @impl true
