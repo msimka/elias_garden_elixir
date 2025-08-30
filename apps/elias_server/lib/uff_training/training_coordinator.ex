@@ -133,6 +133,53 @@ defmodule UFFTraining.TrainingCoordinator do
     GenServer.call(__MODULE__, {:deploy_model, model_version})
   end
   
+  @doc """
+  Schedule weekly training per architect guidance: 58h/week hybrid strategy
+  """
+  def schedule_weekly_training(env) do
+    # Implement architect's hybrid strategy: 60% main, 40% managers
+    platforms = [
+      %{name: "kaggle", hours: 30, focus: :main}, 
+      %{name: "sagemaker", hours: 28, focus: :managers}
+    ]
+    
+    schedule = generate_schedule(platforms)
+    broadcast_schedule(schedule)
+  end
+  
+  defp generate_schedule(platforms) do
+    # Generate weekly schedule per architect guidance
+    Enum.flat_map(1..7, fn day ->
+      [
+        %{day: day, platform: "kaggle", model: "main_uff", duration: 4.3, focus: "Tank Building general"},
+        %{day: day, platform: "sagemaker", model: get_daily_manager(day), duration: 4, focus: "Manager specialization"}
+      ]
+    end)
+  end
+  
+  defp get_daily_manager(day) do
+    managers = [:ufm, :ucm, :urm, :ulm, :uim, :uam]
+    Enum.at(managers, rem(day - 1, 6))
+  end
+  
+  defp broadcast_schedule(schedule) do
+    # Save schedule and notify other processes
+    schedule_path = "apps/elias_server/priv/uff_schedules/weekly_schedule.json"
+    File.mkdir_p!(Path.dirname(schedule_path))
+    
+    case Jason.encode(schedule, pretty: true) do
+      {:ok, json} ->
+        File.write!(schedule_path, json)
+        Logger.info("📅 Weekly training schedule saved")
+        
+        # Broadcast to UFM for federation coordination
+        GenServer.cast(UFFTraining.UFMIntegration, {:schedule_update, schedule})
+        
+      {:error, reason} ->
+        Logger.error("Failed to encode schedule: #{reason}")
+    end
+  end
+  
   # GenServer Callbacks
   
   @impl true
