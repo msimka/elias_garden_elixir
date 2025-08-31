@@ -37,9 +37,13 @@ defmodule UFFTraining.ManagerModels do
       context_window: 4096,
       responsibilities: [
         "Multi-format content processing",
-        "Pipeline optimization patterns",
+        "Pipeline optimization patterns", 
         "Content transformation logic",
-        "Format-specific extraction algorithms"
+        "Format-specific extraction algorithms",
+        "External application content management",
+        "Personal content repository (books, posts, ideas)",
+        "Sandbox content isolation and testing",
+        "Non-core project file organization"
       ]
     },
     
@@ -72,8 +76,12 @@ defmodule UFFTraining.ManagerModels do
       responsibilities: [
         "Tank Building methodology refinement",
         "Component quality assessment", 
-        "Learning pattern recognition",
-        "Adaptive improvement strategies"
+        "Learning pattern recognition", 
+        "Adaptive improvement strategies",
+        "Personal thought and idea capture",
+        "Business concept analysis and development",
+        "Pattern learning from user experiences",
+        "Continuous methodology evolution"
       ]
     },
     
@@ -109,6 +117,25 @@ defmodule UFFTraining.ManagerModels do
         "Creative component generation",
         "Artistic design patterns"
       ]
+    },
+    
+    # UDM - Universal Deployment Management Model (7th Manager)
+    udm: %{
+      model_name: "uff-deepseek-udm-6.7b-fp16",
+      specialization: :universal_deployment_orchestration,
+      training_corpus: "udm_deployment_patterns",
+      deployment_path: "/opt/elias/models/udm/",
+      vram_allocation: "5GB",
+      batch_size: 8,
+      context_window: 4096,
+      responsibilities: [
+        "Automated CI/CD pipeline management",
+        "Zero-downtime deployment coordination", 
+        "Blockchain-verified release management",
+        "Rollback and recovery orchestration",
+        "Environment and configuration management",
+        "Cross-platform deployment strategies"
+      ]
     }
   }
   
@@ -125,7 +152,7 @@ defmodule UFFTraining.ManagerModels do
     %{
       server: "griffith.local",
       base_model_path: "/opt/elias/models/base/deepseek-6.7b-fp16/",
-      total_vram_requirement: "30GB",  # 6 models x 5GB each
+      total_vram_requirement: "35GB",  # 7 models x 5GB each
       deployment_strategy: :distributed,
       manager_instances: Map.keys(@manager_model_configs),
       load_balancer_config: %{
@@ -154,7 +181,7 @@ defmodule UFFTraining.ManagerModels do
     fi
     
     # Deploy each manager model
-    for manager in ufm ucm urm ulm uim uam; do
+    for manager in ufm ucm urm ulm uim uam udm; do
         echo "🧠 Setting up $manager model instance..."
         
         MODEL_DIR="/opt/elias/models/$manager"
@@ -180,8 +207,8 @@ defmodule UFFTraining.ManagerModels do
         echo "✅ $manager model configured"
     done
     
-    echo "🎉 All 6 manager models deployed on Griffith!"
-    echo "📊 Total VRAM usage: 30GB (6 models x 5GB each)"
+    echo "🎉 All 7 manager models deployed on Griffith!"
+    echo "📊 Total VRAM usage: 35GB (7 models x 5GB each)"
     echo "🔗 Models ready for ELIAS federation integration"
     """
   end

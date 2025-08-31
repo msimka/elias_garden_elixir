@@ -1,0 +1,180 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Arial-BoldMT;\f2\froman\fcharset0 Times-Roman;
+\f3\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red237\green237\blue237;\red25\green25\blue25;\red0\green0\blue0;
+\red255\green255\blue255;\red154\green154\blue154;\red13\green13\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c94510\c94510\c94510;\cssrgb\c12941\c12941\c12941;\cssrgb\c0\c0\c0;
+\cssrgb\c100000\c100000\c100000\c10196;\cssrgb\c66667\c66667\c66667;\cssrgb\c5882\c5882\c5882;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Low-rank adaptation, or LoRA,\'a0 allows you to efficiently customize\'a0\'a0\cb1 \
+\cb3 pre-trained neural networks such as\'a0 diffusion models or language models.\cb1 \
+\cb3 It speeds up training and drastically reduces\'a0 the size of model checkpoints by training very\'a0\'a0\cb1 \
+\cb3 few parameters compared to the base model while\'a0 preserving the performance of full fine-tuning,\'a0\'a0\cb1 \
+\cb3 and it has become one of the go-to\'a0 methods for customizing AI models.\cb1 \
+\cb3 My name is Edward Hu, and I led the invention\'a0 of LoRA when I was a researcher at Microsoft.\cb1 \
+\cb3 In this video, I'll share the research\'a0 story behind LoRA, how I understand it,\'a0\'a0\cb1 \
+\cb3 and its technical benefits.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 How we came up with LoRA
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 It was early 2021 and GPT-3 just came out the\'a0 year before -- feels like such a long time ago.\cb1 \
+\cb3 Microsoft at the time just partnered\'a0 up with OpenAI. My team at Microsoft\'a0\'a0\cb1 \
+\cb3 was tasked with answering "can this\'a0 GPT-3 stuff actually make money?"\cb1 \
+\cb3 A somewhat surprising finding was\'a0 that few-shot prompting was not\'a0\'a0\cb1 \
+\cb3 enough to get even the largest models\'a0 to perform well enough for production,\'a0\'a0\cb1 \
+\cb3 especially for tasks like natural language to code\'a0 because it rarely appears in the training data.\cb1 \
+\cb3 Fine-tuning through gradient\'a0 updates was a necessity.\cb1 \
+\cb3 However, full fine tuning is prohibitively\'a0 expensive: a single model checkpoint for the\'a0\'a0\cb1 \
+\cb3 175 billion parameter variant is 1 Terabyte large,\'a0 which is hard to store and takes minutes to load\'a0\'a0\cb1 \
+\cb3 when deployed, and that's not going to work when\'a0 we need to switch among tasks and users rapidly.\cb1 \
+\cb3 We tried many off-the-shelf parameter-efficient\'a0\'a0\cb1 \
+\cb3 fine-tuning methods but all of them\'a0 had to compromise for our case.\cb1 \
+\cb3 It was with product impact in\'a0 mind that we invented LoRA.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 What is LoRA?
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 So what is LoRA?\cb1 \
+\cb3 I like to see it as a generalization of\'a0 full fine-tuning by asking two questions.\cb1 \
+\cb3 Question one: do we need to\'a0 find- tune all the parameters?\cb1 \
+\cb3 Question two: for the weight\'a0 matrices we fine-tune,\'a0\'a0\cb1 \
+\cb3 how expressive should the updates\'a0 be in terms of matrix rank?\cb1 \
+\cb3 We can turn these two questions\'a0 into the two axes of a 2D plane.\'a0\cb1 \
+\cb3 Full fine-tuning is all the way\'a0 in the upper-right corner and\'a0\'a0\cb1 \
+\cb3 the axes, including the origin,\'a0 correspond to the original model.\cb1 \
+\cb3 Any point in this box is a\'a0 valid LoRA configuration.\cb1 \
+\cb3 Let's quickly talk about how\'a0 we control the expressivity\'a0\'a0\cb1 \
+\cb3 of a matrix update by controlling its rank.\cb1 \
+\cb3 A d by d matrix can represent any linear\'a0 transformation in a d-dimensional vector\'a0\'a0\cb1 \
+\cb3 space. However, if we start with a vector in R^d,\'a0 first transform it to R^r where r is less than d,\'a0\'a0\cb1 \
+\cb3 and finally transform it back\'a0 to R^d, we restrict the kind of\'a0\'a0\cb1 \
+\cb3 linear transformations we can represent. How does stopping by R^r achieve that?\cb1 \
+\cb3 Imagine the extreme case where r or\'a0 rank equals one -- whatever the input\'a0\'a0\cb1 \
+\cb3 does boils down to just one number,\'a0 which can only scale the output.\cb1 \
+\cb3 By picking a small r, the kind\'a0 of linear transformation we can\'a0\'a0\cb1 \
+\cb3 represent is greatly limited, even\'a0 though the output is still in R^d.\cb1 \
+\cb3 Now we only have to store 2 * d\'a0 * r parameters instead of d^2.\cb1 \
+\cb3 This is how LoRA stores matrix updates.\cb1 \
+\cb3 Now back to the 2D plane we talked about.\cb1 \
+\cb3 A surprising result of the LoRA\'a0 paper is that a point near the\'a0\'a0\cb1 \
+\cb3 origin can perform just as well as full\'a0 fine-tuning all the way in the corner.\cb1 \
+\cb3 Once we see LoRA as a generalization of full\'a0 fine-tuning, we can easily answer some commonly\'a0\'a0\cb1 \
+\cb3 asked questions for using LoRA such as how to\'a0 choose the rank R or when to use full fine-tuning.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 How to choose the rank r?
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 Since full fine-tuning is a special case of\'a0 LoRA, and we know that full fine-tuning works,\'a0\'a0\cb1 \
+\cb3 we can start with a point near the origin\'a0 and work our way back to the corner.\cb1 \
+\cb3 At some point, this has to\'a0 work and more likely than not,\'a0\'a0\cb1 \
+\cb3 what ended up working will be near the origin.\cb1 \
+\cb3 Otherwise, just give up and do full\'a0 fine-tuning. How may that happen?\cb1 \
+\cb3 Let's consider a thought experiment: if\'a0 we take a language model pre-trained on\'a0\'a0\cb1 \
+\cb3 English and English only, but we want to\'a0 adapt it for some tasks, say, in Martian,\'a0\'a0\cb1 \
+\cb3 and let's say that English and\'a0 Martian have little in common.\cb1 \
+\cb3 Since we're basically training the model all\'a0 over again, parameter efficient fine-tuning\'a0\'a0\cb1 \
+\cb3 methods shouldn't work too well, so we\'a0 might as well do full fine-training instead.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 Does LoRA work for my model architecture?
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 Another question is "can I use LoRA\'a0 for a certain model architecture,\'a0\'a0\cb1 \
+\cb3 say, a WaveNet or a Support Vector Machine?"\cb1 \
+\cb3 And by the way, nobody really asks about\'a0 the latter, but as long as the model uses\'a0\'a0\cb1 \
+\cb3 matrix multiplication, we can ask: do\'a0 we need to fine-tune all the parameters\'a0\'a0\cb1 \
+\cb3 and how expressive should updates be? As\'a0 long as we can ask these two questions,\'a0\'a0\cb1 \
+\cb3 we can use LoRA, which makes\'a0 it very generally applicable.\cb1 \
+\cb3 Indeed, while we invented LoRA\'a0 for large language models,\'a0\'a0\cb1 \
+\cb3 people later found it to be very\'a0 effective for diffusion models as well.\cb1 \
+\cb3 I want to point out that one advantage of\'a0 LoRA is that it's clear what to do next\'a0\'a0\cb1 \
+\cb3 if it underperforms: we adapt more\'a0 parameters and increase the rank.\cb1 \
+\cb3 For approaches like prefix\'a0 tuning, BitFit, or adapters,\'a0\'a0\cb1 \
+\cb3 it's not clear what we can do\'a0 next because there isn't a knob\'a0\'a0\cb1 \
+\cb3 to turn that allow these methods to\'a0 recover full fine-tuning unlike LoRA.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 Benefits of using LoRA
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 Now let's dive into the specifics\'a0 of the benefits of LoRA.\cb1 \
+\cb3 The most visible one is a\'a0 reduction of checkpoint sizes.\cb1 \
+\cb3 On GPT-3, we reduce the checkpoint\'a0 size from 1TB down to 25MB.\'a0\cb1 \
+\cb3 This is a direct result of\'a0 training much fewer parameters:\'a0\'a0\cb1 \
+\cb3 4.7 million in this case compared to 175 billion.\cb1 \
+\cb3 Another important benefit is that LoRA\'a0 doesn't introduce any inference latency.\cb1 \
+\cb3 You might say "hold on, do we have these\'a0 additional low rank matricies on the side?"\cb1 \
+\cb3 Well, that's true during training.\cb1 \
+\cb3 What happens during inference is that since LoRA\'a0 updates are additive to the original parameters,\'a0\'a0\cb1 \
+\cb3 we can expand the low-rank matricies\'a0 by multiplying out the low-rank bottle\'a0\'a0\cb1 \
+\cb3 and add the updates to the original parameters.\cb1 \
+\cb3 Now, we can perform inference literally\'a0 the same way as with a base model,\'a0\'a0\cb1 \
+\cb3 and there is no additional latency by definition.\cb1 \
+\cb3 When we need to switch tasks we simply repeat\'a0 the process, but this time subtract the updates.\cb1 \
+\cb3 By being careful about numerical precisions\'a0 we can recover the original parameters,\'a0\'a0\cb1 \
+\cb3 and we repeat to load another LoRA module.\cb1 \
+\cb3 This process can be done in\'a0 parallel for all parameters\'a0\'a0\cb1 \
+\cb3 and is faster than a single forward pass.\cb1 \
+\cb3 This is how we can switch models quickly without\'a0 introducing any additional inference latency.\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs43\fsmilli21600 \cf2 \cb3 Engineering ideas enabled by LoRA
+\f2\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28\fsmilli14400 \cf2 \cb3 \strokec2 Finally, I want to mention a few\'a0 engineering ideas enabled by LoRA.\cb1 \
+\cb3 The first one is to cache many LoRA\'a0 modules in RAM during deployment,\'a0\'a0\cb1 \
+\cb3 so model switching simply involves\'a0 data transfer between RAM and VRAM.\cb1 \
+\cb3 Since RAM is usually much larger than VRAM,\'a0\'a0\cb1 \
+\cb3 we can cache thousands of LoRA modules and\'a0 never worry about reading from the disk again.\cb1 \
+\cb3 Another idea is to train multiple LoRA\'a0 modules in parallel, each on its own task.\cb1 \
+\cb3 This is achieved by sharing the same\'a0 base model and routing different inputs\'a0\'a0\cb1 \
+\cb3 in a single batch through different LoRA modules.\cb1 \
+\cb3 This way, we can batch different LoRA\'a0 jobs together and fully utilize the GPUs.\cb1 \
+\cb3 There are several community implementations of\'a0 this which I have linked in the video description.\cb1 \
+\cb3 The final idea uses the fact\'a0 that LoRA modules are additive.\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb5 Imagine a pipeline where a pre-trained\'a0 model is gradually specialized.\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 Maybe it's first fine-tuned for a particular\'a0 language, and then a particular domain,\'a0\'a0\cb1 \
+\cb3 and finally a particular task\'a0 or even a specific spefic user.\cb1 \
+\cb3 The adapted models form a tree,\'a0\'a0\cb1 \
+\cb3 each nonroot node can be a LoRA module\'a0 on top of the sum of its ancestors.\cb1 \
+\cb3 The model rank can be larger\'a0 near the root and smaller near\'a0\'a0\cb1 \
+\cb3 the leaves to accommodate different dataset sizes.\cb1 \
+\cb3 Model switching here becomes tree traversal,\'a0\'a0\cb1 \
+\cb3 and we never have to load the\'a0 base model more than once.\cb1 \
+\cb3 Let me know in the comments if\'a0 you have any cool ideas on how\'a0\'a0\cb1 \
+\cb3 LoRA can be used or extended or\'a0 if you just have any questions.\cb1 \
+\cb3 I'll see you in the next video\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs24 \cf0 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec4 \
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs20 \cf0 \cb7 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f3\fs22 \cf0 \cb1 \
+}

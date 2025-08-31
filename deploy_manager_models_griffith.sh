@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deploy UFF Manager Models to Griffith Server
-# Each of the 6 managers gets a specialized DeepSeek 6.7B-FP16 instance
+# Each of the 7 managers gets a specialized DeepSeek 6.7B-FP16 instance
 
 set -e
 
@@ -8,7 +8,7 @@ GRIFFITH_HOST="griffith"
 GRIFFITH_USER="${USER}"  # Use current username
 BASE_PATH="/opt/elias"
 
-echo "🚀 Deploying 6 UFF Manager Models to Griffith..."
+echo "🚀 Deploying 7 UFF Manager Models to Griffith..."
 echo "📡 Target: ${GRIFFITH_USER}@${GRIFFITH_HOST}"
 
 # Test SSH connection
@@ -71,7 +71,7 @@ MODELEOF
 fi
 
 # Setup each manager model
-for manager in ufm ucm urm ulm uim uam; do
+for manager in ufm ucm urm ulm uim uam udm; do
     echo "🔧 Configuring $manager model..."
     
     MODEL_DIR="/opt/elias/models/$manager"
@@ -133,9 +133,9 @@ done
 # Create master control script
 cat > /opt/elias/scripts/manager_models_control.sh << 'CONTROLEOF'
 #!/bin/bash
-# Master control for all 6 manager models
+# Master control for all 7 manager models
 
-MANAGERS=(ufm ucm urm ulm uim uam)
+MANAGERS=(ufm ucm urm ulm uim uam udm)
 
 case "$1" in
     start)
@@ -143,7 +143,7 @@ case "$1" in
         for manager in "${MANAGERS[@]}"; do
             /opt/elias/models/$manager/start_model_server.sh
         done
-        echo "✅ All 6 manager models started"
+        echo "✅ All 7 manager models started"
         ;;
     
     stop)
@@ -182,9 +182,9 @@ CONTROLEOF
 
 chmod +x /opt/elias/scripts/manager_models_control.sh
 
-echo "🎉 All 6 manager models configured on Griffith!"
-echo "📊 Total setup: UFM, UCM, URM, ULM, UIM, UAM"
-echo "💾 Estimated VRAM usage: 30GB (6 models x 5GB each)"
+echo "🎉 All 7 manager models configured on Griffith!"
+echo "📊 Total setup: UFM, UCM, URM, ULM, UIM, UAM, UDM"
+echo "💾 Estimated VRAM usage: 35GB (7 models x 5GB each)"
 echo "🔧 Control script: /opt/elias/scripts/manager_models_control.sh"
 EOF
 

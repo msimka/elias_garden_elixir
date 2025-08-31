@@ -1,0 +1,177 @@
+# ELIAS Brain Extension - Core Architecture Specification
+# μTransfer + GFlowNets + mLoRA Integrated System
+# Version: 1.0 - Framework Implementation Ready
+
+@ system_overview
+  name: "ELIAS Brain Extension"
+  purpose: "Always-available personalized AI that captures, organizes, and enhances human creativity"
+  architecture: "Daemon-generated micro-LoRA forest with predictable scaling"
+  key_technologies: ["μTransfer", "GFlowNets", "mLoRA", "Continual Learning", "Elixir OTP"]
+  deployment: "Multi-device (phone, watch, earpiece) with home daemon coordination"
+
+## Core Components
+
+### **1. Personalized Daemon System**
+@ personalized_daemon
+  concept: "LoRAs generate personalized daemon code, not direct inference"
+  efficiency: "Heavy LoRA inference once daily, lightweight daemon runs 24/7"
+  personalization: "Each user gets custom daemon tailored to their thinking patterns"
+  
+  implementation:
+    module: "ELIAS.PersonalizedDaemon"
+    location: "lib/elias_brain_extension/personalized_daemon.ex"
+    responsibilities:
+      - "24/7 local execution on user devices"
+      - "Voice/text capture and intelligent structuring"
+      - "Offline idea navigation and search"
+      - "Context-aware input classification"
+      - "Personal terminology and style matching"
+      - "Background syncing with full nodes"
+
+### **2. Daemon Generator**
+@ daemon_generator
+  concept: "Generates custom daemon code from trained micro-LoRA forest"
+  frequency: "Daily for power users, weekly/monthly for casual users"
+  input: "User's complete micro-LoRA forest + recent interaction patterns"
+  output: "Compiled personalized daemon embodying user's thinking patterns"
+  
+  implementation:
+    module: "ELIAS.DaemonGenerator"
+    location: "lib/elias_brain_extension/daemon_generator.ex"
+    key_functions:
+      - "update_user_daemon(user_id)"
+      - "generate_daemon_code(base_daemon, user_patterns, user_preferences)"
+      - "deploy_daemon_update(user_id, enhanced_daemon)"
+
+### **3. Micro-LoRA Forest Manager**
+@ micro_lora_forest
+  concept: "Thousands of specialized micro-LoRAs per user across cognitive domains"
+  scaling: "μP ensures predictable hyperparameter transfer across all scales"
+  training: "mLoRA enables concurrent training of 1000+ adapters"
+  discovery: "GFlowNets discover diverse architectures for each domain"
+  
+  structure:
+    Creative_Domains: ["movie_ideas", "book_concepts", "art_projects", "music_composition"]
+    Business_Analysis: ["startup_evaluation", "market_research", "investment_analysis", "competitor_analysis"]
+    Technical_Thinking: ["system_design", "debugging_patterns", "code_optimization", "architecture_review"]
+    Personal_Organization: ["daily_planning", "goal_tracking", "habit_formation", "time_management"]
+  
+  implementation:
+    module: "ELIAS.MicroLoRAManager"
+    location: "lib/elias_brain_extension/micro_lora_manager.ex"
+    key_functions:
+      - "create_user_forest(user_id, cognitive_domains)"
+      - "update_forest_concurrent(user_id, domain_updates)"
+      - "scale_forest_with_mup(user_id, from_size, to_size)"
+
+### **4. User Pattern Learning**
+@ user_pattern_learning
+  concept: "Continual learning system that captures user's evolving thinking patterns"
+  method: "Continual Backpropagation (CBP) prevents catastrophic forgetting"
+  adaptation: "Incremental learning from daily interactions"
+  personalization: "Each micro-LoRA specializes in specific user patterns"
+  
+  implementation:
+    module: "ELIAS.UserPatternLearning"
+    location: "lib/elias_brain_extension/user_pattern_learning.ex"
+    key_functions:
+      - "extract_user_patterns(user_id, interaction_history)"
+      - "update_patterns_incremental(user_id, new_interactions)"
+      - "prevent_catastrophic_forgetting(existing_patterns, new_patterns)"
+
+## AI Integration Layer
+
+### **5. μTransfer Integration**
+@ mu_transfer_integration
+  purpose: "Zero-shot hyperparameter transfer from small proxy models to production scale"
+  cost_reduction: "99% reduction in hyperparameter tuning costs"
+  scaling_guarantee: "Mathematical guarantee of stable scaling via μP"
+  
+  implementation:
+    module: "ELIAS.MuTransfer"
+    location: "lib/ai_integration/mu_transfer/hyperparameter_transfer.ex"
+    key_functions:
+      - "setup_mup_scaling(base_model, target_model)"
+      - "transfer_hyperparameters(tuned_small_model, production_model)"
+      - "validate_mup_implementation(model)"
+
+### **6. GFlowNets Integration**
+@ gflownet_integration  
+  purpose: "Discover diverse micro-LoRA architectures and generate creative ideas"
+  advantage: "Proportional sampling ensures diversity, not just optimization"
+  applications: ["Architecture discovery", "Creative idea generation", "Diverse solution exploration"]
+  
+  implementation:
+    module: "ELIAS.GFlowNetIntegration"
+    location: "lib/ai_integration/gflownet/architecture_discovery.ex"
+    key_functions:
+      - "discover_diverse_architectures(domain, user_patterns)"
+      - "sample_creative_ideas(user_constraints, diversity_requirement)"
+      - "evaluate_architecture_effectiveness(architecture)"
+
+### **7. mLoRA Integration**
+@ mlora_integration
+  purpose: "Concurrent training and serving of thousands of micro-LoRAs"
+  scalability: "Unified memory management for massive adapter collections"
+  efficiency: "4x throughput improvement via optimized batching"
+  
+  implementation:
+    module: "ELIAS.MLoRAIntegration"
+    location: "lib/ai_integration/mlora/concurrent_trainer.ex"
+    key_functions:
+      - "train_concurrent_adapters(micro_lora_batch)"
+      - "manage_unified_memory_pool(active_adapters)"
+      - "optimize_adapter_serving(user_requests)"
+
+## System Architecture Flow
+
+### **Daily Update Cycle**
+```
+1. Collect user interactions → User Pattern Learning
+2. Update micro-LoRA forest → mLoRA concurrent training (with μP transferred HP)
+3. Discover new architectures → GFlowNets architecture search
+4. Generate enhanced daemon → Daemon Generator
+5. Deploy to user devices → Personalized Daemon update
+```
+
+### **User Interaction Flow**
+```
+User: "Movie idea about time travel..."
+↓ 
+Personalized Daemon (local):
+  - Recognizes creative input type
+  - Applies user's movie structuring patterns  
+  - Stores in personal Tiki hierarchy
+  - Uses GFlowNet-generated diverse suggestions
+↓
+Background sync with full node for LoRA training
+```
+
+### **Scaling Architecture**
+```
+Individual User: 1,000-5,000 micro-LoRAs
+Full Node: 30-50 users (30K-250K total adapters)
+Federation: 5 full nodes, 100-150 users total
+μP Scaling: Hyperparameters tuned once, transferred to all scales
+```
+
+## Success Metrics
+
+@ success_criteria
+  user_experience: "Feels like talking to an enhanced version of yourself"
+  response_time: "<100ms for local daemon responses"
+  personalization_quality: "90%+ accuracy in understanding user's style/preferences"  
+  creative_diversity: "GFlowNets prevent repetitive/stale idea generation"
+  scaling_efficiency: "Linear cost scaling with user base via μP transfer"
+  training_stability: "99% successful micro-LoRA training convergence"
+
+## Implementation Priority
+
+@ development_phases
+  Phase_1: "Core daemon architecture + basic micro-LoRA management"
+  Phase_2: "μTransfer integration for hyperparameter scaling"
+  Phase_3: "GFlowNets integration for diverse architecture discovery"
+  Phase_4: "mLoRA integration for concurrent training at scale"
+  Phase_5: "Full system integration + multi-device deployment"
+
+This specification defines the complete ELIAS brain extension system, ready for implementation with comprehensive stub creation and development roadmap.

@@ -1,0 +1,70 @@
+# Student Learning Profile - Mike's AI Journey
+# Tracking knowledge state, progress, and learning needs
+# Updated: 2025-08-31
+
+@ student_info
+  name: "Mike"
+  learning_style: "hands-on, practical applications first"
+  background: "technical, software development"
+  goal: "master AI concepts from fundamentals to cutting edge"
+
+@ current_knowledge_state
+  ## Confirmed Knowledge ✓
+  - Software engineering and system architecture
+  - Elixir/functional programming expertise
+  - Basic understanding of neural networks (assumed)
+  - Experience with complex systems and distributed architectures
+  
+  ## Learning Targets 🎯
+  - Deep learning plasticity and continual learning
+  - Attention mechanisms and transformer architecture
+  - Reinforcement learning and agent design
+  - Modern AI research methodologies
+  
+  ## Knowledge Gaps (To Address) ❌
+  - Mathematical foundations of deep learning
+  - Specific attention mechanism implementations
+  - Reinforcement learning theory and practice
+  - Research paper analysis and synthesis
+
+@ available_source_materials
+  papers_processed: [
+    "sutton_continual_learning_transcript.md",
+    "uszkoreit_transformer_interview.md", 
+    "oak_architecture_paper.md"
+  ]
+  
+  papers_pending: []
+  
+  learning_artifacts: [
+    "ai_concepts_master.tiki"
+  ]
+
+@ learning_progression_plan
+  current_phase: "Foundation Building"
+  next_milestone: "Understanding Neural Network Basics"
+  
+  phase_1_foundations: [
+    "What is a neural network?",
+    "How do networks learn?", 
+    "Why do they stop learning?",
+    "What makes learning 'continual'?"
+  ]
+  
+  phase_2_mechanisms: [
+    "Attention vs recurrence",
+    "Parallel processing advantages", 
+    "Sequence modeling fundamentals"
+  ]
+  
+  phase_3_architectures: [
+    "Reinforcement learning basics",
+    "Agent design principles",
+    "Hierarchical learning systems"
+  ]
+
+@ teaching_approach
+  method: "Socratic + hands-on experimentation"
+  pace: "student-driven, comprehensive understanding over speed"
+  focus: "practical intuition first, then mathematical rigor"
+  integration: "connect each new concept to previous knowledge"

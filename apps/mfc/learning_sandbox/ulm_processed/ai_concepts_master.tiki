@@ -1,0 +1,321 @@
+# AI Learning Mastery - Tiki Hierarchical Knowledge System
+# From Sutton, Uszkoreit, and Oak Architecture Papers
+# Generated 2025-08-31 for ULM Learning Pipeline
+
+@ meta
+  source_papers: ["sutton_continual_learning", "jakob_uszkoreit_transformer", "oak_architecture"]  
+  learning_objective: "Master foundational AI concepts from deep learning plasticity to transformer architectures"
+  difficulty_progression: "beginner -> intermediate -> advanced -> expert"
+  estimated_duration: "4-6 weeks intensive study"
+
+## Core Learning Pillars
+
+### Pillar-1: Deep Learning Foundations & Plasticity Crisis
+  @ concepts
+    - Neural network training dynamics
+    - Continual vs transient learning
+    - Loss of plasticity phenomenon
+    - Catastrophic forgetting vs plasticity loss
+    
+  @ key_insights
+    - **Sutton's Discovery**: Standard deep learning fails at continual learning
+    - Networks become "dormant" - units stop activating effectively
+    - Weight magnitudes grow unbounded without proper regularization
+    - This is why AI systems can't learn continuously like humans
+
+  @ learning_path
+    1. **Understand the Problem**
+       - Why can't neural networks learn continuously?
+       - What happens to network weights over time?
+       - How does this affect real AI systems?
+    
+    2. **Explore Solutions** 
+       - L2 regularization keeps weights manageable
+       - Continual Backprop: selective reinitialization
+       - Shrink & Perturb: controlled weight perturbation
+    
+    3. **Apply Knowledge**
+       - Recognize plasticity loss in your models
+       - Implement continual learning techniques
+       - Design systems that learn throughout their lifetime
+
+### Pillar-2: Transformer Revolution & Attention Mechanisms  
+  @ concepts
+    - Self-attention mechanism
+    - Sequence-to-sequence modeling
+    - Parallel vs sequential processing
+    - Hierarchical signal processing
+    
+  @ key_insights
+    - **Uszkoreit's Innovation**: Attention allows parallel processing of sequences
+    - RNNs forced sequential processing (computational bottleneck)
+    - Self-attention creates "soft tree structures" dynamically
+    - Universal architecture applicable across domains
+    
+  @ learning_path
+    1. **Historical Context**
+       - From rule-based to statistical to neural language processing
+       - Why RNNs were limited despite being more expressive
+       - The computational efficiency breakthrough
+    
+    2. **Technical Deep Dive**
+       - How self-attention compares all sequence positions pairwise
+       - Parallel computation enables massive scaling
+       - Position encoding preserves sequential information
+    
+    3. **Impact & Applications**
+       - GPT, BERT, and the LLM explosion
+       - Multi-modal applications (vision, protein folding)
+       - The path to current AI capabilities
+
+### Pillar-3: Reinforcement Learning & Agent Architecture
+  @ concepts  
+    - Options framework (policies + termination functions)
+    - Runtime vs design-time learning
+    - Big World Hypothesis
+    - Auxiliary task learning
+    
+  @ key_insights
+    - **Sutton's Vision**: Intelligence emerges from experience, not pre-training
+    - Agents must create their own subproblems (like children playing)
+    - The world is too big to model completely - agents must adapt
+    - Options enable hierarchical planning and abstraction
+    
+  @ learning_path
+    1. **Foundations**
+       - Reward hypothesis: all goals can be scalar rewards
+       - Model-free vs model-based reinforcement learning
+       - Why experience beats pre-programmed knowledge
+    
+    2. **Oak Architecture**
+       - 8-step parallel runtime learning system
+       - How features become subproblems become options
+       - Planning with learned option models
+    
+    3. **Future Implications**
+       - Path to artificial general intelligence
+       - Continuous learning throughout agent lifetime
+       - Open-ended abstraction discovery
+
+## Learning Modules
+
+### Module-1: The Plasticity Problem [Week 1]
+  @ exercises
+    - **Experiment 1**: Train a network on continual ImageNet pairs
+      * Observe performance degradation over tasks
+      * Plot percentage of dormant units over time
+      * Compare with L2 regularization
+    
+    - **Experiment 2**: Implement Continual Backprop
+      * Add selective unit reinitialization
+      * Measure utility of network units
+      * Compare with baseline performance
+    
+  @ key_papers_section: Sutton continual learning (plasticity experiments)
+  @ practical_application: "Why your AI model stops learning after deployment"
+
+### Module-2: Attention Mechanisms [Week 2] 
+  @ exercises
+    - **Experiment 1**: Compare RNN vs Transformer training speed
+      * Time training on long sequences
+      * Measure memory usage and computational complexity
+      * Visualize attention patterns
+    
+    - **Experiment 2**: Multi-head attention analysis
+      * What does each attention head learn?
+      * How do heads specialize for different relationships?
+      * Position encoding ablation studies
+    
+  @ key_papers_section: Uszkoreit transformer deep dive
+  @ practical_application: "Build your own mini-transformer from scratch"
+
+### Module-3: Options & Hierarchical Learning [Week 3]
+  @ exercises
+    - **Experiment 1**: Simple options in grid world
+      * Create "go to door" and "pick up key" options
+      * Learn option models and plan with them
+      * Compare with flat action space
+    
+    - **Experiment 2**: Feature-to-subproblem conversion
+      * Identify interesting state features
+      * Convert features to reward-respecting subproblems
+      * Evaluate option utility over time
+    
+  @ key_papers_section: Oak architecture options framework
+  @ practical_application: "Hierarchical AI that learns like children playing"
+
+### Module-4: Integration & Advanced Concepts [Week 4]
+  @ exercises
+    - **Project**: Build a continual learning transformer
+      * Combine plasticity preservation with attention
+      * Add option-based auxiliary tasks
+      * Test on multi-domain sequential learning
+    
+    - **Analysis**: Compare learning paradigms
+      * Design-time vs runtime learning trade-offs
+      * When is each approach superior?
+      * Future research directions
+    
+  @ synthesis: "How these three approaches could merge for AGI"
+  @ capstone: "Design your own AI architecture"
+
+## Tiki Knowledge Hierarchy
+
+### Level-1: Fundamentals (High School + Undergrad)
+  @ prerequisite_check
+    - Linear algebra: vectors, matrices, gradients
+    - Probability: distributions, expectations, Bayes rule
+    - Programming: Python, basic neural networks
+    - Calculus: derivatives, chain rule, optimization
+  
+  @ core_concepts
+    - What is a neural network?
+    - How does backpropagation work?
+    - What is reinforcement learning?
+    - Basic sequence modeling
+
+### Level-2: Intermediate (Advanced Undergrad + Grad)
+  @ advanced_concepts  
+    - Why do networks lose plasticity?
+    - How does attention enable parallel processing?
+    - What are options in RL?
+    - Continual vs catastrophic forgetting
+  
+  @ technical_depth
+    - Mathematical formulations of attention
+    - Options as semi-MDPs
+    - Gradient flow in continual learning
+    - Hierarchical abstractions
+
+### Level-3: Expert (Research Level)
+  @ cutting_edge
+    - Designing new continual learning algorithms
+    - Novel attention mechanisms beyond self-attention
+    - Open-ended option discovery
+    - Meta-learning for feature generation
+  
+  @ research_directions
+    - Solving the continual learning problem completely
+    - Attention alternatives for efficiency
+    - Runtime abstraction discovery
+    - Bridging symbolic and neural approaches
+
+## Practical Learning Assignments
+
+### Assignment-1: "Diagnose a Failing AI System"
+  @ scenario
+    You're consulting for a company whose chatbot performed well initially but has gotten worse over time, especially on new topics.
+  
+  @ tasks
+    1. Identify if this is plasticity loss or catastrophic forgetting
+    2. Propose 3 specific solutions with pros/cons
+    3. Design experiments to validate your hypothesis
+    4. Estimate implementation timeline and resources needed
+  
+  @ deliverables
+    - Technical diagnosis report (2 pages)
+    - Proposed solution architecture diagram  
+    - Experimental validation plan
+    - Implementation roadmap
+
+### Assignment-2: "Design a Learning Architecture"
+  @ scenario
+    Design an AI system for a household robot that must continuously learn new tasks throughout its lifetime while retaining all previous knowledge.
+  
+  @ requirements
+    - Must handle vision, language, and motor control
+    - Learn from limited data per task
+    - Never forget previous capabilities
+    - Self-discover useful subskills
+  
+  @ deliverables
+    - System architecture diagram with component explanations
+    - Learning algorithm specifications
+    - Evaluation metrics and benchmarks
+    - Discussion of failure modes and mitigations
+
+### Assignment-3: "Future AI Research Proposal"
+  @ scenario
+    You're applying for a PhD/postdoc position. Write a research proposal that builds on insights from all three papers.
+  
+  @ requirements
+    - Novel research direction not covered in existing work
+    - Clear technical approach and methodology
+    - Potential impact on AI field
+    - Realistic 3-5 year timeline
+  
+  @ deliverables
+    - 5-page research proposal
+    - Literature review and positioning
+    - Experimental plan with expected results
+    - Broader impact statement
+
+## Assessment & Mastery Indicators
+
+### Beginner Mastery
+  ✓ Can explain why continual learning is hard
+  ✓ Understands attention vs recurrence trade-offs  
+  ✓ Knows what options are in RL
+  ✓ Can implement basic versions of key algorithms
+
+### Intermediate Mastery  
+  ✓ Can diagnose plasticity problems in real systems
+  ✓ Designs efficient attention mechanisms
+  ✓ Creates meaningful hierarchical abstractions
+  ✓ Integrates concepts across papers
+
+### Expert Mastery
+  ✓ Proposes novel solutions to open problems
+  ✓ Sees connections to broader AI research
+  ✓ Can critique and extend existing approaches
+  ✓ Contributes original research ideas
+
+## Recommended Study Sequence
+
+### Week 1: Foundation Building
+  - Day 1-2: Read Sutton continual learning paper carefully
+  - Day 3-4: Implement simple plasticity loss experiment
+  - Day 5-7: Understand the problem deeply, research solutions
+
+### Week 2: Transformer Deep Dive
+  - Day 1-2: Read Uszkoreit interview, trace transformer history
+  - Day 3-4: Implement attention mechanism from scratch
+  - Day 5-7: Explore modern applications and limitations
+
+### Week 3: Agent Architectures
+  - Day 1-2: Study Oak architecture paper
+  - Day 3-4: Implement simple option discovery
+  - Day 5-7: Connect to broader RL and cognitive science
+
+### Week 4: Integration & Research
+  - Day 1-3: Work on capstone project combining all concepts
+  - Day 4-5: Present/discuss findings with peers
+  - Day 6-7: Plan next learning steps and research directions
+
+## Connection to Broader AI Landscape
+
+### Historical Context
+  - These papers represent key inflection points in AI development
+  - Sutton: exposed fundamental limitations of current methods
+  - Uszkoreit: enabled the modern LLM revolution  
+  - Oak: points toward more biological/cognitive approaches
+
+### Current Relevance
+  - Continual learning: critical for deployed AI systems
+  - Transformers: backbone of current AI breakthroughs
+  - Options: needed for more general AI agents
+
+### Future Implications  
+  - Solving plasticity → AI that improves throughout lifetime
+  - Post-transformer architectures → more efficient AI
+  - Runtime learning → truly general intelligence
+
+@ meta_learning_objective
+  By mastering these concepts, you'll understand both current AI limitations and the path forward to more capable, continual learning systems that can adapt and grow like biological intelligence.
+
+@ final_capstone_question
+  "How would you combine continual learning, attention mechanisms, and hierarchical options to create an AI system that learns and grows throughout its lifetime while maintaining and building upon all previous knowledge?"
+
+---
+# End of AI Concepts Master Learning System
+# Ready for ULM Learning Pipeline Integration

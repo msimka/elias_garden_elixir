@@ -326,7 +326,7 @@ defmodule UFFTraining.QualityValidator do
     base_score = 0.8
     
     # Check for single responsibility
-    function_count = String.split(component_code, "def ") |> length() - 1
+    function_count = (String.split(component_code, "def ") |> length()) - 1
     responsibility_score = if function_count <= 5, do: 0.1, else: 0.0
     
     # Check for error handling

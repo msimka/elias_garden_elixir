@@ -1,0 +1,148 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Arial-BoldMT;\f1\froman\fcharset0 Times-Roman;\f2\fswiss\fcharset0 ArialMT;
+\f3\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red237\green237\blue237;\red255\green255\blue255;\red0\green0\blue0;
+\red25\green25\blue25;\red154\green154\blue154;\red13\green13\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c94510\c94510\c94510;\cssrgb\c100000\c100000\c100000\c10196;\cssrgb\c0\c0\c0;
+\cssrgb\c12941\c12941\c12941;\cssrgb\c66667\c66667\c66667;\cssrgb\c5882\c5882\c5882;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs43\fsmilli21600 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Intro
+\f1\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs28\fsmilli14400 \cf2 \cb5 \strokec2 Training a large model like GPT 4 requires thousands of GPUs, but what if you can tune\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 its hyperparameters on just one GPU?\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 \uc0\u956 Transfer makes the hyperparameter optimization of an enormous neural network a lot cheaper\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 by optimizing hyperparameters on a much smaller model and transferring the optimal combination\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 to a large model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 It has been used by Cerebras-GPT and cited by Chichella from Google DeepMind and the\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 GPT-4 technical report.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 My name is Edward Hu.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 I'm currently a PhD student advised by Yoshua Bengio.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 I created \uc0\u956 Transfer with Greg Yang now a co-founder of xAI.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 By the end of the video, you will know what \uc0\u956 Transfer does, why it works, and how to\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 apply it today.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 First, let's break down the mechanics of \uc0\u956 Transfer.\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs43\fsmilli21600 \cf2 \cb5 \strokec2 \uc0\u956 Transfer in 3 steps
+\f1\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs28\fsmilli14400 \cf2 \cb5 \strokec2 It has three simple steps.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 First, parameterize your model in the \uc0\u956 Parametrization, or \u956 P.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Second, search for hyperparameters on the small model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Finally, copy the optimal hyperparameters of a small model to a large model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Let's unpack the first step, parameterizing the model in \uc0\u956 P, with an example.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Parameterizations describe how we change the model initialization and learning rates as\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 a function of width.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 For example, when we double the width, should we make the learning rate smaller by a factor\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 of two, smaller by a factor of the square root of two, or not at all?\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 These choices for every parameter throughout the network determine the parameterization.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 In this Jupyter notebook, we have a multi-layer perception, one parameterized in PyTorch default\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 and another in \uc0\u956 P.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 This one-line change that I've highlighted here parameterizes the model in \uc0\u956 P, and when\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 used with the \uc0\u956 Optimizer, we completely change the hyperparameter stability of the model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 In this plot, the x-axis is the learning rate, and different curves represent different widths.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 I recommend following this notebook which I have linked in the video description.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Now, you might be wondering: why these changes?\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 The default scaling in PyTorch or JAX is designed for stability during initialization but not\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 during training.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 We'll come back to this later in the video.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 In step two, we optimize hyperparameters as usual on the small model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Finally, we simply copy the optimal hyperparameters to a bigger version of the network without\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 needing to retune them.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 It's important to keep in mind that \uc0\u956 Transfer doesn't tell you what the optimal hyperparameters\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 are for the large model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Instead, it tells you how to transfer optimal hyperparameters from a small model to a large\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 model.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 For example, instead of saying that the optimal learning rate is 2, \uc0\u956 Transfer tells you that\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 for some layers, if you double the width, the optimal learning should halve.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Now, let's talk about why \uc0\u956 P and \u956 Transfer work.\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs43\fsmilli21600 \cf2 \cb5 \strokec2 Why \uc0\u956 P and \u956 Transfer work
+\f1\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs28\fsmilli14400 \cf2 \cb5 \strokec2 The most common operation in a neural network is matrix-vector multiplication, which is\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 a series of dot products.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Within each dot product, we sum over width-many products.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 In the infinite width limit, this summation has infinite terms and gives us a coordinate\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 of the preactivation.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 The key principle behind \uc0\u956 P is that this sum should neither explode to Infinity nor\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 vanish to zero because neither of these two are useful for downstream tasks.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 To ensure that we steer away from these two extremes, it's important that we understand\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 the two convergence laws governing the result of this summation: the central limit theorem\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 and the law of large numbers.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 If the individual pieces we are summing are independent and identically distributed, or\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 IID, with zero mean, the result of the sum behaves according to the central limit theorem.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 This occurs in a neural network because of the random initialization, which typically\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 has zero mean and IID coordinates.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 If these pieces we sum are IID but have nonzero mean the result behaves according to the law\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 of large numbers.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 This also occurs in the neural network because gradient updates are highly correlated with\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 the input data, and this correlation gives a nonzero mean.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Now, we have a problem because according to the central limit theorem, we need to normalize\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 by the square root of width to stabilize the sum, but according to the law of large numbers,\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 we need to normalize by width instead of its square root.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 \uc0\u956 P carefully manages these two behaviors so none of the layer activations explode or\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 vanish.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 A finite-width neural network always learns some features in every layer but the infinite-width\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 limit is much less forgiving.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 There's a trichotomy of exploding to infinity, feature learning, and vanishing to zero because\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 any incorrect scaling is instantly amplified to the extreme by the infinite sum over width.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 In fact, \uc0\u956 P is the unique parameterization that maximizes feature learning, because other\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 stable parameterizations fail to learn features in some layers.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 The \uc0\u956  in \u956 P actually stands for maximal update for this reason.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 \uc0\u956 P is also unique in that it is the only parameterization that gives empirical hyperparameter\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 stability, as shown in this animation, where we sweep learning rate for different widths.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Check out Greg Yang's 2-hour talk in the video description for a more technical take on \uc0\u956 P.\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs43\fsmilli21600 \cf2 \cb5 \strokec2 How to apply \uc0\u956 Transfer today
+\f1\b0\fs24 \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs28\fsmilli14400 \cf2 \cb5 \strokec2 Finally, how can you use \uc0\u956 P and \u956 Transfer today?\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 The easiest way is through the \uc0\u956 P repo on GitHub.\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 We have examples on MLP, Resnet, and Transformer in the repo, linked in the video description.\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb5 You can use our package directly in your code by changing a few lines of code.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Last but not the least, how can we check if \uc0\u956 P has been correctly implemented?\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 First, the activations after a few steps of training should stay stable across widths.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 We call this the coordinate check.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 We should see this stability for \uc0\u956 P but not for standard parameterization.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Once we have passed the coordinate check, a more expensive but more reliable check is\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 to verify hyperparameter stability through a sweep of a chosen hyperparameter, learning\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 rate for example, for different model widths.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 It is important that the hyperparameters for the smallest model are optimal in this case.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 You can see this example in the Jupyter notebook for more detail.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 If you encounter difficulties, a good resource is the issues in the \uc0\u956 P repo.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 You might discover that others have resolved similar issues through discussions with Greg\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 and me.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 If you can't find an answer feel free to open a new issue, and we'll try our best to respond.\cf2 \cb1 \strokec2 \
+\cf2 \cb5 \strokec2 Thank you for watching, and I hope this helps!\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec4 \
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf0 \cb7 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f3\fs22 \cf0 \cb1 \
+}

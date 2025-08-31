@@ -225,13 +225,13 @@ defmodule MultiFormatConverter.ContentExtraction.RtfTextExtractor do
         {:ok, %{
           version: version,
           charset_info: charset_info,
-          full_header: String.split(rtf_content, "}", 1) |> List.first()
+          full_header: String.split(rtf_content, "}", parts: 2) |> List.first()
         }}
         
       nil ->
         # Try simpler pattern
         if String.starts_with?(rtf_content, "{\\rtf") do
-          header_end = String.split(rtf_content, " ", 2) |> List.first()
+          header_end = String.split(rtf_content, " ", parts: 2) |> List.first()
           {:ok, %{
             version: "1",
             charset_info: "unknown",
@@ -244,24 +244,75 @@ defmodule MultiFormatConverter.ContentExtraction.RtfTextExtractor do
   end
 
   defp parse_rtf_content_blocks(rtf_content) do
-    # Tank Building Stage 2: Basic block parsing
-    # Remove RTF control codes and extract text blocks
+    # Tank Building Stage 2: More robust RTF parsing
+    # Use a simpler approach that extracts all readable text
     
-    # Step 1: Remove RTF header
-    content_without_header = Regex.replace(~r/{\\rtf[^}]*}/, rtf_content, "", global: false)
-    
-    # Step 2: Extract text between control codes
-    text_blocks = content_without_header
-    |> String.split(~r/\\[a-z]+\d*\s?/, trim: true)
-    |> Enum.map(&String.trim/1)
-    |> Enum.filter(&(String.length(&1) > 0))
-    |> Enum.map(&clean_rtf_text_block/1)
-    |> Enum.filter(&(String.length(&1) > 0))
-    
-    %{
-      text_blocks: text_blocks,
-      block_count: length(text_blocks)
-    }
+    try do
+      # Step 1: Remove RTF control words and groups
+      cleaned_text = rtf_content
+      |> remove_rtf_control_words()
+      |> remove_rtf_groups()
+      |> clean_rtf_formatting()
+      |> normalize_whitespace()
+      
+      # Step 2: Split into paragraphs
+      text_blocks = cleaned_text
+      |> String.split(~r/\n\s*\n/, trim: true)
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(&(String.length(&1) > 0))
+      
+      %{
+        text_blocks: text_blocks,
+        block_count: length(text_blocks)
+      }
+    rescue
+      error ->
+        Logger.warning("RTF parsing fallback: #{inspect(error)}")
+        # Fallback: extract any visible text
+        fallback_text = simple_rtf_extract(rtf_content)
+        %{
+          text_blocks: [fallback_text],
+          block_count: 1
+        }
+    end
+  end
+  
+  defp remove_rtf_control_words(text) do
+    # Remove RTF control words like \par, \tab, \b, etc.
+    text
+    |> String.replace(~r/\\[a-z]+\d*\s?/i, " ")
+    |> String.replace(~r/\\[^a-z\s]/i, " ")
+  end
+  
+  defp remove_rtf_groups(text) do
+    # Remove RTF groups like {\fonttbl...}, {\colortbl...}, etc.
+    text
+    |> String.replace(~r/\{\\[^}]*\}/s, " ")
+    |> String.replace(~r/\{[^}]*\}/s, " ")
+  end
+  
+  defp clean_rtf_formatting(text) do
+    # Remove remaining RTF artifacts
+    text
+    |> String.replace(~r/[{}\\]/, " ")
+    |> String.replace(~r/\\\*/, " ")
+  end
+  
+  defp normalize_whitespace(text) do
+    text
+    |> String.replace(~r/\s+/, " ")
+    |> String.replace(~r/\n\s*\n/, "\n\n")
+    |> String.trim()
+  end
+  
+  defp simple_rtf_extract(rtf_content) do
+    # Ultra-simple fallback: just extract anything that looks like readable text
+    rtf_content
+    |> String.replace(~r/\{.*?\}/s, " ")
+    |> String.replace(~r/\\[a-z0-9]+\s?/i, " ")
+    |> String.replace(~r/[{}\\]/, " ")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
   end
 
   defp clean_rtf_text_block(block) do

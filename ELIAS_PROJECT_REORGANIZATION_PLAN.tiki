@@ -1,0 +1,167 @@
+# ELIAS Project Reorganization Plan
+# Clean Architecture with Tiki Specifications
+# Ready for μTransfer + GFlowNets + mLoRA Implementation
+
+@ reorganization_goals
+  objective: "Clean project structure with comprehensive Tiki specs"
+  timeline: "Complete before implementation phase"
+  priority: "High - blocks all development work"
+  outcome: "Framework ready for μP + GFlowNet + mLoRA architecture"
+
+## Current State Analysis
+@ current_issues
+  scattered_files: "50+ markdown files in root directory"
+  mixed_concerns: "Research, specs, and implementation mixed together"
+  duplicate_content: "Multiple versions of similar documents"
+  missing_structure: "No clear separation between research, specs, and implementation"
+  outdated_content: "Many files reference old architectures"
+
+## Target Structure
+
+### **1. Research & Learning**
+```
+research/
+├── papers/
+│   ├── sutton_continual_learning.md
+│   ├── uszkoreit_transformer_interview.md  
+│   ├── oak_architecture.md
+│   ├── lora_inventor_insights.md
+│   ├── gflownet_overview.md
+│   └── mu_transfer_analysis.md
+├── analysis/
+│   ├── technology_integration_analysis.tiki
+│   ├── competitive_landscape.md
+│   └── implementation_feasibility.md
+└── notes/
+    ├── brainstorming/
+    └── meeting_notes/
+```
+
+### **2. Architecture Specifications**
+```
+specs/
+├── core_architecture/
+│   ├── elias_brain_extension.tiki
+│   ├── daemon_architecture.tiki
+│   ├── micro_lora_forest.tiki
+│   └── user_interaction_flow.tiki
+├── integration_specs/
+│   ├── mu_transfer_integration.tiki
+│   ├── gflownet_integration.tiki
+│   ├── mlora_integration.tiki
+│   └── complete_system_integration.tiki
+├── manager_specs/
+│   ├── uam.tiki (User Authentication Manager)
+│   ├── ucm.tiki (User Communication Manager)
+│   ├── udm.tiki (User Data Manager)
+│   ├── ufm.tiki (User Federation Manager)
+│   ├── uim.tiki (User Intelligence Manager)
+│   ├── ulm.tiki (User Learning Manager)
+│   └── urm.tiki (User Resource Manager)
+└── component_specs/
+    ├── multi_format_converter.tiki
+    ├── tiki_language.tiki
+    └── uff_training_system.tiki
+```
+
+### **3. Implementation Stubs**
+```
+lib/
+├── elias_brain_extension/
+│   ├── daemon_generator.ex
+│   ├── micro_lora_manager.ex
+│   ├── personalized_daemon.ex
+│   └── user_pattern_learning.ex
+├── ai_integration/
+│   ├── mu_transfer/
+│   │   ├── hyperparameter_transfer.ex
+│   │   ├── mup_scaling.ex
+│   │   └── proxy_model_trainer.ex
+│   ├── gflownet/
+│   │   ├── architecture_discovery.ex
+│   │   ├── diverse_sampling.ex
+│   │   └── creative_generator.ex
+│   ├── mlora/
+│   │   ├── concurrent_trainer.ex
+│   │   ├── unified_memory_pool.ex
+│   │   └── adapter_manager.ex
+│   └── integration/
+│       ├── training_pipeline.ex
+│       ├── scaling_coordinator.ex
+│       └── system_orchestrator.ex
+└── [existing apps structure remains]
+```
+
+### **4. Documentation**
+```
+docs/
+├── architecture/
+│   ├── system_overview.md
+│   ├── component_interactions.md
+│   └── scaling_strategy.md
+├── implementation/
+│   ├── development_roadmap.md
+│   ├── implementation_phases.md
+│   └── testing_strategy.md
+├── deployment/
+│   ├── infrastructure_requirements.md
+│   ├── deployment_guide.md
+│   └── monitoring_setup.md
+└── research/
+    ├── literature_review.md
+    ├── technology_comparison.md
+    └── innovation_summary.md
+```
+
+### **5. Clean Root Directory**
+```
+elias_garden_elixir/
+├── README.md (updated comprehensive overview)
+├── DEVELOPMENT_STATUS.md
+├── ARCHITECTURE_OVERVIEW.md
+├── apps/ (unchanged)
+├── research/ (new)
+├── specs/ (reorganized)
+├── docs/ (new)
+├── config/
+├── scripts/
+└── [essential files only]
+```
+
+## Implementation Steps
+
+### **Phase 1: Archive Current State**
+1. Create `archive/` directory for old files
+2. Move all loose markdown files to archive
+3. Preserve git history during moves
+
+### **Phase 2: Create New Structure**
+1. Create new directory structure
+2. Consolidate and clean up content
+3. Remove duplicates and outdated information
+
+### **Phase 3: Build Comprehensive Specs**
+1. Create complete Tiki specifications for all components
+2. Include μTransfer + GFlowNets + mLoRA integration specs
+3. Define clear interfaces between components
+
+### **Phase 4: Implementation Stubs**
+1. Create stub files for all major components
+2. Define module interfaces and function signatures
+3. Add comprehensive documentation strings
+
+### **Phase 5: Git Cleanup**
+1. Commit reorganized structure
+2. Push to GitHub
+3. Sync with Griffith
+4. Tag as "pre-implementation-clean-state"
+
+## Success Criteria
+- [ ] Root directory has <10 files
+- [ ] All components have Tiki specifications
+- [ ] Implementation stubs exist for all major features
+- [ ] Git history preserved during reorganization
+- [ ] Documentation is comprehensive and current
+- [ ] Project ready for μP + GFlowNet + mLoRA development
+
+This reorganization prepares us for the next phase: building the actual ELIAS brain extension framework with clean, well-specified architecture.

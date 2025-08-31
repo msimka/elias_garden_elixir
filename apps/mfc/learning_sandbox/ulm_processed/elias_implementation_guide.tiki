@@ -1,0 +1,236 @@
+# ELIAS Implementation Guide - AI Concepts for System Building
+# Extracting actionable insights from research papers
+# Focus: What we need to implement, not academic theory
+
+@ implementation_targets
+  primary_goal: "Build ELIAS systems that learn continuously and don't degrade"
+  secondary_goals: [
+    "Implement attention mechanisms for better processing",
+    "Create hierarchical learning components", 
+    "Build systems that improve over time"
+  ]
+
+## Core Problems We Need To Solve
+
+### Problem 1: Continual Learning (From Sutton Paper)
+  @ business_problem
+    - AI systems degrade over time when learning new tasks
+    - Models "forget" previous knowledge when updating
+    - Production systems become less effective, not more effective
+  
+  @ technical_root_cause
+    - Neural network weights grow too large over time
+    - Many neurons become "dormant" (stop activating)
+    - Network loses ability to adapt to new information
+  
+  @ elias_implementation_approach
+    ```elixir
+    # We need systems that:
+    # 1. Monitor their own learning effectiveness
+    # 2. Detect when they're losing plasticity
+    # 3. Take corrective action automatically
+    
+    defmodule ELIAS.ContinualLearning do
+      # Track network health metrics
+      def monitor_plasticity(network_state) do
+        dormant_units = count_inactive_units(network_state)
+        weight_magnitudes = measure_weight_sizes(network_state)
+        learning_rate = measure_recent_learning_progress(network_state)
+        
+        %{
+          health_score: calculate_health(dormant_units, weight_magnitudes, learning_rate),
+          needs_intervention: dormant_units > 0.5 or weight_magnitudes > threshold
+        }
+      end
+      
+      # Sutton's solution: Selective reinitialization
+      def maintain_plasticity(network_state) do
+        if needs_intervention?(network_state) do
+          # Find least useful units and reinitialize them
+          reinitialize_dormant_units(network_state)
+        else
+          network_state
+        end
+      end
+    end
+    ```
+
+### Problem 2: Attention for Better Processing (From Uszkoreit Interview)
+  @ business_problem
+    - Sequential processing is slow and doesn't scale
+    - Can't process long sequences effectively
+    - Context gets lost in long documents/conversations
+  
+  @ key_insight
+    - Instead of processing sequences step-by-step, process all positions simultaneously
+    - Each position "attends to" (looks at) all other positions
+    - This enables parallel processing and better long-range understanding
+  
+  @ elias_implementation_approach
+    ```elixir
+    defmodule ELIAS.AttentionMechanism do
+      # Core attention: every input looks at every other input
+      def self_attention(sequence) do
+        sequence
+        |> Enum.with_index()
+        |> Enum.map(fn {current_item, i} ->
+          # For each position, compute attention to all other positions
+          attention_scores = compute_attention_scores(current_item, sequence)
+          weighted_sum = weight_and_sum(sequence, attention_scores)
+          {i, weighted_sum}
+        end)
+      end
+      
+      # This gives us better document understanding in our MFC pipeline
+      def process_document_with_attention(document) do
+        sentences = split_into_sentences(document)
+        attended_sentences = self_attention(sentences)
+        reconstruct_with_better_context(attended_sentences)
+      end
+    end
+    ```
+
+### Problem 3: Hierarchical Learning (From Oak Architecture)
+  @ business_problem
+    - Systems can't discover their own learning objectives
+    - Everything has to be pre-programmed
+    - No way to build up complex behaviors from simple ones
+  
+  @ key_insight
+    - Agents should create their own subproblems (like children playing)
+    - Learn "options" (ways of behaving) that can be combined
+    - Build hierarchical knowledge from experience, not design
+  
+  @ elias_implementation_approach
+    ```elixir
+    defmodule ELIAS.HierarchicalLearning do
+      # Discover interesting patterns and make them into subgoals
+      def discover_subproblems(experience_data) do
+        interesting_features = find_recurring_patterns(experience_data)
+        
+        interesting_features
+        |> Enum.map(fn feature ->
+          create_subproblem(feature, experience_data)
+        end)
+      end
+      
+      # Create "options" - policies for achieving specific goals
+      def create_option(subproblem) do
+        %ELIAS.Option{
+          policy: learn_policy_for(subproblem),
+          termination: learn_when_to_stop(subproblem),
+          model: learn_what_happens_when_executed(subproblem)
+        }
+      end
+      
+      # This enables ELIAS managers to develop their own capabilities
+      def manager_self_improvement(manager_state, experience) do
+        new_subproblems = discover_subproblems(experience)
+        new_options = Enum.map(new_subproblems, &create_option/1)
+        
+        %{manager_state | available_options: manager_state.available_options ++ new_options}
+      end
+    end
+    ```
+
+## Immediate ELIAS Applications
+
+### 1. ULM (Universal Learning Manager) Improvements
+  ```elixir
+  # Apply continual learning to prevent knowledge degradation
+  defmodule ELIAS.Manager.ULM.Enhanced do
+    use ELIAS.ContinualLearning
+    
+    def process_new_document(state, document) do
+      # Check if learning system is healthy
+      health = monitor_plasticity(state.learning_networks)
+      
+      # Process document with attention mechanism
+      processed_doc = ELIAS.AttentionMechanism.process_document_with_attention(document)
+      
+      # Update knowledge while maintaining plasticity
+      new_state = update_knowledge(state, processed_doc)
+      |> maintain_plasticity()
+      
+      {:ok, new_state}
+    end
+  end
+  ```
+
+### 2. UFM (Universal Federation Manager) Enhancements
+  ```elixir
+  # Apply hierarchical learning to workflow orchestration
+  defmodule ELIAS.Manager.UFM.Enhanced do
+    use ELIAS.HierarchicalLearning
+    
+    def optimize_workflows(state, workflow_history) do
+      # Discover recurring workflow patterns
+      subproblems = discover_subproblems(workflow_history)
+      
+      # Create reusable workflow "options"
+      workflow_options = Enum.map(subproblems, &create_workflow_option/1)
+      
+      # Use these for better orchestration
+      %{state | available_workflows: state.available_workflows ++ workflow_options}
+    end
+  end
+  ```
+
+### 3. MFC (Multi-Format Converter) Intelligence
+  ```elixir
+  # Apply attention to better document understanding
+  defmodule MFC.CLI.Intelligent do
+    def clean_and_process_content_v2(input_path, source_path, options) do
+      {:ok, content} = File.read(input_path)
+      
+      # Extract content with attention-based understanding
+      main_content = extract_content_with_attention(content)
+      
+      # Apply hierarchical cleaning (discover cleaning subproblems)
+      cleaning_strategies = discover_cleaning_patterns(main_content, options.type)
+      cleaned_content = apply_hierarchical_cleaning(main_content, cleaning_strategies)
+      
+      # Continually improve cleaning based on results
+      update_cleaning_knowledge(cleaning_strategies, cleaned_content)
+      
+      processed_path = save_processed_content(cleaned_content, input_path)
+      {:ok, processed_path}
+    end
+  end
+  ```
+
+## Implementation Priority
+
+### Phase 1: Continual Learning Foundation
+  1. Add plasticity monitoring to existing ELIAS managers
+  2. Implement selective reinitialization for learning components
+  3. Create health metrics and alerts for learning degradation
+
+### Phase 2: Attention Mechanisms  
+  1. Enhance MFC document processing with attention
+  2. Add attention-based context understanding to ULM
+  3. Use attention for better cross-manager communication
+
+### Phase 3: Hierarchical Learning
+  1. Enable managers to discover their own subproblems
+  2. Create option libraries for reusable behaviors
+  3. Implement self-improving system capabilities
+
+## Key Implementation Notes
+
+### For Continual Learning:
+- Monitor dormant units and weight magnitudes in real-time
+- Implement automatic intervention when plasticity drops
+- Log learning health metrics for system monitoring
+
+### For Attention:
+- Start with document processing in MFC
+- Extend to inter-manager communication
+- Use for long-context understanding in conversations
+
+### For Hierarchical Learning:
+- Begin with pattern discovery in workflow logs
+- Create reusable "options" for common tasks
+- Enable managers to self-improve over time
+
+This gives us a concrete roadmap for implementing the key insights from these papers directly into ELIAS architecture.
