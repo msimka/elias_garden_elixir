@@ -9,7 +9,7 @@ config :elias_garden, :griffith_server,
   host: System.get_env("GRIFFITH_HOST") || "griffith.local",
   ip_address: System.get_env("GRIFFITH_IP") || "172.20.35.144", 
   ssh_port: String.to_integer(System.get_env("GRIFFITH_SSH_PORT") || "22"),
-  user: System.get_env("GRIFFITH_USER") || "mikesimka",
+  user: System.get_env("GRIFFITH_USER") || "msimka",
   
   # Node Configuration
   node_name: System.get_env("GRIFFITH_NODE") || "elias@griffith.local",
@@ -17,7 +17,7 @@ config :elias_garden, :griffith_server,
   
   # Deployment Paths
   remote_path: System.get_env("GRIFFITH_PATH") || "/opt/elias_garden_elixir",
-  backup_path: System.get_env("GRIFFITH_BACKUP") || "/home/mikesimka/backups/elias_garden_elixir",
+  backup_path: System.get_env("GRIFFITH_BACKUP") || "/home/msimka/backups/elias_garden_elixir",
   log_path: System.get_env("GRIFFITH_LOGS") || "/var/log/elias",
   
   # Service Configuration
