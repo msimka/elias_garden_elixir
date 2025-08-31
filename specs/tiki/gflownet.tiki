@@ -1,0 +1,1324 @@
+# GFlowNet Architecture Discovery - Tiki API Specifications
+
+## Overview
+Tiki format specifications for Generative Flow Networks (GFlowNet) enabling diverse neural architecture discovery with mathematical guarantees for exploration coverage and reward optimization. Discovers optimal LoRA architectures through structured exploration of discrete combinatorial spaces.
+
+---
+
+## 🌊 GFlowNet Theory Foundation
+
+### Mathematical Guarantees
+GFlowNet provides provable guarantees for:
+- **Diverse Exploration**: Mathematically guaranteed coverage of architecture space
+- **Reward Optimization**: Samples proportional to reward function values
+- **Mode Discovery**: Finds multiple high-reward architecture modes
+- **Flow Conservation**: Maintains probabilistic consistency across trajectories
+
+**Core Principle**: Sample architectures with probability proportional to their reward, while maintaining maximum diversity in the discovered set.
+
+---
+
+## 🔬 Architecture Discovery
+
+### Comprehensive Architecture Discovery
+
+#### `POST /api/v1/gflownet/architectures/discover`
+**Purpose**: Discover optimal neural architectures using GFlowNet sampling with diversity guarantees
+
+**Authentication**: System-level API key for architecture discovery operations
+
+**Request Body**:
+```json
+{
+  "domain": "creative|business|technical|general",
+  "constraints": {
+    "parameter_range": {
+      "min_parameters": 1000,
+      "max_parameters": 10000000
+    },
+    "computational_budget": {
+      "max_memory_mb": 512,
+      "max_inference_latency_ms": 100,
+      "max_training_hours": 4.0
+    },
+    "architecture_constraints": {
+      "min_layers": 2,
+      "max_layers": 12,
+      "allowed_layer_types": ["attention", "mlp", "norm"],
+      "rank_constraints": {
+        "min_rank": 4,
+        "max_rank": 64
+      }
+    }
+  },
+  "discovery_config": {
+    "num_samples": 50,
+    "diversity_weight": 0.3,
+    "exploration_temperature": 1.0,
+    "reward_shaping": {
+      "effectiveness_weight": 0.4,
+      "efficiency_weight": 0.3,
+      "novelty_weight": 0.3
+    },
+    "sampling_strategy": {
+      "method": "guided_exploration",
+      "pareto_optimization": true,
+      "constraint_handling": "soft_penalty"
+    }
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "discovery_id": "gfn_discovery_creative_20240115_1030",
+  "domain": "creative",
+  "discovered_architectures": [
+    {
+      "architecture_id": "arch_gfn_001",
+      "architecture_spec": {
+        "layers": [
+          {
+            "type": "attention",
+            "config": {
+              "heads": 8,
+              "head_dim": 64,
+              "dropout": 0.1
+            }
+          },
+          {
+            "type": "mlp", 
+            "config": {
+              "hidden_size": 2048,
+              "activation": "gelu",
+              "dropout": 0.1
+            }
+          },
+          {
+            "type": "norm",
+            "config": {
+              "type": "layer_norm",
+              "epsilon": 1e-5
+            }
+          }
+        ],
+        "parameters": 2457600,
+        "memory_footprint": "9.8MB",
+        "estimated_performance": {
+          "inference_latency_ms": 42,
+          "training_efficiency": 0.87,
+          "memory_efficiency": 0.91
+        }
+      },
+      "reward_scores": {
+        "effectiveness": 0.89,
+        "efficiency": 0.85,
+        "novelty": 0.78,
+        "composite_score": 0.84
+      },
+      "diversity_contribution": 0.23,
+      "gflownet_metadata": {
+        "sampling_probability": 0.034,
+        "trajectory_length": 7,
+        "flow_score": 0.92
+      }
+    }
+  ],
+  "diversity_metrics": {
+    "coverage": 0.76,
+    "uniqueness": 0.82,
+    "pareto_frontier_size": 12,
+    "mode_discovery": 5,
+    "exploration_efficiency": 0.68
+  },
+  "discovery_statistics": {
+    "total_evaluations": 3247,
+    "discovery_time": "18 minutes 32 seconds",
+    "success_rate": 0.94,
+    "best_composite_score": 0.91,
+    "convergence_achieved": true
+  },
+  "mathematical_guarantees": {
+    "flow_conservation": "validated",
+    "diversity_lower_bound": 0.65,
+    "reward_approximation_error": 0.03,
+    "exploration_coverage": "73% of feasible space"
+  },
+  "recommendations": [
+    "arch_gfn_001 recommended for balanced performance",
+    "arch_gfn_007 optimal for creative applications",
+    "arch_gfn_012 most efficient for resource-constrained deployment"
+  ],
+  "discovered_at": "2024-01-15T10:48:00Z"
+}
+```
+
+**Business Logic**:
+1. Initialize GFlowNet with domain-specific reward function and constraints
+2. Sample diverse architectures using guided exploration with temperature control
+3. Evaluate each architecture across multi-objective reward function
+4. Apply Pareto optimization to identify non-dominated solutions
+5. Measure diversity using structural, functional, and performance metrics
+6. Validate flow conservation and mathematical guarantees
+7. Generate recommendations based on domain requirements and user preferences
+
+**Error Handling**:
+- `400`: Invalid discovery parameters or malformed constraints
+- `422`: Constraint validation failed - infeasible constraint combination
+- `429`: Discovery queue full - high computational demand
+- `507`: Insufficient computational resources for discovery scope
+
+---
+
+### Efficient Architecture Sampling
+
+#### `POST /api/v1/gflownet/architectures/sample`
+**Purpose**: Sample architectures from pre-trained GFlowNet for efficient discovery
+
+**Request Body**:
+```json
+{
+  "domain": "creative",
+  "gflownet_model_id": "gfn_creative_v2_1",
+  "sampling_config": {
+    "num_samples": 10,
+    "temperature": 1.0,
+    "diversity_boost": true,
+    "constraint_satisfaction": {
+      "hard_constraints": ["max_parameters < 5000000"],
+      "soft_constraints": [
+        {
+          "constraint": "inference_latency < 50ms",
+          "weight": 0.8,
+          "penalty_type": "exponential"
+        }
+      ]
+    },
+    "sampling_strategy": {
+      "method": "ancestral_sampling",
+      "bias_correction": true,
+      "importance_sampling": false
+    }
+  },
+  "evaluation_config": {
+    "evaluate_samples": true,
+    "evaluation_metrics": ["effectiveness", "efficiency", "novelty"],
+    "quick_evaluation": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "sampling_id": "gfn_sample_20240115_1115",
+  "domain": "creative",
+  "sampled_architectures": [
+    {
+      "architecture_id": "sample_001",
+      "architecture_spec": {
+        "layers": [...],
+        "parameters": 3241600,
+        "rank": 16,
+        "attention_config": {
+          "heads": 12,
+          "head_dim": 64
+        }
+      },
+      "sampling_probability": 0.078,
+      "reward_prediction": 0.86,
+      "gflownet_metadata": {
+        "trajectory_probability": 0.034,
+        "forward_flow": 2.45,
+        "backward_flow": 2.41,
+        "flow_consistency": 0.98
+      }
+    }
+  ],
+  "sampling_quality": {
+    "diversity_achieved": 0.74,
+    "average_reward": 0.83,
+    "exploration_efficiency": 0.91,
+    "constraint_satisfaction_rate": 0.95
+  },
+  "gflownet_metrics": {
+    "flow_consistency": 0.96,
+    "mode_coverage": 0.81,
+    "temperature_effectiveness": 0.87,
+    "bias_correction_applied": true
+  },
+  "performance_prediction": {
+    "expected_effectiveness": "85-89% confidence interval",
+    "training_time_estimate": "2.3-3.7 hours",
+    "resource_requirements": "8-12GB GPU memory"
+  },
+  "sampled_at": "2024-01-15T11:18:00Z"
+}
+```
+
+**Business Logic**:
+1. Load pre-trained GFlowNet model for specified domain
+2. Configure sampling parameters including temperature and diversity boost
+3. Execute guided sampling with constraint satisfaction checks
+4. Apply bias correction and importance weighting if requested
+5. Evaluate sampled architectures using fast approximation methods
+6. Compute flow consistency metrics and trajectory probabilities
+7. Provide quality assessments and performance predictions for each sample
+
+---
+
+## 🎯 Diversity Optimization
+
+### Advanced Diversity Control
+
+#### `POST /api/v1/gflownet/diversity/optimize`
+**Purpose**: Configure GFlowNet for maximum diversity while maintaining reward quality
+
+**Request Body**:
+```json
+{
+  "optimization_objective": "balanced_diversity_reward",
+  "diversity_constraints": {
+    "min_diversity_score": 0.7,
+    "diversity_metric": "structural_diversity",
+    "constraint_tolerance": 0.05,
+    "diversity_regularization": {
+      "method": "entropy_regularization",
+      "strength": 0.2,
+      "adaptive": true
+    }
+  },
+  "reward_constraints": {
+    "min_reward_threshold": 0.75,
+    "reward_distribution": "pareto_optimal",
+    "quality_preservation": 0.9
+  },
+  "exploration_strategy": {
+    "exploration_bonus": 0.1,
+    "novelty_detection": true,
+    "adaptive_temperature": true,
+    "curiosity_driven": {
+      "enabled": true,
+      "curiosity_weight": 0.15,
+      "surprise_threshold": 0.3
+    }
+  },
+  "optimization_horizon": {
+    "max_iterations": 1000,
+    "convergence_tolerance": 0.01,
+    "early_stopping": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "optimization_id": "div_opt_20240115_1200",
+  "optimization_config": {
+    "diversity_regularization_applied": true,
+    "exploration_strategy": "curiosity_driven_adaptive",
+    "reward_shaping": {
+      "diversity_bonus": 0.2,
+      "novelty_bonus": 0.15,
+      "quality_preservation": 0.9
+    }
+  },
+  "expected_outcomes": {
+    "diversity_improvement": "15-25% increase in structural diversity",
+    "exploration_efficiency": "40% better coverage of solution space",
+    "solution_quality": "Maintained within 95% of maximum reward",
+    "mode_discovery": "Expected to find 3-5 additional reward modes"
+  },
+  "mathematical_guarantees": {
+    "diversity_lower_bound": 0.68,
+    "reward_approximation_quality": 0.97,
+    "exploration_coverage_guarantee": "min 65% of feasible space",
+    "convergence_guarantee": "theoretically guaranteed under assumptions"
+  },
+  "configuration_applied": {
+    "temperature_schedule": "adaptive_annealing",
+    "exploration_bonus_schedule": "curiosity_weighted",
+    "diversity_regularization": "entropy_based",
+    "constraint_handling": "soft_penalty_with_barrier"
+  },
+  "recommendations": [
+    "Monitor diversity metrics for first 200 iterations",
+    "Consider reducing exploration bonus after convergence",
+    "Apply constraint annealing if hard constraints too restrictive"
+  ],
+  "configured_at": "2024-01-15T12:05:00Z"
+}
+```
+
+**Business Logic**:
+1. Analyze current architecture space coverage and diversity gaps
+2. Configure diversity regularization terms in GFlowNet loss function
+3. Implement adaptive exploration strategies with curiosity-driven bonuses
+4. Set up multi-objective optimization balancing diversity and reward
+5. Apply constraint handling methods for hard and soft requirements
+6. Configure convergence monitoring and early stopping criteria
+7. Provide mathematical guarantees for diversity and exploration coverage
+
+---
+
+### Comprehensive Diversity Measurement
+
+#### `POST /api/v1/gflownet/diversity/measure`
+**Purpose**: Quantify diversity of architecture set using multiple complementary metrics
+
+**Request Body**:
+```json
+{
+  "architecture_set": [
+    {
+      "architecture_id": "arch_001",
+      "architecture_spec": {...},
+      "performance_metrics": {...}
+    }
+  ],
+  "diversity_metrics": [
+    "structural_diversity",
+    "functional_diversity", 
+    "performance_diversity",
+    "behavioral_diversity"
+  ],
+  "measurement_config": {
+    "distance_functions": {
+      "structural": "edit_distance",
+      "functional": "activation_similarity",
+      "performance": "euclidean",
+      "behavioral": "kl_divergence"
+    },
+    "aggregation_method": "harmonic_mean",
+    "normalization": "min_max",
+    "confidence_level": 0.95
+  },
+  "reference_set": {
+    "include_reference": true,
+    "reference_source": "domain_baseline_architectures"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "measurement_id": "div_measure_20240115_1230",
+  "diversity_analysis": {
+    "structural_diversity": {
+      "score": 0.82,
+      "interpretation": "High structural variety",
+      "distribution": {
+        "mean_pairwise_distance": 0.34,
+        "std_pairwise_distance": 0.12,
+        "max_distance": 0.67,
+        "min_distance": 0.08
+      }
+    },
+    "functional_diversity": {
+      "score": 0.76,
+      "interpretation": "Good functional coverage",
+      "activation_analysis": {
+        "feature_space_coverage": 0.71,
+        "representation_variety": 0.81,
+        "functional_modes": 4
+      }
+    },
+    "performance_diversity": {
+      "score": 0.68,
+      "interpretation": "Moderate performance variety",
+      "pareto_analysis": {
+        "pareto_frontier_size": 8,
+        "dominated_solutions": 3,
+        "trade_off_coverage": 0.74
+      }
+    },
+    "behavioral_diversity": {
+      "score": 0.79,
+      "interpretation": "High behavioral variety",
+      "response_patterns": {
+        "pattern_clusters": 5,
+        "pattern_separation": 0.83,
+        "behavioral_modes": 6
+      }
+    }
+  },
+  "aggregate_metrics": {
+    "overall_diversity": 0.76,
+    "diversity_confidence": 0.94,
+    "coverage_estimation": 0.71,
+    "uniqueness_ratio": 0.85
+  },
+  "comparative_analysis": {
+    "vs_reference_set": {
+      "diversity_improvement": "+23%",
+      "coverage_improvement": "+31%",
+      "novel_architectures": 7
+    },
+    "vs_random_baseline": {
+      "diversity_ratio": 2.3,
+      "quality_preservation": 0.92
+    }
+  },
+  "diversity_insights": {
+    "diversity_sources": [
+      "Layer type combinations (34% contribution)",
+      "Attention head configurations (28% contribution)",
+      "MLP hidden size variations (21% contribution)",
+      "Normalization strategies (17% contribution)"
+    ],
+    "improvement_opportunities": [
+      "Increase rank diversity for better adaptation variety",
+      "Explore more dropout configurations",
+      "Consider alternative activation functions"
+    ]
+  },
+  "measured_at": "2024-01-15T12:35:00Z"
+}
+```
+
+**Business Logic**:
+1. Compute pairwise distances using domain-appropriate distance functions
+2. Calculate diversity scores across structural, functional, performance, and behavioral dimensions
+3. Analyze distribution properties and identify diversity modes
+4. Compare against reference architectures and random baselines
+5. Decompose diversity sources to understand main variation factors
+6. Generate insights for improving diversity in future discoveries
+7. Provide statistical confidence measures for diversity estimates
+
+---
+
+## 🧠 Flow Training and Optimization
+
+### GFlowNet Flow Function Training
+
+#### `POST /api/v1/gflownet/flow/train`
+**Purpose**: Train GFlowNet flow function for domain-specific architecture discovery
+
+**Request Body**:
+```json
+{
+  "domain": "creative",
+  "training_data": {
+    "architecture_samples": [
+      {
+        "architecture_spec": {
+          "layers": [...],
+          "parameters": 2457600,
+          "configuration": {...}
+        },
+        "reward_score": 0.87,
+        "evaluation_metadata": {
+          "effectiveness": 0.89,
+          "efficiency": 0.84,
+          "user_feedback": 4.2,
+          "domain_specific_scores": {
+            "creativity": 0.91,
+            "style_consistency": 0.83
+          }
+        }
+      }
+    ],
+    "reward_function": {
+      "type": "multi_objective",
+      "objectives": [
+        {
+          "name": "effectiveness",
+          "weight": 0.4,
+          "function": "user_satisfaction_proxy"
+        },
+        {
+          "name": "efficiency", 
+          "weight": 0.3,
+          "function": "computational_efficiency"
+        },
+        {
+          "name": "novelty",
+          "weight": 0.3,
+          "function": "architectural_novelty"
+        }
+      ]
+    }
+  },
+  "training_config": {
+    "num_epochs": 200,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "optimizer": {
+      "type": "adam",
+      "beta1": 0.9,
+      "beta2": 0.999,
+      "weight_decay": 1e-5
+    },
+    "flow_matching_weight": 1.0,
+    "diversity_regularization": 0.1,
+    "trajectory_balance": {
+      "enabled": true,
+      "balance_weight": 0.5,
+      "log_variance_regularization": 0.01
+    },
+    "early_stopping": {
+      "patience": 20,
+      "min_improvement": 0.001,
+      "monitor_metric": "flow_consistency"
+    }
+  },
+  "architecture_encoding": {
+    "encoding_method": "graph_neural_network",
+    "node_features": ["layer_type", "parameters", "connectivity"],
+    "edge_features": ["information_flow", "gradient_flow"],
+    "embedding_dimension": 256
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "training_id": "gfn_train_creative_20240115_1300",
+  "domain": "creative",
+  "training_status": "queued",
+  "estimated_completion": "2024-01-15T16:30:00Z",
+  "training_config": {
+    "total_parameters": 4782000,
+    "architecture_encoder": "gnn_128d",
+    "flow_network": "mlp_4_layers",
+    "reward_predictor": "ensemble_5_models"
+  },
+  "progress_tracking": {
+    "monitoring_url": "wss://gflownet.elias.brain/training/gfn_train_creative_20240115_1300",
+    "tensorboard_url": "https://tensorboard.elias.brain/gfn_train_creative_20240115_1300",
+    "expected_improvements": [
+      "Flow consistency: target >0.95",
+      "Diversity coverage: target >0.80",
+      "Reward approximation: target error <0.05",
+      "Sample quality: target >0.85 average reward"
+    ]
+  },
+  "resource_allocation": {
+    "gpu_type": "A100",
+    "memory_allocated": "32GB",
+    "estimated_cost": "$89.50",
+    "parallel_workers": 4
+  },
+  "mathematical_objectives": {
+    "flow_conservation_loss": "minimize ||F(s) - sum(P(s'|s) * F(s'))||",
+    "trajectory_balance_loss": "minimize log P_F(τ) - log P_B(τ) - log R(x)",
+    "diversity_regularization": "maximize entropy(sampling_distribution)",
+    "reward_prediction_loss": "minimize ||R_pred(x) - R_true(x)||"
+  },
+  "training_initiated_at": "2024-01-15T13:05:00Z"
+}
+```
+
+**Business Logic**:
+1. Prepare architecture samples with comprehensive reward annotations
+2. Initialize GFlowNet with graph neural network architecture encoder
+3. Configure multi-objective training with flow conservation and trajectory balance losses
+4. Set up diversity regularization to encourage exploration
+5. Implement early stopping based on flow consistency metrics
+6. Track training progress with real-time monitoring and visualization
+7. Validate mathematical properties of learned flow function during training
+
+---
+
+### Flow Function Status and Updates
+
+#### `GET /api/v1/gflownet/flow/status/{training_id}`
+**Purpose**: Monitor GFlowNet flow training progress with detailed metrics
+
+**Response**:
+```json
+{
+  "training_id": "gfn_train_creative_20240115_1300",
+  "training_status": "running",
+  "progress": {
+    "current_epoch": 87,
+    "total_epochs": 200,
+    "completion_percentage": 43.5,
+    "elapsed_time": "1h 23m 42s",
+    "estimated_remaining": "1h 56m 18s"
+  },
+  "training_metrics": {
+    "current_losses": {
+      "flow_conservation_loss": 0.042,
+      "trajectory_balance_loss": 0.028,
+      "diversity_regularization": -2.34,
+      "reward_prediction_loss": 0.015,
+      "total_loss": 0.089
+    },
+    "best_metrics": {
+      "flow_consistency": 0.94,
+      "diversity_score": 0.81,
+      "reward_approximation_error": 0.033,
+      "sample_quality": 0.87
+    },
+    "convergence_indicators": {
+      "loss_trend": "decreasing",
+      "gradient_norm": 0.0034,
+      "learning_rate": 0.0008,
+      "early_stopping_patience": 5
+    }
+  },
+  "sample_quality_evolution": [
+    {
+      "epoch": 10,
+      "diversity": 0.65,
+      "average_reward": 0.71,
+      "flow_consistency": 0.78
+    },
+    {
+      "epoch": 50,
+      "diversity": 0.76,
+      "average_reward": 0.83,
+      "flow_consistency": 0.89
+    },
+    {
+      "epoch": 87,
+      "diversity": 0.81,
+      "average_reward": 0.87,
+      "flow_consistency": 0.94
+    }
+  ],
+  "architecture_insights": {
+    "discovered_patterns": [
+      "Attention head count strongly correlates with creativity scores",
+      "MLP hidden size sweet spot around 1536-2048 for efficiency",
+      "Layer normalization placement affects stability significantly"
+    ],
+    "mode_discovery": {
+      "identified_modes": 4,
+      "mode_separation": 0.67,
+      "mode_characteristics": [
+        "High creativity, moderate efficiency",
+        "Balanced performance across metrics", 
+        "Ultra-efficient, good creativity",
+        "Novel architectures, high variance"
+      ]
+    }
+  },
+  "training_health": {
+    "resource_utilization": {
+      "gpu_usage": "89%",
+      "memory_usage": "28.4GB / 32GB",
+      "network_bandwidth": "450 MB/s"
+    },
+    "stability_indicators": {
+      "gradient_stability": "good",
+      "loss_oscillations": "minimal",
+      "numerical_stability": "excellent"
+    }
+  },
+  "status_updated_at": "2024-01-15T14:28:00Z"
+}
+```
+
+**Business Logic**:
+1. Track training progress across multiple epochs with detailed metrics
+2. Monitor flow conservation, trajectory balance, and diversity losses
+3. Evaluate sample quality evolution throughout training process
+4. Identify architectural patterns and reward modes discovered by GFlowNet
+5. Monitor computational resource utilization and training stability
+6. Provide early stopping recommendations based on convergence indicators
+7. Generate insights about discovered architecture-reward relationships
+
+---
+
+## 🎲 Advanced Sampling Strategies
+
+### Sophisticated Sampling Configuration
+
+#### `POST /api/v1/gflownet/sampling/configure`
+**Purpose**: Configure advanced sampling strategies with sophisticated exploration control
+
+**Request Body**:
+```json
+{
+  "sampling_strategy": {
+    "base_method": "guided_mcmc",
+    "temperature_schedule": {
+      "type": "adaptive_annealing",
+      "initial_temperature": 1.5,
+      "final_temperature": 0.3,
+      "adaptation_rate": 0.95,
+      "adaptation_trigger": "diversity_plateau"
+    },
+    "exploration_control": {
+      "curiosity_driven": true,
+      "novelty_bonus": 0.2,
+      "uncertainty_sampling": true,
+      "information_gain_weight": 0.15
+    }
+  },
+  "diversity_constraints": {
+    "min_pairwise_distance": 0.3,
+    "diversity_enforcement": "soft_constraint",
+    "diversity_penalty_weight": 0.1,
+    "diversity_measurement": "structural_behavioral_combined"
+  },
+  "reward_shaping": {
+    "multi_objective_balancing": {
+      "method": "pareto_scalarization",
+      "preference_weights": {
+        "effectiveness": 0.35,
+        "efficiency": 0.35,
+        "novelty": 0.3
+      },
+      "adaptive_weights": true
+    },
+    "reward_normalization": {
+      "method": "quantile_normalization",
+      "reference_distribution": "training_data"
+    }
+  },
+  "constraint_handling": {
+    "hard_constraints": [
+      {
+        "constraint": "parameters < 5000000",
+        "violation_penalty": "rejection_sampling"
+      }
+    ],
+    "soft_constraints": [
+      {
+        "constraint": "inference_latency < 100ms",
+        "penalty_function": "exponential",
+        "penalty_strength": 2.0
+      }
+    ]
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "strategy_id": "sampling_strategy_20240115_1400",
+  "configured_strategy": {
+    "sampling_method": "adaptive_guided_mcmc",
+    "temperature_control": "curiosity_adaptive_annealing",
+    "diversity_enforcement": "soft_constraint_with_bonus",
+    "reward_integration": "pareto_scalarized_adaptive"
+  },
+  "expected_behavior": {
+    "exploration_characteristics": {
+      "initial_phase": "Broad exploration with high temperature",
+      "middle_phase": "Focused exploration around promising regions",
+      "final_phase": "Fine-tuning with diversity preservation"
+    },
+    "diversity_guarantees": {
+      "min_diversity_score": 0.72,
+      "expected_mode_coverage": 0.85,
+      "novelty_discovery_rate": "3-5 novel architectures per 100 samples"
+    },
+    "quality_expectations": {
+      "average_reward": "85-90% of optimal",
+      "pareto_efficiency": ">80% of samples on Pareto frontier",
+      "constraint_satisfaction": ">95% hard, >85% soft"
+    }
+  },
+  "adaptive_parameters": {
+    "temperature_bounds": [0.3, 2.0],
+    "diversity_weight_range": [0.05, 0.4],
+    "curiosity_sensitivity": 0.15,
+    "adaptation_frequency": "every_50_samples"
+  },
+  "mathematical_properties": {
+    "convergence_guarantee": "Asymptotic convergence to reward-proportional sampling",
+    "diversity_lower_bound": 0.65,
+    "exploration_efficiency": "O(sqrt(n)) regret bound",
+    "constraint_satisfaction_probability": ">0.95"
+  },
+  "monitoring_recommendations": [
+    "Track diversity score every 25 samples",
+    "Monitor temperature adaptation effectiveness",
+    "Validate constraint satisfaction rates",
+    "Assess Pareto frontier coverage evolution"
+  ],
+  "configured_at": "2024-01-15T14:05:00Z"
+}
+```
+
+**Business Logic**:
+1. Configure sophisticated sampling algorithms with adaptive temperature control
+2. Implement curiosity-driven exploration with uncertainty estimation
+3. Set up multi-objective reward shaping with Pareto optimization
+4. Configure constraint handling for both hard and soft requirements
+5. Establish diversity enforcement mechanisms with mathematical guarantees
+6. Set up adaptive parameter schedules based on sampling progress
+7. Provide theoretical guarantees and monitoring recommendations
+
+---
+
+### Batch Sampling with Diversity Constraints
+
+#### `POST /api/v1/gflownet/sampling/batch`
+**Purpose**: Generate batch of diverse architectures with quality and diversity optimization
+
+**Request Body**:
+```json
+{
+  "batch_config": {
+    "batch_size": 20,
+    "diversity_objective": "maximize_set_diversity",
+    "quality_threshold": 0.8,
+    "diversity_constraint": {
+      "min_pairwise_distance": 0.25,
+      "coverage_requirement": 0.7,
+      "mode_representation": "balanced"
+    }
+  },
+  "sampling_method": {
+    "base_sampler": "gflownet_guided",
+    "diversity_optimization": {
+      "method": "determinantal_point_process",
+      "kernel": "combined_similarity",
+      "diversity_vs_quality_trade_off": 0.3
+    },
+    "iterative_improvement": {
+      "max_iterations": 50,
+      "improvement_threshold": 0.01,
+      "local_search": true
+    }
+  },
+  "evaluation_config": {
+    "immediate_evaluation": true,
+    "evaluation_depth": "comprehensive",
+    "performance_prediction": true,
+    "uncertainty_quantification": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "batch_id": "batch_sample_20240115_1445",
+  "batch_summary": {
+    "requested_size": 20,
+    "delivered_size": 20,
+    "diversity_achieved": 0.84,
+    "average_quality": 0.87,
+    "constraint_satisfaction": 0.95
+  },
+  "sampled_batch": [
+    {
+      "architecture_id": "batch_arch_001",
+      "architecture_spec": {...},
+      "individual_scores": {
+        "effectiveness": 0.91,
+        "efficiency": 0.83,
+        "novelty": 0.79,
+        "composite": 0.84
+      },
+      "batch_contribution": {
+        "diversity_contribution": 0.18,
+        "uniqueness_score": 0.76,
+        "mode_representation": "high_creativity_mode"
+      }
+    }
+  ],
+  "diversity_analysis": {
+    "set_diversity_score": 0.84,
+    "pairwise_distance_stats": {
+      "mean": 0.42,
+      "std": 0.15,
+      "min": 0.28,
+      "max": 0.71
+    },
+    "mode_coverage": {
+      "identified_modes": 5,
+      "covered_modes": 5,
+      "mode_distribution": "well_balanced",
+      "underrepresented_regions": []
+    }
+  },
+  "optimization_trace": {
+    "initial_diversity": 0.61,
+    "final_diversity": 0.84,
+    "optimization_iterations": 23,
+    "improvement_per_iteration": 0.01,
+    "convergence_achieved": true
+  },
+  "quality_guarantees": {
+    "all_above_threshold": true,
+    "pareto_optimal_count": 15,
+    "dominated_solutions": 5,
+    "quality_diversity_trade_off": "optimal"
+  },
+  "sampled_at": "2024-01-15T14:48:00Z"
+}
+```
+
+**Business Logic**:
+1. Initialize batch sampling with diversity and quality constraints
+2. Use determinantal point processes for diversity-quality optimization
+3. Implement iterative improvement with local search for better solutions
+4. Evaluate each architecture comprehensively with uncertainty estimates
+5. Optimize batch composition for maximum set diversity and individual quality
+6. Validate constraint satisfaction and Pareto optimality
+7. Provide detailed analysis of batch diversity and optimization process
+
+---
+
+## 🎯 Reward Function Design
+
+### Multi-Objective Reward Definition
+
+#### `POST /api/v1/gflownet/rewards/define`
+**Purpose**: Define comprehensive reward function for architecture evaluation
+
+**Request Body**:
+```json
+{
+  "domain": "creative",
+  "reward_objectives": [
+    {
+      "objective_name": "user_effectiveness",
+      "weight": 0.35,
+      "metric_definition": {
+        "type": "composite_metric",
+        "components": [
+          {
+            "metric": "user_satisfaction_score",
+            "weight": 0.6,
+            "measurement": "5_point_likert_scale"
+          },
+          {
+            "metric": "task_completion_rate",
+            "weight": 0.4,
+            "measurement": "success_percentage"
+          }
+        ]
+      },
+      "optimization_direction": "maximize",
+      "normalization": "z_score"
+    },
+    {
+      "objective_name": "computational_efficiency",
+      "weight": 0.3,
+      "metric_definition": {
+        "type": "resource_efficiency",
+        "components": [
+          {
+            "metric": "inference_speed",
+            "weight": 0.4,
+            "measurement": "ms_per_token",
+            "target_value": 50
+          },
+          {
+            "metric": "memory_usage",
+            "weight": 0.3,
+            "measurement": "mb_peak_usage",
+            "constraint": "< 512MB"
+          },
+          {
+            "metric": "energy_consumption",
+            "weight": 0.3,
+            "measurement": "joules_per_inference"
+          }
+        ]
+      },
+      "optimization_direction": "maximize",
+      "normalization": "min_max"
+    },
+    {
+      "objective_name": "architectural_novelty",
+      "weight": 0.35,
+      "metric_definition": {
+        "type": "novelty_metric",
+        "reference_set": "domain_existing_architectures",
+        "distance_function": "structural_distance",
+        "novelty_threshold": 0.3
+      },
+      "optimization_direction": "maximize",
+      "normalization": "percentile_rank"
+    }
+  ],
+  "reward_function_type": "nonlinear",
+  "aggregation_method": {
+    "type": "weighted_geometric_mean",
+    "min_value_threshold": 0.1,
+    "balance_penalty": 0.1
+  },
+  "constraints": {
+    "hard_constraints": [
+      {
+        "constraint_name": "parameter_limit",
+        "expression": "total_parameters <= 10000000",
+        "violation_handling": "reject"
+      }
+    ],
+    "soft_constraints": [
+      {
+        "constraint_name": "latency_preference",
+        "expression": "inference_latency <= 100",
+        "penalty_function": "quadratic",
+        "penalty_strength": 0.2
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "effectiveness_metrics": [
+      "user_satisfaction",
+      "task_success_rate",
+      "response_quality",
+      "style_consistency"
+    ],
+    "efficiency_metrics": [
+      "inference_speed",
+      "memory_usage", 
+      "training_time",
+      "energy_consumption"
+    ],
+    "domain_specific_metrics": [
+      "creativity_score",
+      "narrative_coherence",
+      "character_consistency",
+      "genre_appropriateness"
+    ]
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "reward_function_id": "reward_creative_multi_obj_20240115_1500",
+  "domain": "creative",
+  "reward_specification": {
+    "function_type": "nonlinear_weighted_geometric_mean",
+    "objective_count": 3,
+    "total_weight": 1.0,
+    "aggregation_formula": "R(x) = (r1^w1 * r2^w2 * r3^w3)^(1/sum(w)) * balance_factor",
+    "constraint_integration": "soft_penalty_with_hard_rejection"
+  },
+  "validation_results": {
+    "mathematical_validity": true,
+    "constraint_consistency": true,
+    "optimization_feasibility": true,
+    "numerical_stability": true,
+    "gradient_properties": {
+      "differentiable": true,
+      "lipschitz_continuous": true,
+      "gradient_bounds": "well_defined"
+    }
+  },
+  "expected_behavior": {
+    "primary_optimization_target": "Balanced excellence across effectiveness, efficiency, and novelty",
+    "trade_offs": [
+      "Effectiveness vs efficiency: Geometric mean prevents extreme trade-offs",
+      "Novelty vs proven patterns: Novelty bonus encourages exploration",
+      "Quality vs diversity: Balance penalty maintains solution quality"
+    ],
+    "convergence_properties": {
+      "local_optima": "Multiple local optima expected due to novelty term",
+      "exploration_requirement": "High due to architectural novelty component",
+      "gradient_guidance": "Strong gradients for efficiency and effectiveness"
+    }
+  },
+  "optimization_characteristics": {
+    "reward_landscape": "Multi-modal with smooth basins",
+    "exploration_difficulty": "Moderate - novelty term aids exploration",
+    "convergence_rate": "Medium - geometric mean slows convergence near optimum",
+    "robustness": "High - balanced objectives prevent overfitting"
+  },
+  "usage_recommendations": [
+    "Use temperature annealing to balance exploration vs exploitation",
+    "Monitor novelty metric to ensure continued architectural diversity",
+    "Adjust effectiveness weight if user satisfaction patterns change",
+    "Consider efficiency weight increase for resource-constrained deployment"
+  ],
+  "sensitivity_analysis": {
+    "most_sensitive_parameter": "user_effectiveness weight",
+    "robust_parameters": ["memory_usage_threshold", "balance_penalty"],
+    "interaction_effects": "Efficiency and novelty show positive interaction",
+    "weight_sensitivity": "Moderate - geometric mean provides stability"
+  },
+  "created_at": "2024-01-15T15:03:00Z"
+}
+```
+
+**Business Logic**:
+1. Parse multi-objective reward specification with domain-specific components
+2. Validate mathematical properties of composite reward function
+3. Configure constraint handling for hard and soft requirements
+4. Set up normalization and aggregation methods for balanced optimization
+5. Analyze reward landscape properties and optimization characteristics
+6. Provide sensitivity analysis and parameter robustness assessment
+7. Generate usage recommendations based on reward function properties
+
+---
+
+## 🏗️ Domain-Specific Discovery
+
+### Creative Domain Architecture Discovery
+
+#### `POST /api/v1/gflownet/domains/creative/discover`
+**Purpose**: Discover architectures optimized for creative applications with domain-specific rewards
+
+**Request Body**:
+```json
+{
+  "domain_requirements": {
+    "creative_capabilities": [
+      "narrative_generation",
+      "character_development", 
+      "style_adaptation",
+      "creative_ideation"
+    ],
+    "quality_priorities": [
+      "originality",
+      "coherence",
+      "style_consistency",
+      "user_voice_preservation"
+    ],
+    "resource_constraints": {
+      "max_inference_time": "100ms",
+      "max_memory_usage": "256MB",
+      "training_time_budget": "4 hours"
+    },
+    "domain_knowledge": {
+      "successful_patterns": [
+        "Multi-head attention for context tracking",
+        "Large MLP blocks for creative reasoning",
+        "Layer normalization for stability"
+      ],
+      "failure_modes": [
+        "Too few attention heads reduce coherence",
+        "Insufficient MLP capacity limits creativity",
+        "Poor normalization causes instability"
+      ]
+    }
+  },
+  "current_performance": {
+    "baseline_architectures": [
+      {
+        "architecture_id": "baseline_creative_v1",
+        "effectiveness": 0.78,
+        "creativity_score": 0.72,
+        "coherence": 0.85,
+        "limitations": ["Limited narrative depth", "Inconsistent style"]
+      }
+    ],
+    "performance_gaps": [
+      "Need 15% improvement in creativity scores",
+      "Require better long-term coherence",
+      "Style consistency needs 20% improvement"
+    ]
+  },
+  "discovery_config": {
+    "num_samples": 75,
+    "creativity_emphasis": 0.4,
+    "coherence_emphasis": 0.3,
+    "efficiency_emphasis": 0.3,
+    "exploration_strategy": "creativity_guided",
+    "novelty_bonus": 0.25
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "domain": "creative",
+  "discovered_architectures": [
+    {
+      "architecture_id": "creative_discovery_001",
+      "architecture_spec": {
+        "layers": [
+          {
+            "type": "attention",
+            "config": {
+              "heads": 16,
+              "head_dim": 64,
+              "dropout": 0.1,
+              "attention_type": "creative_enhanced"
+            }
+          },
+          {
+            "type": "mlp",
+            "config": {
+              "hidden_size": 3072,
+              "activation": "swish",
+              "dropout": 0.15,
+              "creative_expansion": 1.5
+            }
+          }
+        ],
+        "creative_enhancements": {
+          "narrative_memory": "long_range_attention",
+          "style_conditioning": "adaptive_layer_norm",
+          "creativity_injection": "stochastic_sampling_layer"
+        }
+      },
+      "domain_specific_scores": {
+        "creativity": 0.91,
+        "narrative_coherence": 0.87,
+        "style_consistency": 0.89,
+        "character_development": 0.83,
+        "originality": 0.88
+      },
+      "expected_improvements": {
+        "vs_baseline_creativity": "+26%",
+        "vs_baseline_coherence": "+12%", 
+        "vs_baseline_style": "+23%",
+        "overall_creative_effectiveness": "+19%"
+      }
+    }
+  ],
+  "domain_specific_insights": {
+    "architecture_patterns": [
+      "16-head attention optimal for creative context tracking",
+      "3072 MLP hidden size sweet spot for creative reasoning",
+      "Stochastic elements essential for originality",
+      "Adaptive normalization improves style consistency"
+    ],
+    "performance_characteristics": {
+      "creativity_vs_efficiency": "Creative architectures require 40% more parameters for 25% creativity gain",
+      "coherence_vs_novelty": "Long-range attention crucial for maintaining coherence while being creative",
+      "style_adaptation": "Adaptive normalization enables better style transfer without retraining"
+    },
+    "optimization_opportunities": [
+      "Attention head specialization for different creative aspects",
+      "Dynamic MLP sizing based on creative complexity",
+      "Hierarchical style conditioning for better consistency"
+    ]
+  },
+  "recommendations": {
+    "best_for_domain": "creative_discovery_001 - optimal balance of creativity and coherence",
+    "trade_off_analysis": {
+      "high_creativity": "creative_discovery_003 (+5% creativity, -3% efficiency)",
+      "high_coherence": "creative_discovery_007 (+8% coherence, -2% creativity)",
+      "balanced": "creative_discovery_001 (optimal across all metrics)"
+    },
+    "implementation_guidance": [
+      "Use 16-head attention with creative enhancement module",
+      "Implement adaptive layer normalization for style consistency",
+      "Add stochastic sampling layer for originality boost",
+      "Configure long-range attention for narrative coherence"
+    ]
+  },
+  "creative_domain_metrics": {
+    "narrative_depth_improvement": "+34%",
+    "character_consistency_gain": "+28%",
+    "style_adaptation_speed": "3x faster",
+    "creative_idea_generation": "+42% novel concepts"
+  },
+  "discovered_at": "2024-01-15T15:45:00Z"
+}
+```
+
+**Business Logic**:
+1. Apply domain-specific reward functions emphasizing creativity and originality
+2. Configure GFlowNet exploration to favor architectures with creative enhancements
+3. Evaluate architectures using creative domain metrics (narrative, style, character)
+4. Identify architectural patterns that enhance creative performance
+5. Analyze trade-offs between creativity, coherence, and computational efficiency
+6. Generate domain-specific insights about creative architecture design
+7. Provide implementation guidance for creative domain deployment
+
+---
+
+This comprehensive Tiki specification documents all GFlowNet API endpoints with detailed business logic, mathematical foundations, and implementation guidelines for diverse neural architecture discovery with provable guarantees.

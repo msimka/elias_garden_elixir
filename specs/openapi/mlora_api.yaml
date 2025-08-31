@@ -1,0 +1,1116 @@
+openapi: 3.0.3
+info:
+  title: mLoRA - Massively Parallel LoRA Training API
+  description: |
+    Massively parallel Low-Rank Adaptation (mLoRA) API for concurrent training of thousands
+    of micro-LoRAs with efficient resource utilization and automatic scaling. Enables
+    personalized AI at scale through distributed parameter-efficient fine-tuning.
+    
+    Supports concurrent training of 1000+ individual LoRAs with shared base models,
+    intelligent resource allocation, and automatic load balancing across distributed
+    infrastructure. Optimized for personalization scenarios requiring thousands of
+    specialized model variants.
+  version: "1.0.0"
+  contact:
+    name: ELIAS mLoRA Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://mlora.elias.brain
+    description: Production mLoRA API
+  - url: https://staging-mlora.elias.brain
+    description: Staging environment
+  - url: http://localhost:4005
+    description: Local development server
+
+tags:
+  - name: batch-training
+    description: Massively parallel batch LoRA training operations
+  - name: resource-management
+    description: Distributed resource allocation and optimization
+  - name: load-balancing
+    description: Dynamic load balancing across training clusters
+  - name: scaling-automation
+    description: Automatic scaling and resource provisioning
+  - name: training-orchestration
+    description: Training workflow coordination and monitoring
+
+paths:
+  # ============================================================================
+  # BATCH TRAINING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mlora/batch/train:
+    post:
+      tags: [batch-training]
+      summary: Launch massively parallel LoRA training batch
+      description: |
+        Initiate concurrent training of hundreds to thousands of LoRAs with
+        intelligent resource allocation and automatic scaling. Optimizes
+        training efficiency through shared computation and memory optimization.
+      operationId: launchBatchTraining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchTrainingRequest'
+      responses:
+        '202':
+          description: Batch training initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchTrainingResponse'
+        '400':
+          description: Invalid batch configuration
+        '429':
+          description: Training queue at capacity
+        '503':
+          description: Insufficient resources for batch size
+
+  /api/v1/mlora/batch/status/{batch_id}:
+    get:
+      tags: [batch-training]
+      summary: Get batch training status and progress
+      description: Monitor progress of massively parallel LoRA training batch
+      operationId: getBatchTrainingStatus
+      parameters:
+        - name: batch_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Batch training identifier
+      responses:
+        '200':
+          description: Batch status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchTrainingStatus'
+        '404':
+          description: Batch not found
+
+  /api/v1/mlora/batch/scale:
+    post:
+      tags: [batch-training]
+      summary: Dynamically scale batch training resources
+      description: |
+        Automatically scale training resources up or down based on demand,
+        performance metrics, and cost optimization goals. Supports elastic
+        scaling across cloud and on-premises infrastructure.
+      operationId: scaleBatchTraining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchScalingRequest'
+      responses:
+        '200':
+          description: Scaling operation initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchScalingResponse'
+
+  /api/v1/mlora/batch/optimize:
+    post:
+      tags: [batch-training]
+      summary: Optimize batch training configuration
+      description: |
+        Analyze current batch performance and automatically optimize training
+        parameters, resource allocation, and scheduling for maximum efficiency
+        and cost effectiveness.
+      operationId: optimizeBatchTraining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchOptimizationRequest'
+      responses:
+        '200':
+          description: Optimization analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchOptimizationResponse'
+
+  # ============================================================================
+  # RESOURCE MANAGEMENT ENDPOINTS
+  # ============================================================================
+
+  /api/v1/mlora/resources/allocate:
+    post:
+      tags: [resource-management]
+      summary: Allocate distributed resources for LoRA training
+      description: |
+        Intelligently allocate GPU, CPU, and memory resources across distributed
+        infrastructure for optimal LoRA training performance. Considers cost,
+        performance, and availability constraints.
+      operationId: allocateResources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceAllocationRequest'
+      responses:
+        '200':
+          description: Resources allocated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceAllocationResponse'
+        '409':
+          description: Resource allocation conflict
+        '503':
+          description: Insufficient available resources
+
+  /api/v1/mlora/resources/monitor:
+    get:
+      tags: [resource-management]
+      summary: Monitor distributed resource utilization
+      description: |
+        Real-time monitoring of resource utilization across all training nodes
+        including GPU usage, memory consumption, network bandwidth, and
+        training throughput metrics.
+      operationId: monitorResources
+      parameters:
+        - name: time_window
+          in: query
+          schema:
+            type: string
+            enum: [1h, 6h, 24h, 7d]
+            default: 1h
+          description: Monitoring time window
+        - name: granularity
+          in: query
+          schema:
+            type: string
+            enum: [minute, hour, day]
+            default: minute
+          description: Data granularity
+      responses:
+        '200':
+          description: Resource monitoring data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceMonitoringResponse'
+
+  /api/v1/mlora/resources/optimize:
+    post:
+      tags: [resource-management]
+      summary: Optimize resource utilization
+      description: |
+        Analyze resource usage patterns and automatically optimize allocation
+        for better performance and cost efficiency. Includes recommendations
+        for infrastructure scaling and configuration adjustments.
+      operationId: optimizeResourceUtilization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceOptimizationRequest'
+      responses:
+        '200':
+          description: Resource optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceOptimizationResponse'
+
+  # ============================================================================
+  # LOAD BALANCING ENDPOINTS
+  # ============================================================================
+
+  /api/v1/mlora/loadbalancer/configure:
+    post:
+      tags: [load-balancing]
+      summary: Configure intelligent load balancing
+      description: |
+        Configure advanced load balancing strategies for distributing LoRA
+        training workloads across available resources. Supports multiple
+        balancing algorithms and custom optimization objectives.
+      operationId: configureLoadBalancing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadBalancingConfig'
+      responses:
+        '200':
+          description: Load balancing configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadBalancingResponse'
+
+  /api/v1/mlora/loadbalancer/rebalance:
+    post:
+      tags: [load-balancing]
+      summary: Trigger dynamic load rebalancing
+      description: |
+        Manually trigger or schedule automatic load rebalancing to optimize
+        training distribution based on current resource availability and
+        performance metrics.
+      operationId: rebalanceTrainingLoad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadRebalancingRequest'
+      responses:
+        '200':
+          description: Load rebalancing initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadRebalancingResponse'
+
+  /api/v1/mlora/loadbalancer/health:
+    get:
+      tags: [load-balancing]
+      summary: Check load balancer health status
+      description: Monitor load balancer health and performance metrics
+      operationId: getLoadBalancerHealth
+      responses:
+        '200':
+          description: Load balancer health retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadBalancerHealthResponse'
+
+  # ============================================================================
+  # SCALING AUTOMATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/mlora/autoscale/configure:
+    post:
+      tags: [scaling-automation]
+      summary: Configure automatic scaling policies
+      description: |
+        Set up intelligent auto-scaling policies that automatically provision
+        and de-provision resources based on training demand, performance
+        targets, and cost constraints.
+      operationId: configureAutoScaling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoScalingConfig'
+      responses:
+        '200':
+          description: Auto-scaling configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoScalingResponse'
+
+  /api/v1/mlora/autoscale/policies:
+    get:
+      tags: [scaling-automation]
+      summary: List active scaling policies
+      description: Retrieve all active auto-scaling policies and their status
+      operationId: listScalingPolicies
+      responses:
+        '200':
+          description: Scaling policies retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalingPoliciesResponse'
+
+  /api/v1/mlora/autoscale/trigger:
+    post:
+      tags: [scaling-automation]
+      summary: Manually trigger scaling event
+      description: |
+        Manually trigger scaling up or down for testing or immediate
+        capacity adjustments. Useful for handling predictable load spikes.
+      operationId: triggerScaling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualScalingRequest'
+      responses:
+        '200':
+          description: Scaling triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManualScalingResponse'
+
+  # ============================================================================
+  # TRAINING ORCHESTRATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/mlora/orchestration/schedule:
+    post:
+      tags: [training-orchestration]
+      summary: Schedule complex training workflows
+      description: |
+        Schedule and orchestrate complex multi-stage training workflows
+        with dependencies, conditional execution, and resource coordination
+        across thousands of concurrent LoRA training jobs.
+      operationId: scheduleTrainingWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSchedulingRequest'
+      responses:
+        '202':
+          description: Workflow scheduled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSchedulingResponse'
+
+  /api/v1/mlora/orchestration/workflows:
+    get:
+      tags: [training-orchestration]
+      summary: List active training workflows
+      description: Retrieve status and details of all active training workflows
+      operationId: listTrainingWorkflows
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, running, completed, failed, paused]
+          description: Filter workflows by status
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of workflows to return
+      responses:
+        '200':
+          description: Training workflows retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingWorkflowsResponse'
+
+  /api/v1/mlora/orchestration/workflows/{workflow_id}/control:
+    post:
+      tags: [training-orchestration]
+      summary: Control workflow execution
+      description: |
+        Control workflow execution with pause, resume, cancel, or retry
+        operations. Supports graceful handling of long-running training
+        workflows.
+      operationId: controlWorkflowExecution
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Workflow identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowControlRequest'
+      responses:
+        '200':
+          description: Workflow control executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowControlResponse'
+
+  # ============================================================================
+  # SPECIALIZED TRAINING ENDPOINTS
+  # ============================================================================
+
+  /api/v1/mlora/federated/train:
+    post:
+      tags: [batch-training]
+      summary: Federated mLoRA training across nodes
+      description: |
+        Coordinate federated training of LoRAs across multiple federation
+        nodes while preserving privacy and optimizing communication efficiency.
+        Supports secure aggregation and differential privacy.
+      operationId: federatedTraining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederatedTrainingRequest'
+      responses:
+        '202':
+          description: Federated training initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederatedTrainingResponse'
+
+  /api/v1/mlora/personalization/batch:
+    post:
+      tags: [batch-training]
+      summary: Batch personalization training
+      description: |
+        Train thousands of personalized LoRAs simultaneously with shared
+        knowledge transfer and efficient personalization strategies. Optimized
+        for user-specific AI assistant training.
+      operationId: batchPersonalizationTraining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalizationBatchRequest'
+      responses:
+        '202':
+          description: Personalization batch training started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizationBatchResponse'
+
+components:
+  schemas:
+    # Batch Training Schemas
+    BatchTrainingRequest:
+      type: object
+      required: [training_jobs, resource_requirements]
+      properties:
+        training_jobs:
+          type: array
+          minItems: 1
+          maxItems: 10000
+          items:
+            type: object
+            properties:
+              job_id:
+                type: string
+                description: Unique identifier for training job
+              base_model:
+                type: string
+                description: Base model for LoRA adaptation
+              training_data:
+                type: object
+                properties:
+                  dataset_id:
+                    type: string
+                  data_source:
+                    type: string
+                    format: uri
+                  preprocessing_config:
+                    type: object
+              lora_config:
+                type: object
+                properties:
+                  rank:
+                    type: integer
+                    minimum: 1
+                    maximum: 512
+                    default: 16
+                  alpha:
+                    type: number
+                    default: 32
+                  dropout:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                    default: 0.1
+                  target_modules:
+                    type: array
+                    items:
+                      type: string
+              training_config:
+                type: object
+                properties:
+                  learning_rate:
+                    type: number
+                    default: 0.0001
+                  batch_size:
+                    type: integer
+                    default: 8
+                  num_epochs:
+                    type: integer
+                    default: 3
+                  optimizer:
+                    type: string
+                    enum: [adam, adamw, sgd]
+                    default: adamw
+        resource_requirements:
+          type: object
+          properties:
+            gpu_memory_per_job:
+              type: integer
+              description: GPU memory in MB per training job
+            cpu_cores_per_job:
+              type: integer
+              description: CPU cores per training job
+            max_parallel_jobs:
+              type: integer
+              description: Maximum concurrent training jobs
+            preferred_regions:
+              type: array
+              items:
+                type: string
+              description: Preferred cloud regions for training
+        optimization_config:
+          type: object
+          properties:
+            enable_gradient_checkpointing:
+              type: boolean
+              default: true
+            enable_mixed_precision:
+              type: boolean
+              default: true
+            memory_optimization:
+              type: string
+              enum: [none, moderate, aggressive]
+              default: moderate
+            communication_backend:
+              type: string
+              enum: [nccl, gloo, mpi]
+              default: nccl
+
+    BatchTrainingResponse:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          format: uuid
+        total_jobs:
+          type: integer
+        estimated_completion_time:
+          type: string
+          format: date-time
+        resource_allocation:
+          type: object
+          properties:
+            allocated_gpus:
+              type: integer
+            allocated_cpu_cores:
+              type: integer
+            total_memory_gb:
+              type: number
+            estimated_cost:
+              type: string
+        training_infrastructure:
+          type: object
+          properties:
+            training_nodes:
+              type: integer
+            load_balancer_config:
+              type: object
+            monitoring_dashboard:
+              type: string
+              format: uri
+        batch_status:
+          type: string
+          enum: [queued, starting, running, completed, failed, cancelled]
+        started_at:
+          type: string
+          format: date-time
+
+    BatchTrainingStatus:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, starting, running, completed, failed, cancelled]
+        progress:
+          type: object
+          properties:
+            completed_jobs:
+              type: integer
+            running_jobs:
+              type: integer
+            queued_jobs:
+              type: integer
+            failed_jobs:
+              type: integer
+            total_jobs:
+              type: integer
+            completion_percentage:
+              type: number
+              minimum: 0
+              maximum: 100
+        performance_metrics:
+          type: object
+          properties:
+            average_training_time:
+              type: string
+              description: Average time per training job
+            throughput:
+              type: number
+              description: Jobs completed per hour
+            resource_utilization:
+              type: object
+              properties:
+                gpu_utilization:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                cpu_utilization:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                memory_utilization:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+        cost_analysis:
+          type: object
+          properties:
+            current_cost:
+              type: string
+            projected_total_cost:
+              type: string
+            cost_per_job:
+              type: string
+        health_status:
+          type: object
+          properties:
+            overall_health:
+              type: string
+              enum: [healthy, warning, critical]
+            active_alerts:
+              type: array
+              items:
+                type: string
+        estimated_completion:
+          type: string
+          format: date-time
+        last_updated:
+          type: string
+          format: date-time
+
+    # Resource Management Schemas
+    ResourceAllocationRequest:
+      type: object
+      required: [resource_requirements, optimization_goals]
+      properties:
+        resource_requirements:
+          type: object
+          properties:
+            total_gpu_hours:
+              type: number
+            preferred_gpu_types:
+              type: array
+              items:
+                type: string
+                enum: [V100, A100, H100, RTX4090, RTX3090]
+            memory_requirements:
+              type: object
+              properties:
+                total_memory_gb:
+                  type: number
+                memory_per_node:
+                  type: number
+            network_requirements:
+              type: object
+              properties:
+                bandwidth_gbps:
+                  type: number
+                latency_max_ms:
+                  type: number
+        optimization_goals:
+          type: object
+          properties:
+            primary_objective:
+              type: string
+              enum: [cost, performance, efficiency, availability]
+            cost_budget:
+              type: number
+              description: Maximum budget for resource allocation
+            performance_target:
+              type: object
+              properties:
+                min_throughput:
+                  type: number
+                max_latency:
+                  type: number
+            availability_requirements:
+              type: object
+              properties:
+                uptime_percentage:
+                  type: number
+                  minimum: 90
+                  maximum: 99.99
+                fault_tolerance:
+                  type: string
+                  enum: [none, basic, high]
+        scheduling_preferences:
+          type: object
+          properties:
+            start_time:
+              type: string
+              format: date-time
+            deadline:
+              type: string
+              format: date-time
+            priority:
+              type: string
+              enum: [low, normal, high, urgent]
+
+    ResourceAllocationResponse:
+      type: object
+      properties:
+        allocation_id:
+          type: string
+          format: uuid
+        resource_summary:
+          type: object
+          properties:
+            allocated_nodes:
+              type: integer
+            total_gpus:
+              type: integer
+            total_cpu_cores:
+              type: integer
+            total_memory_gb:
+              type: number
+            network_bandwidth_gbps:
+              type: number
+        cost_breakdown:
+          type: object
+          properties:
+            hourly_cost:
+              type: string
+            estimated_total_cost:
+              type: string
+            cost_per_gpu_hour:
+              type: string
+        performance_estimates:
+          type: object
+          properties:
+            expected_throughput:
+              type: string
+            expected_completion_time:
+              type: string
+            efficiency_rating:
+              type: string
+              enum: [excellent, good, fair, poor]
+        allocation_details:
+          type: array
+          items:
+            type: object
+            properties:
+              node_id:
+                type: string
+              node_type:
+                type: string
+              gpu_count:
+                type: integer
+              gpu_type:
+                type: string
+              region:
+                type: string
+              availability_zone:
+                type: string
+        monitoring_endpoints:
+          type: object
+          properties:
+            metrics_dashboard:
+              type: string
+              format: uri
+            log_aggregation:
+              type: string
+              format: uri
+        allocated_at:
+          type: string
+          format: date-time
+
+    # Load Balancing Schemas
+    LoadBalancingConfig:
+      type: object
+      required: [balancing_strategy, target_metrics]
+      properties:
+        balancing_strategy:
+          type: string
+          enum: [round_robin, weighted_round_robin, least_connections, resource_aware, performance_based]
+        target_metrics:
+          type: object
+          properties:
+            target_gpu_utilization:
+              type: number
+              minimum: 50
+              maximum: 95
+              default: 80
+            target_memory_utilization:
+              type: number
+              minimum: 50
+              maximum: 90
+              default: 75
+            max_queue_depth:
+              type: integer
+              minimum: 1
+              maximum: 1000
+              default: 100
+        health_checks:
+          type: object
+          properties:
+            interval_seconds:
+              type: integer
+              default: 30
+            timeout_seconds:
+              type: integer
+              default: 10
+            failure_threshold:
+              type: integer
+              default: 3
+            success_threshold:
+              type: integer
+              default: 2
+        failover_config:
+          type: object
+          properties:
+            enable_automatic_failover:
+              type: boolean
+              default: true
+            failover_delay_seconds:
+              type: integer
+              default: 60
+            backup_capacity_percentage:
+              type: number
+              default: 20
+
+    LoadBalancingResponse:
+      type: object
+      properties:
+        config_id:
+          type: string
+          format: uuid
+        balancing_strategy:
+          type: string
+        active_nodes:
+          type: integer
+        estimated_performance:
+          type: object
+          properties:
+            expected_throughput_improvement:
+              type: string
+            load_distribution_score:
+              type: number
+              minimum: 0
+              maximum: 1
+        configuration_status:
+          type: string
+          enum: [applied, pending, error]
+        configured_at:
+          type: string
+          format: date-time
+
+    # Auto-scaling Schemas
+    AutoScalingConfig:
+      type: object
+      required: [scaling_policies, resource_limits]
+      properties:
+        scaling_policies:
+          type: array
+          items:
+            type: object
+            properties:
+              policy_name:
+                type: string
+              trigger_metric:
+                type: string
+                enum: [cpu_utilization, gpu_utilization, memory_utilization, queue_depth, response_time]
+              scale_up_threshold:
+                type: number
+              scale_down_threshold:
+                type: number
+              scale_up_action:
+                type: object
+                properties:
+                  scaling_adjustment:
+                    type: integer
+                  cooldown_period:
+                    type: integer
+              scale_down_action:
+                type: object
+                properties:
+                  scaling_adjustment:
+                    type: integer
+                  cooldown_period:
+                    type: integer
+        resource_limits:
+          type: object
+          properties:
+            min_instances:
+              type: integer
+              minimum: 1
+            max_instances:
+              type: integer
+              maximum: 10000
+            max_cost_per_hour:
+              type: number
+        optimization_objectives:
+          type: object
+          properties:
+            primary_objective:
+              type: string
+              enum: [cost, performance, availability]
+            performance_targets:
+              type: object
+              properties:
+                target_utilization:
+                  type: number
+                max_response_time:
+                  type: number
+
+    AutoScalingResponse:
+      type: object
+      properties:
+        autoscaling_id:
+          type: string
+          format: uuid
+        active_policies:
+          type: integer
+        current_capacity:
+          type: object
+          properties:
+            active_instances:
+              type: integer
+            total_capacity:
+              type: string
+        estimated_behavior:
+          type: object
+          properties:
+            expected_scaling_frequency:
+              type: string
+            cost_optimization_potential:
+              type: string
+        configuration_status:
+          type: string
+          enum: [active, inactive, error]
+        configured_at:
+          type: string
+          format: date-time
+
+    # Federated Training Schemas
+    FederatedTrainingRequest:
+      type: object
+      required: [federation_nodes, training_config, privacy_config]
+      properties:
+        federation_nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              node_id:
+                type: string
+              node_endpoint:
+                type: string
+                format: uri
+              available_resources:
+                type: object
+              data_summary:
+                type: object
+                description: Non-sensitive data characteristics
+        training_config:
+          type: object
+          properties:
+            aggregation_method:
+              type: string
+              enum: [fedavg, fedprox, fedopt]
+              default: fedavg
+            communication_rounds:
+              type: integer
+              default: 10
+            local_epochs:
+              type: integer
+              default: 1
+            client_fraction:
+              type: number
+              minimum: 0.1
+              maximum: 1.0
+              default: 1.0
+        privacy_config:
+          type: object
+          properties:
+            enable_differential_privacy:
+              type: boolean
+              default: true
+            privacy_epsilon:
+              type: number
+              default: 1.0
+            enable_secure_aggregation:
+              type: boolean
+              default: true
+            homomorphic_encryption:
+              type: boolean
+              default: false
+
+    FederatedTrainingResponse:
+      type: object
+      properties:
+        federation_id:
+          type: string
+          format: uuid
+        participating_nodes:
+          type: integer
+        total_data_samples:
+          type: integer
+          description: Aggregated count without revealing individual contributions
+        estimated_completion:
+          type: string
+          format: date-time
+        privacy_guarantees:
+          type: object
+          properties:
+            differential_privacy_epsilon:
+              type: number
+            secure_aggregation_enabled:
+              type: boolean
+            data_locality_preserved:
+              type: boolean
+        coordination_endpoints:
+          type: object
+          properties:
+            status_endpoint:
+              type: string
+              format: uri
+            metrics_endpoint:
+              type: string
+              format: uri
+        started_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

@@ -1,0 +1,993 @@
+# Individual LoRA Management - Tiki API Specifications
+
+## Overview
+Tiki format specifications for granular management of individual LoRA adaptations within user forests. Every single LoRA adapter has its own endpoints for fine-grained control, monitoring, and optimization across thousands of concurrent adaptations per user.
+
+---
+
+## 🧬 LoRA Lifecycle Management
+
+### LoRA Creation with Architecture Discovery
+
+#### `POST /api/v1/users/{user_id}/loras`
+**Purpose**: Create new LoRA adaptation with GFlowNet-powered architecture discovery
+
+**Authentication**: User ownership validation + LoRA forest quota check
+
+**Path Parameters**:
+- `user_id` (UUID, required): User identifier owning the LoRA forest
+
+**Request Body**:
+```json
+{
+  "domain": "creative|business|technical|general",
+  "specialization": "creative_writing|code_review|email_composition|data_analysis",
+  "training_data": {
+    "samples": [
+      {
+        "input": "User's example input",
+        "output": "Desired output style",
+        "feedback": "positive|negative",
+        "context": "situational_metadata"
+      }
+    ],
+    "sample_count": 150,
+    "quality_score": 0.87
+  },
+  "architecture_preferences": {
+    "rank": 8,
+    "target_layers": ["attention", "mlp", "output"],
+    "optimization_objective": "creativity|accuracy|efficiency|memory"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "user_id": "uuid",
+  "domain": "creative", 
+  "specialization": "creative_writing",
+  "architecture": {
+    "rank": 8,
+    "layers": 6,
+    "attention_heads": 12,
+    "target_layers": ["attention", "mlp"],
+    "parameters": 4194304,
+    "memory_footprint": "16MB"
+  },
+  "training_job_id": "uuid",
+  "estimated_training_time": "45 minutes",
+  "status": "training_queued",
+  "gflownet_discovery": {
+    "architectures_sampled": 50,
+    "optimal_architecture_score": 0.94,
+    "diversity_achieved": 0.78
+  }
+}
+```
+
+**Business Logic**:
+1. Use GFlowNet (JAX-compiled) to sample optimal architecture combinations
+2. Apply μTransfer principles for hyperparameter initialization
+3. Validate training data quality and consistency
+4. Queue in mLoRA concurrent training pipeline (PyTorch)
+5. Apply user's historical preferences for architecture selection
+6. Generate unique LoRA ID with timestamp and version tracking
+
+**Error Handling**:
+- `400`: Invalid specialization or malformed training data
+- `402`: User exceeded LoRA forest quota (upgrade required)
+- `429`: Training queue full (retry with exponential backoff)
+- `413`: Training data exceeds size limits
+
+---
+
+### Individual LoRA Details
+
+#### `GET /api/v1/users/{user_id}/loras/{lora_id}`
+**Purpose**: Get comprehensive details about specific LoRA adaptation
+
+**Path Parameters**:
+- `user_id` (UUID, required): User identifier
+- `lora_id` (string, required): Unique LoRA identifier
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "user_id": "uuid",
+  "domain": "creative",
+  "specialization": "creative_writing",
+  "status": "active|training|idle|archived|failed",
+  "created_at": "2024-01-15T10:30:00Z",
+  "last_updated": "2024-01-15T14:22:00Z",
+  "architecture": {
+    "rank": 8,
+    "layers": 6,
+    "attention_heads": 12,
+    "target_layers": ["attention", "mlp"],
+    "total_parameters": 4194304,
+    "trainable_parameters": 98304,
+    "efficiency_ratio": 0.023,
+    "mu_transfer_scaled": true
+  },
+  "training_history": [
+    {
+      "training_session": 1,
+      "started_at": "2024-01-15T10:45:00Z",
+      "completed_at": "2024-01-15T11:30:00Z",
+      "samples_trained": 150,
+      "final_loss": 0.034,
+      "effectiveness_improvement": "+23%"
+    }
+  ],
+  "performance_metrics": {
+    "effectiveness_score": 0.91,
+    "user_satisfaction": 0.87,
+    "response_quality": 0.93,
+    "style_consistency": 0.89,
+    "inference_speed": "38ms avg",
+    "memory_usage": "16MB"
+  },
+  "usage_statistics": {
+    "total_inferences": 2847,
+    "successful_responses": 2834,
+    "user_feedback_positive": 2456,
+    "last_used": "2024-01-15T14:20:00Z",
+    "daily_usage_trend": "+12% this week"
+  },
+  "federation_status": {
+    "replicated_nodes": ["fed-us-west-2", "fed-us-east-1"],
+    "consistency_status": "synchronized",
+    "last_sync": "2024-01-15T14:15:00Z",
+    "sync_conflicts": 0
+  }
+}
+```
+
+**Business Logic**:
+1. Aggregate performance data from all inference calls
+2. Calculate effectiveness metrics based on user feedback
+3. Monitor federation replication status across nodes
+4. Track usage patterns for optimization recommendations
+5. Provide training history with improvement trajectories
+6. Include architecture details for transparency
+
+---
+
+### LoRA Training & Retraining
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/train`
+**Purpose**: Train or retrain LoRA with new data using incremental learning
+
+**Request Body**:
+```json
+{
+  "training_data": {
+    "samples": [
+      {
+        "input": "New example input",
+        "expected_output": "Desired improvement",
+        "feedback_type": "correction|enhancement|style_adjustment",
+        "priority": "high|medium|low"
+      }
+    ],
+    "incremental": true,
+    "merge_strategy": "additive|replacement|weighted_merge"
+  },
+  "training_config": {
+    "epochs": 50,
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "regularization": {
+      "weight_decay": 1e-5,
+      "dropout": 0.1
+    },
+    "early_stopping": {
+      "patience": 10,
+      "min_improvement": 0.001
+    }
+  },
+  "prevent_catastrophic_forgetting": true,
+  "quality_assurance": {
+    "validation_split": 0.2,
+    "minimum_effectiveness": 0.8,
+    "rollback_on_degradation": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "training_job_id": "uuid",
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "status": "queued|running|completed|failed",
+  "queue_position": 3,
+  "estimated_start": "2024-01-15T15:45:00Z",
+  "estimated_completion": "2024-01-15T16:30:00Z",
+  "training_config": {
+    "method": "incremental_lora_pytorch",
+    "forgetting_prevention": "elastic_weight_consolidation",
+    "resource_allocation": {
+      "gpu_type": "A100",
+      "memory_allocated": "8GB",
+      "estimated_cost": "$0.47"
+    }
+  },
+  "progress_tracking": {
+    "monitoring_url": "wss://training.elias.brain/progress/uuid",
+    "estimated_improvement": "+15% effectiveness",
+    "risk_assessment": "low"
+  }
+}
+```
+
+**Business Logic**:
+1. Queue training in mLoRA concurrent pipeline to avoid interference
+2. Apply ElasticWeightConsolidation to prevent catastrophic forgetting
+3. Use PyTorch PEFT library for efficient parameter updates
+4. Monitor training progress with real-time WebSocket updates
+5. Implement automatic rollback if performance degrades
+6. Generate cost estimates based on compute resources required
+
+---
+
+## 🎯 LoRA Inference & Usage
+
+### Direct LoRA Inference
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/inference`
+**Purpose**: Run inference using specific LoRA adaptation with detailed contribution analysis
+
+**Request Body**:
+```json
+{
+  "input": {
+    "text": "Help me write a creative story about artificial intelligence",
+    "context": {
+      "genre": "science_fiction",
+      "tone": "optimistic",
+      "length": "short_story",
+      "audience": "general"
+    },
+    "constraints": {
+      "max_length": 2000,
+      "style_requirements": ["vivid_imagery", "dialogue_heavy"]
+    }
+  },
+  "inference_config": {
+    "temperature": 0.8,
+    "max_tokens": 500,
+    "top_p": 0.9,
+    "repetition_penalty": 1.1
+  },
+  "return_reasoning": true,
+  "measure_contribution": true
+}
+```
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "inference_id": "uuid",
+  "output": {
+    "generated_text": "In the year 2157, Maya discovered something extraordinary about her AI companion...",
+    "metadata": {
+      "genre_adherence": 0.93,
+      "tone_consistency": 0.91,
+      "style_requirements_met": ["vivid_imagery", "dialogue_heavy"]
+    }
+  },
+  "inference_time_ms": 38,
+  "confidence_score": 0.89,
+  "personalization_applied": true,
+  "lora_contribution": {
+    "adaptation_strength": 0.73,
+    "specialization_match": 0.91,
+    "creative_enhancement": 0.84,
+    "style_influence": {
+      "vocabulary_choices": 0.67,
+      "narrative_structure": 0.81,
+      "character_development": 0.74
+    }
+  },
+  "reasoning_chain": [
+    "Analyzed genre requirements (sci-fi, optimistic tone)",
+    "Applied creative writing patterns from LoRA",
+    "Generated vivid imagery using learned vocabulary",
+    "Structured narrative with dialogue emphasis",
+    "Applied user's storytelling preferences"
+  ],
+  "quality_metrics": {
+    "coherence": 0.92,
+    "creativity": 0.87,
+    "user_style_match": 0.94,
+    "factual_consistency": 0.96
+  }
+}
+```
+
+**Business Logic**:
+1. Load specific LoRA weights for targeted adaptation
+2. Apply LoRA transformations to base model during inference
+3. Measure and quantify LoRA's contribution to output quality
+4. Track inference patterns for usage analytics
+5. Generate detailed reasoning chains for transparency
+6. Return comprehensive quality metrics for improvement
+
+---
+
+## 🔧 LoRA Optimization & Scaling
+
+### Architecture Optimization
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/optimize`
+**Purpose**: Optimize LoRA architecture using GFlowNet exploration and μTransfer scaling
+
+**Request Body**:
+```json
+{
+  "optimization_objectives": [
+    "performance|efficiency|accuracy|creativity|memory_usage"
+  ],
+  "constraints": {
+    "max_parameters": 8388608,
+    "max_memory": "32MB", 
+    "max_inference_latency": 50,
+    "min_effectiveness": 0.85
+  },
+  "optimization_strategy": {
+    "gflownet_config": {
+      "num_samples": 100,
+      "diversity_requirement": "high",
+      "exploration_temperature": 1.2
+    },
+    "search_space": {
+      "rank_range": [4, 32],
+      "layer_range": [2, 12],
+      "attention_head_range": [4, 16]
+    }
+  },
+  "mu_transfer_scaling": {
+    "enable_coordinate_check": true,
+    "scaling_validation": true,
+    "preserve_performance": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "optimization_job_id": "uuid",
+  "current_architecture": {
+    "rank": 8,
+    "layers": 6,
+    "parameters": 4194304,
+    "effectiveness": 0.91,
+    "memory": "16MB"
+  },
+  "optimization_plan": {
+    "gflownet_exploration": {
+      "architectures_to_sample": 100,
+      "estimated_discovery_time": "45 minutes",
+      "search_strategy": "pareto_optimal_frontier"
+    },
+    "proposed_architectures": [
+      {
+        "architecture_id": "arch_1",
+        "rank": 12,
+        "layers": 4,
+        "expected_effectiveness": 0.94,
+        "expected_memory": "18MB",
+        "improvement_areas": ["creativity", "style_consistency"]
+      },
+      {
+        "architecture_id": "arch_2", 
+        "rank": 6,
+        "layers": 8,
+        "expected_effectiveness": 0.89,
+        "expected_memory": "12MB",
+        "improvement_areas": ["efficiency", "inference_speed"]
+      }
+    ]
+  },
+  "estimated_completion": "2024-01-15T17:15:00Z",
+  "cost_estimate": {
+    "gflownet_exploration": "$2.34",
+    "architecture_validation": "$1.67",
+    "total_optimization": "$4.01"
+  },
+  "risk_assessment": {
+    "performance_degradation_risk": "low",
+    "rollback_available": true,
+    "validation_strategy": "a_b_testing"
+  }
+}
+```
+
+**Business Logic**:
+1. Use GFlowNet (JAX) to explore diverse architecture combinations
+2. Apply Pareto optimization for multi-objective trade-offs
+3. Validate architectures using μTransfer coordinate checks
+4. Estimate performance improvements using historical data
+5. Provide cost-benefit analysis for optimization decision
+6. Enable A/B testing between current and optimized architectures
+
+---
+
+### μTransfer Scaling
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/scale`
+**Purpose**: Scale LoRA using μTransfer principles with mathematical performance guarantees
+
+**Request Body**:
+```json
+{
+  "target_size": 2048,
+  "scaling_strategy": "mu_transfer|gradual_scaling|architecture_search",
+  "preserve_performance": true,
+  "scaling_config": {
+    "base_width": 512,
+    "target_width": 2048,
+    "coordinate_check": true,
+    "validation_samples": 100
+  },
+  "quality_assurance": {
+    "min_effectiveness_retention": 0.95,
+    "max_performance_degradation": 0.05,
+    "rollback_threshold": 0.10
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "scaling_job_id": "uuid",
+  "scaling_factor": 4.0,
+  "mu_transfer_applied": true,
+  "scaling_plan": {
+    "current_size": 512,
+    "target_size": 2048,
+    "parameter_scaling": {
+      "total_parameters_before": 4194304,
+      "total_parameters_after": 16777216,
+      "scaling_efficiency": "4x parameters for 4x model size"
+    }
+  },
+  "hyperparameter_changes": {
+    "learning_rate": 0.0001,
+    "attention_scale": 0.0005,
+    "initialization_scale": 0.0313,
+    "output_multiplier": 0.25,
+    "mu_transfer_validated": true
+  },
+  "expected_performance_change": "maintained or improved",
+  "scaling_guarantees": {
+    "mathematical_optimality": true,
+    "no_additional_tuning_required": true,
+    "performance_preservation": "99% confidence",
+    "cost_reduction": "99% vs manual hyperparameter search"
+  },
+  "estimated_completion": "2024-01-15T16:45:00Z",
+  "validation_plan": {
+    "coordinate_check": "automatic",
+    "performance_validation": "100 test samples",
+    "effectiveness_comparison": "before_vs_after"
+  }
+}
+```
+
+**Business Logic**:
+1. Apply μTransfer scaling laws for mathematical optimality
+2. Perform coordinate check to validate scaling stability
+3. Scale all hyperparameters according to μP principles
+4. Validate performance on representative test samples
+5. Provide rollback capability if scaling fails validation
+6. Generate detailed performance comparison reports
+
+---
+
+## 📊 LoRA Analytics & Monitoring
+
+### Comprehensive Usage Analytics
+
+#### `GET /api/v1/users/{user_id}/loras/{lora_id}/analytics`
+**Purpose**: Get detailed analytics for LoRA usage patterns and optimization opportunities
+
+**Query Parameters**:
+- `analytics_type`: `usage|performance|effectiveness|patterns|optimization`
+- `time_range`: `1h|6h|24h|7d|30d|all_time`
+- `granularity`: `minute|hour|day|week|month`
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "analytics_type": "comprehensive",
+  "time_range": "7d",
+  "generated_at": "2024-01-15T15:30:00Z",
+  "usage_statistics": {
+    "total_inferences": 2847,
+    "unique_sessions": 134,
+    "average_daily_usage": 407,
+    "peak_usage_hour": "14:00-15:00 UTC",
+    "usage_trends": [
+      {
+        "date": "2024-01-15",
+        "inferences": 421,
+        "effectiveness": 0.91,
+        "user_satisfaction": 0.87
+      }
+    ],
+    "usage_patterns": {
+      "most_common_context": "creative_writing",
+      "average_session_length": "23 minutes",
+      "preferred_creativity_level": 0.8
+    }
+  },
+  "performance_trends": {
+    "effectiveness_over_time": [
+      {
+        "timestamp": "2024-01-15T00:00:00Z",
+        "effectiveness": 0.87,
+        "sample_size": 67
+      }
+    ],
+    "inference_latency": {
+      "average": 38,
+      "p95": 45,
+      "p99": 52,
+      "trend": "stable"
+    },
+    "quality_metrics": {
+      "coherence_trend": "+3% improvement",
+      "creativity_trend": "+7% improvement", 
+      "style_consistency": "stable at 0.89"
+    }
+  },
+  "effectiveness_analysis": {
+    "overall_effectiveness": 0.91,
+    "improvement_since_creation": "+23%",
+    "effectiveness_by_context": {
+      "short_stories": 0.94,
+      "emails": 0.87,
+      "creative_prompts": 0.93,
+      "technical_writing": 0.82
+    },
+    "user_feedback_analysis": {
+      "positive_feedback_rate": 0.86,
+      "improvement_suggestions": 127,
+      "most_requested_enhancement": "better_dialogue_writing"
+    }
+  },
+  "optimization_opportunities": [
+    {
+      "opportunity_type": "architecture_optimization",
+      "potential_improvement": "15% effectiveness increase",
+      "implementation_effort": "medium",
+      "estimated_cost": "$4.01",
+      "confidence": 0.82
+    },
+    {
+      "opportunity_type": "training_data_enhancement",
+      "potential_improvement": "8% style consistency",
+      "implementation_effort": "low",
+      "estimated_cost": "$1.23",
+      "confidence": 0.91
+    }
+  ],
+  "competitive_analysis": {
+    "rank_among_user_loras": 3,
+    "percentile_effectiveness": 87,
+    "similar_lora_comparison": {
+      "better_than": 0.73,
+      "areas_of_strength": ["creativity", "style_match"],
+      "areas_for_improvement": ["technical_accuracy"]
+    }
+  }
+}
+```
+
+**Business Logic**:
+1. Aggregate usage data from all inference calls and user interactions
+2. Calculate trends using time-series analysis with seasonality detection
+3. Identify usage patterns and preferences for personalization insights
+4. Generate optimization recommendations based on performance gaps
+5. Compare against other LoRAs for competitive benchmarking
+6. Provide actionable insights for improving LoRA effectiveness
+
+---
+
+## 🔄 LoRA Versioning & History
+
+### Version Management
+
+#### `GET /api/v1/users/{user_id}/loras/{lora_id}/versions`
+**Purpose**: Get complete version history with performance comparisons
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "total_versions": 5,
+  "current_version": "v1.4",
+  "versions": [
+    {
+      "version_id": "v1.4",
+      "version_number": "1.4.0",
+      "created_at": "2024-01-15T14:22:00Z",
+      "description": "Improved dialogue writing based on user feedback",
+      "tag": "dialogue_enhancement",
+      "changes": [
+        "Added 47 dialogue samples to training data",
+        "Optimized conversation flow patterns",
+        "Enhanced character voice consistency"
+      ],
+      "performance_metrics": {
+        "effectiveness": 0.91,
+        "dialogue_quality": 0.94,
+        "overall_improvement": "+12% vs v1.3"
+      },
+      "is_current": true,
+      "rollback_available": true
+    },
+    {
+      "version_id": "v1.3",
+      "version_number": "1.3.2", 
+      "created_at": "2024-01-14T09:15:00Z",
+      "description": "Architecture optimization via GFlowNet",
+      "tag": "architecture_optimization",
+      "changes": [
+        "Increased rank from 6 to 8",
+        "Reduced layers from 8 to 6",
+        "Applied μTransfer scaling"
+      ],
+      "performance_metrics": {
+        "effectiveness": 0.84,
+        "inference_speed": "28ms (was 41ms)",
+        "memory_usage": "16MB (was 21MB)"
+      },
+      "is_current": false,
+      "rollback_available": true
+    }
+  ],
+  "version_comparison": {
+    "best_effectiveness": "v1.4 (0.91)",
+    "fastest_inference": "v1.3 (28ms)",
+    "lowest_memory": "v1.2 (14MB)",
+    "most_stable": "v1.4 (99.2% success rate)"
+  },
+  "storage_usage": {
+    "total_versions_size": "89MB",
+    "average_version_size": "17.8MB",
+    "compression_ratio": 0.73
+  }
+}
+```
+
+**Business Logic**:
+1. Maintain complete version history with metadata and performance data
+2. Enable easy performance comparison across versions
+3. Provide rollback capabilities to any previous version
+4. Track changes and improvements over time
+5. Optimize storage using compression and deduplication
+6. Generate insights about version performance trends
+
+---
+
+### Version Rollback
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/rollback`
+**Purpose**: Rollback LoRA to previous version with validation
+
+**Request Body**:
+```json
+{
+  "target_version": "v1.3",
+  "rollback_reason": "performance_degradation|user_preference|testing",
+  "rollback_options": {
+    "preserve_recent_training": false,
+    "merge_improvements": false,
+    "create_backup": true
+  },
+  "validation_config": {
+    "run_performance_test": true,
+    "test_sample_size": 50,
+    "rollback_if_worse": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "rollback_job_id": "uuid",
+  "source_version": "v1.4",
+  "target_version": "v1.3", 
+  "rollback_status": "completed|in_progress|failed|validated",
+  "backup_created": {
+    "backup_id": "backup_v1.4_20240115_1530",
+    "restore_available": true,
+    "backup_expires": "2024-04-15T15:30:00Z"
+  },
+  "performance_comparison": {
+    "before_rollback": {
+      "effectiveness": 0.91,
+      "inference_time": 38,
+      "memory_usage": "16MB"
+    },
+    "after_rollback": {
+      "effectiveness": 0.84,
+      "inference_time": 28,
+      "memory_usage": "18MB"
+    },
+    "validation_result": "rollback_successful",
+    "user_impact": "7% effectiveness decrease, 26% speed improvement"
+  },
+  "rollback_completed_at": "2024-01-15T15:35:00Z"
+}
+```
+
+**Business Logic**:
+1. Create backup of current version before rollback
+2. Validate target version exists and is compatible
+3. Perform atomic rollback operation with integrity checks
+4. Run performance validation on representative test samples
+5. Provide detailed comparison between versions
+6. Enable easy restoration if rollback causes issues
+
+---
+
+## 🌐 Federation Integration
+
+### Cross-Node Synchronization
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/sync`
+**Purpose**: Synchronize individual LoRA across federation nodes with conflict resolution
+
+**Request Body**:
+```json
+{
+  "sync_options": {
+    "target_nodes": ["fed-us-west-2", "fed-us-east-1", "fed-eu-west-1"],
+    "sync_priority": "high|normal|low|urgent",
+    "consistency_level": "strong|eventual|bounded",
+    "conflict_resolution": "merge|latest_wins|manual_review"
+  },
+  "sync_validation": {
+    "checksum_validation": true,
+    "performance_validation": true,
+    "rollback_on_failure": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "sync_job_id": "uuid",
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "sync_status": "initiated|in_progress|completed|failed",
+  "target_nodes": [
+    {
+      "node_id": "fed-us-west-2",
+      "status": "completed",
+      "sync_time": "1.2s",
+      "latency": "15ms"
+    },
+    {
+      "node_id": "fed-us-east-1",
+      "status": "completed", 
+      "sync_time": "1.8s",
+      "latency": "28ms"
+    },
+    {
+      "node_id": "fed-eu-west-1",
+      "status": "in_progress",
+      "progress": "73%",
+      "eta": "2024-01-15T15:32:00Z"
+    }
+  ],
+  "sync_metrics": {
+    "total_data_transferred": "16.7MB",
+    "compression_ratio": 0.68,
+    "transfer_speed": "12.3MB/s",
+    "integrity_verified": true
+  },
+  "conflict_resolution": {
+    "conflicts_detected": 0,
+    "resolution_strategy": "merge",
+    "manual_intervention_required": false
+  },
+  "estimated_completion": "2024-01-15T15:32:00Z"
+}
+```
+
+**Business Logic**:
+1. Distribute LoRA weights across multiple federation nodes for availability
+2. Handle network partitions and node failures gracefully  
+3. Implement conflict resolution strategies for concurrent modifications
+4. Verify data integrity using cryptographic checksums
+5. Optimize transfer using compression and incremental sync
+6. Provide real-time sync progress and estimated completion times
+
+---
+
+## 🔍 LoRA Health & Diagnostics
+
+### Comprehensive Health Assessment
+
+#### `GET /api/v1/users/{user_id}/loras/{lora_id}/health`
+**Purpose**: Get detailed health assessment with predictive analysis
+
+**Response**:
+```json
+{
+  "lora_id": "creative_writing_specialist_v1_20240115",
+  "overall_health": "healthy|degraded|critical|optimal",
+  "health_score": 0.94,
+  "last_health_check": "2024-01-15T15:30:00Z",
+  "health_dimensions": {
+    "performance_health": {
+      "score": 0.91,
+      "status": "healthy",
+      "metrics": {
+        "effectiveness": 0.91,
+        "consistency": 0.87,
+        "response_quality": 0.93
+      },
+      "trends": {
+        "effectiveness_trend": "+3% this week",
+        "stability": "improving"
+      }
+    },
+    "resource_health": {
+      "score": 0.96,
+      "status": "optimal",
+      "resource_utilization": {
+        "memory_usage": "16MB of 32MB allocated",
+        "compute_efficiency": 0.87,
+        "inference_speed": "38ms avg (target: <50ms)"
+      },
+      "optimization_suggestions": [
+        "Consider architecture optimization for better memory efficiency"
+      ]
+    },
+    "training_health": {
+      "score": 0.92,
+      "status": "healthy",
+      "training_metrics": {
+        "last_training_success": true,
+        "convergence_quality": 0.89,
+        "overfitting_risk": "low",
+        "catastrophic_forgetting": "prevented"
+      },
+      "training_recommendations": [
+        "Ready for next training session",
+        "No additional regularization needed"
+      ]
+    },
+    "federation_health": {
+      "score": 0.97,
+      "status": "optimal",
+      "replication_status": {
+        "replicated_nodes": 3,
+        "target_replicas": 3,
+        "consistency_check": "passed",
+        "sync_latency": "1.2s avg"
+      },
+      "availability": "99.97% (30-day average)"
+    }
+  },
+  "predictive_analysis": {
+    "performance_prediction": {
+      "next_week_effectiveness": 0.93,
+      "confidence": 0.84,
+      "factors": ["continued_usage", "training_schedule"]
+    },
+    "maintenance_recommendations": [
+      {
+        "action": "architecture_optimization",
+        "urgency": "low",
+        "expected_benefit": "+5% effectiveness",
+        "estimated_cost": "$4.01"
+      }
+    ],
+    "risk_assessment": {
+      "performance_degradation_risk": "low",
+      "resource_exhaustion_risk": "very_low",
+      "federation_failure_risk": "very_low",
+      "overall_risk": "low"
+    }
+  },
+  "alerts": [
+    {
+      "type": "info",
+      "message": "LoRA effectiveness improved by 3% this week",
+      "timestamp": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+**Business Logic**:
+1. Aggregate health metrics across performance, resources, training, and federation
+2. Use machine learning models to predict future performance trends
+3. Generate actionable recommendations based on health analysis
+4. Assess risks and provide early warning for potential issues
+5. Compare against historical performance and peer LoRAs
+6. Provide comprehensive diagnostics for troubleshooting
+
+---
+
+## 🚀 Advanced LoRA Operations
+
+### LoRA Merging & Composition
+
+#### `POST /api/v1/users/{user_id}/loras/merge`
+**Purpose**: Merge multiple LoRAs into composite adaptation
+
+**Request Body**:
+```json
+{
+  "source_loras": [
+    {
+      "lora_id": "creative_writing_v1",
+      "weight": 0.6,
+      "contribution_focus": ["narrative_structure", "creativity"]
+    },
+    {
+      "lora_id": "dialogue_specialist_v2", 
+      "weight": 0.4,
+      "contribution_focus": ["character_voice", "conversation_flow"]
+    }
+  ],
+  "merge_strategy": "weighted_average|selective_merge|hierarchical",
+  "target_specialization": "complete_creative_writing",
+  "merge_options": {
+    "preserve_individual_strengths": true,
+    "minimize_interference": true,
+    "optimize_combined_performance": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "merge_job_id": "uuid",
+  "merged_lora_id": "creative_writing_complete_v1_merged",
+  "merge_strategy": "weighted_average",
+  "source_loras_combined": 2,
+  "merge_result": {
+    "effectiveness_prediction": 0.94,
+    "combined_strengths": ["narrative_structure", "dialogue", "creativity"],
+    "potential_conflicts": [],
+    "resolution_applied": "automatic_weight_balancing"
+  },
+  "performance_estimate": {
+    "expected_improvement": "+18% over individual LoRAs",
+    "confidence": 0.82,
+    "validation_required": true
+  },
+  "merge_completed_at": "2024-01-15T16:45:00Z"
+}
+```
+
+**Business Logic**:
+1. Analyze compatibility between source LoRAs for successful merging
+2. Apply weighted averaging or selective merging based on strategy
+3. Optimize combined performance while preserving individual strengths  
+4. Validate merged LoRA performance against individual components
+5. Provide rollback capability if merge reduces effectiveness
+6. Generate new LoRA ID and version tracking for merged adaptation
+
+---
+
+This comprehensive Tiki specification provides detailed documentation for every individual LoRA management endpoint, ensuring developers understand the granular control available for managing thousands of concurrent LoRA adaptations within each user's forest.

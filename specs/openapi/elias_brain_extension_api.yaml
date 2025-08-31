@@ -1,0 +1,1253 @@
+openapi: 3.0.3
+info:
+  title: ELIAS Brain Extension API
+  description: |
+    Complete OpenAPI specification for ELIAS Brain Extension system.
+    Integrates μTransfer + GFlowNets + Amortized Inference + mLoRA technologies
+    for scalable personalized AI brain extensions.
+  version: "1.0.0"
+  contact:
+    name: ELIAS Development Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.elias.brain
+    description: Production ELIAS Brain Extension API
+  - url: https://staging-api.elias.brain
+    description: Staging environment
+  - url: http://localhost:4000
+    description: Local development server
+
+tags:
+  - name: user-interaction
+    description: User input processing and response generation
+  - name: micro-lora
+    description: Micro-LoRA forest management and training
+  - name: daemon-generation
+    description: Personalized daemon code generation and deployment
+  - name: architecture-discovery
+    description: GFlowNet-based architecture discovery
+  - name: hyperparameter-transfer
+    description: μTransfer hyperparameter scaling
+  - name: amortized-inference
+    description: Tractable posterior sampling and Bayesian averaging
+  - name: system-monitoring
+    description: Performance metrics and health monitoring
+  - name: federation
+    description: Cross-federation scaling and corporate sharing
+
+paths:
+  # ============================================================================
+  # USER INTERACTION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/input:
+    post:
+      tags: [user-interaction]
+      summary: Process user input
+      description: |
+        Capture and process user input (voice, text, or multimodal).
+        Returns structured response in <100ms via local daemon.
+      operationId: processUserInput
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique user identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInputRequest'
+      responses:
+        '200':
+          description: Input processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInputResponse'
+        '400':
+          description: Invalid input format
+        '404':
+          description: User not found
+        '500':
+          description: Processing error
+
+  /api/v1/users/{user_id}/knowledge/search:
+    post:
+      tags: [user-interaction]
+      summary: Search user knowledge base
+      description: Query user's knowledge base with semantic search
+      operationId: searchKnowledgeBase
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeSearchRequest'
+      responses:
+        '200':
+          description: Search completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeSearchResponse'
+
+  /api/v1/users/{user_id}/creative/generate:
+    post:
+      tags: [user-interaction]
+      summary: Generate creative content
+      description: |
+        Generate diverse creative content using amortized inference.
+        Returns multiple high-quality variants via Bayesian model averaging.
+      operationId: generateCreativeContent
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreativeGenerationRequest'
+      responses:
+        '200':
+          description: Creative content generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreativeGenerationResponse'
+
+  # ============================================================================
+  # MICRO-LORA MANAGEMENT ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/lora-forest:
+    get:
+      tags: [micro-lora]
+      summary: Get micro-LoRA forest status
+      description: Retrieve complete status of user's micro-LoRA forest
+      operationId: getLoraForestStatus
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Forest status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraForestStatus'
+    
+    post:
+      tags: [micro-lora]
+      summary: Manage micro-LoRA forest
+      description: Create, update, or modify user's micro-LoRA forest
+      operationId: manageLoraForest
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraForestManagementRequest'
+      responses:
+        '200':
+          description: Forest management operation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraForestManagementResponse'
+
+  /api/v1/users/{user_id}/lora-forest/train:
+    post:
+      tags: [micro-lora]
+      summary: Train micro-LoRAs concurrently
+      description: |
+        Train multiple micro-LoRAs simultaneously using mLoRA pipeline.
+        Handles up to thousands of adapters concurrently.
+      operationId: trainMicroLorasConcurrent
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConcurrentTrainingRequest'
+      responses:
+        '202':
+          description: Training initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConcurrentTrainingResponse'
+
+  /api/v1/users/{user_id}/lora-forest/scale:
+    post:
+      tags: [micro-lora, hyperparameter-transfer]
+      summary: Scale micro-LoRA using μTransfer
+      description: |
+        Scale micro-LoRA forest using μTransfer principles.
+        Zero-shot hyperparameter transfer with 99% cost reduction.
+      operationId: scaleMicroLoraWithMuTransfer
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuTransferScalingRequest'
+      responses:
+        '200':
+          description: Scaling completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MuTransferScalingResponse'
+
+  # ============================================================================
+  # DAEMON GENERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/daemon/generate:
+    post:
+      tags: [daemon-generation]
+      summary: Generate personalized daemon
+      description: |
+        Generate personalized daemon code from user's micro-LoRA forest.
+        Uses amortized inference for diverse pattern synthesis.
+      operationId: generatePersonalizedDaemon
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DaemonGenerationRequest'
+      responses:
+        '200':
+          description: Daemon generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DaemonGenerationResponse'
+
+  /api/v1/users/{user_id}/daemon/deploy:
+    post:
+      tags: [daemon-generation]
+      summary: Deploy daemon to devices
+      description: Deploy daemon to user's devices with hot-swappable updates
+      operationId: deployDaemonToDevices
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DaemonDeploymentRequest'
+      responses:
+        '200':
+          description: Deployment initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DaemonDeploymentResponse'
+
+  /api/v1/users/{user_id}/daemon/update:
+    patch:
+      tags: [daemon-generation]
+      summary: Update daemon incrementally
+      description: |
+        Update daemon with new patterns from recent interactions.
+        Incremental learning without catastrophic forgetting.
+      operationId: updateDaemonIncrementally
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DaemonUpdateRequest'
+      responses:
+        '200':
+          description: Daemon updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DaemonUpdateResponse'
+
+  # ============================================================================
+  # GFLOWNET ARCHITECTURE DISCOVERY ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/architectures/discover:
+    post:
+      tags: [architecture-discovery]
+      summary: Discover diverse architectures
+      description: |
+        Discover diverse micro-LoRA architectures using GFlowNets.
+        Proportional sampling vs single optimization for creativity.
+      operationId: discoverDiverseArchitectures
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchitectureDiscoveryRequest'
+      responses:
+        '200':
+          description: Architecture discovery completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchitectureDiscoveryResponse'
+
+  /api/v1/users/{user_id}/creative/sample-gflownet:
+    post:
+      tags: [architecture-discovery]
+      summary: Sample creative ideas with GFlowNets
+      description: |
+        Sample creative ideas using GFlowNets with amortized inference.
+        Returns diverse, high-quality ideas proportional to reward function.
+      operationId: sampleCreativeIdeasGFlowNet
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GFlowNetCreativeSamplingRequest'
+      responses:
+        '200':
+          description: Creative sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GFlowNetCreativeSamplingResponse'
+
+  # ============================================================================
+  # HYPERPARAMETER TRANSFER ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/setup:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Setup μTransfer scaling
+      description: |
+        Set up μP parameterization for zero-shot hyperparameter transfer.
+        Enables 99% cost reduction in scaling experiments.
+      operationId: setupMuTransferScaling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuTransferSetupRequest'
+      responses:
+        '200':
+          description: μTransfer scaling configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MuTransferSetupResponse'
+
+  /api/v1/mu-transfer/hyperparameters:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Transfer hyperparameters
+      description: |
+        Transfer hyperparameters from tuned proxy model to production scale.
+        Mathematical guarantee of optimality.
+      operationId: transferHyperparameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HyperparameterTransferRequest'
+      responses:
+        '200':
+          description: Hyperparameters transferred successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HyperparameterTransferResponse'
+
+  # ============================================================================
+  # AMORTIZED INFERENCE ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/inference/sample-posterior:
+    post:
+      tags: [amortized-inference]
+      summary: Sample intractable posterior
+      description: |
+        Sample from intractable posterior distributions using amortized inference.
+        Treats chain-of-thought reasoning as latent variable modeling (X → Z → Y).
+      operationId: sampleIntractablePosterior
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PosteriorSamplingRequest'
+      responses:
+        '200':
+          description: Posterior sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosteriorSamplingResponse'
+
+  /api/v1/inference/bayesian-averaging:
+    post:
+      tags: [amortized-inference]
+      summary: Bayesian model averaging
+      description: |
+        Perform Bayesian model averaging across multiple reasoning chains.
+        Aggregates diverse approaches for robust, high-quality outputs.
+      operationId: bayesianModelAveraging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BayesianAveragingRequest'
+      responses:
+        '200':
+          description: Bayesian averaging completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BayesianAveragingResponse'
+
+  # ============================================================================
+  # SYSTEM MONITORING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/metrics:
+    get:
+      tags: [system-monitoring]
+      summary: Get system metrics
+      description: Get comprehensive system health and performance metrics
+      operationId: getSystemMetrics
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: metric_types
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [performance, health, usage, lora_forest, inference]
+          description: Types of metrics to retrieve
+      responses:
+        '200':
+          description: Metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemMetricsResponse'
+
+  /api/v1/users/{user_id}/patterns/analyze:
+    post:
+      tags: [system-monitoring]
+      summary: Analyze user patterns
+      description: Analyze user's creativity and personalization patterns
+      operationId: analyzeUserPatterns
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatternAnalysisRequest'
+      responses:
+        '200':
+          description: Pattern analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatternAnalysisResponse'
+
+  # ============================================================================
+  # FEDERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/federation/scale:
+    post:
+      tags: [federation]
+      summary: Scale across federation
+      description: Scale user's brain extension across federation nodes
+      operationId: scaleAcrossFederation
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederationScalingRequest'
+      responses:
+        '200':
+          description: Federation scaling initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederationScalingResponse'
+
+  /api/v1/corporate/{org_id}/sharing:
+    post:
+      tags: [federation]
+      summary: Manage corporate IP sharing
+      description: Manage corporate IP sharing for enterprise deployments
+      operationId: manageCorporateSharing
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorporateSharingRequest'
+      responses:
+        '200':
+          description: Corporate sharing configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorporateSharingResponse'
+
+components:
+  schemas:
+    # User Interaction Schemas
+    UserInputRequest:
+      type: object
+      required: [input_type, content]
+      properties:
+        input_type:
+          type: string
+          enum: [text, voice, multimodal]
+        content:
+          type: string
+        context:
+          type: object
+          additionalProperties: true
+        options:
+          type: object
+          properties:
+            response_speed:
+              type: string
+              enum: [fast, balanced, thorough]
+            creativity_level:
+              type: number
+              minimum: 0
+              maximum: 1
+
+    UserInputResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        response_time_ms:
+          type: number
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        personalization_applied:
+          type: boolean
+        reasoning_chains:
+          type: array
+          items:
+            type: object
+
+    KnowledgeSearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        filters:
+          type: object
+          properties:
+            domain:
+              type: array
+              items:
+                type: string
+            date_range:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+        limit:
+          type: integer
+          default: 20
+
+    KnowledgeSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              content:
+                type: string
+              relevance_score:
+                type: number
+              source:
+                type: string
+              domain:
+                type: string
+        total_results:
+          type: integer
+        search_time_ms:
+          type: number
+
+    CreativeGenerationRequest:
+      type: object
+      required: [domain, prompt]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        prompt:
+          type: string
+        options:
+          type: object
+          properties:
+            num_variants:
+              type: integer
+              default: 5
+            creativity:
+              type: string
+              enum: [low, medium, high]
+            style:
+              type: string
+
+    CreativeGenerationResponse:
+      type: object
+      properties:
+        diverse_outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              variant_id:
+                type: string
+              content:
+                type: string
+              creativity_score:
+                type: number
+              novelty_score:
+                type: number
+              user_style_match:
+                type: number
+        generation_metadata:
+          type: object
+
+    # Micro-LoRA Schemas
+    LoraForestStatus:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        total_loras:
+          type: integer
+        active_loras:
+          type: integer
+        domains:
+          type: array
+          items:
+            type: string
+        forest_health:
+          type: object
+          properties:
+            overall_score:
+              type: number
+            memory_usage:
+              type: string
+            inference_speed:
+              type: string
+        last_updated:
+          type: string
+          format: date-time
+
+    LoraForestManagementRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [create, add_lora, remove_lora, merge_loras, optimize, prune]
+        parameters:
+          type: object
+          additionalProperties: true
+
+    LoraForestManagementResponse:
+      type: object
+      properties:
+        action_completed:
+          type: string
+        result:
+          type: object
+        forest_status:
+          $ref: '#/components/schemas/LoraForestStatus'
+
+    ConcurrentTrainingRequest:
+      type: object
+      required: [training_data, domains]
+      properties:
+        training_data:
+          type: object
+          additionalProperties: true
+        domains:
+          type: array
+          items:
+            type: string
+        training_config:
+          type: object
+          properties:
+            concurrent_loras:
+              type: integer
+              default: 1000
+            training_epochs:
+              type: integer
+              default: 100
+
+    ConcurrentTrainingResponse:
+      type: object
+      properties:
+        training_job_id:
+          type: string
+          format: uuid
+        estimated_completion:
+          type: string
+          format: date-time
+        concurrent_loras:
+          type: integer
+        training_method:
+          type: string
+
+    # μTransfer Schemas
+    MuTransferScalingRequest:
+      type: object
+      required: [domain, from_size, to_size]
+      properties:
+        domain:
+          type: string
+        from_size:
+          type: integer
+        to_size:
+          type: integer
+        scaling_config:
+          type: object
+
+    MuTransferScalingResponse:
+      type: object
+      properties:
+        scaling_factor:
+          type: number
+        hyperparameters_transferred:
+          type: object
+        cost_reduction:
+          type: string
+        performance_guarantee:
+          type: string
+
+    MuTransferSetupRequest:
+      type: object
+      required: [base_config, target_config]
+      properties:
+        base_config:
+          type: object
+          properties:
+            width:
+              type: integer
+            depth:
+              type: integer
+            learning_rate:
+              type: number
+        target_config:
+          type: object
+          properties:
+            width:
+              type: integer
+            depth:
+              type: integer
+
+    MuTransferSetupResponse:
+      type: object
+      properties:
+        scaling_config:
+          type: object
+        coordinate_check_required:
+          type: boolean
+        expected_cost_reduction:
+          type: string
+
+    HyperparameterTransferRequest:
+      type: object
+      required: [domain, proxy_hyperparameters, target_scale]
+      properties:
+        domain:
+          type: string
+        proxy_hyperparameters:
+          type: object
+        target_scale:
+          type: integer
+
+    HyperparameterTransferResponse:
+      type: object
+      properties:
+        transferred_hyperparameters:
+          type: object
+        transfer_guarantee:
+          type: string
+        validation_required:
+          type: boolean
+
+    # Daemon Generation Schemas
+    DaemonGenerationRequest:
+      type: object
+      properties:
+        generation_options:
+          type: object
+          properties:
+            platform:
+              type: string
+              enum: [javascript, python, elixir]
+              default: javascript
+            domains:
+              type: array
+              items:
+                type: string
+            optimization_level:
+              type: string
+              enum: [development, production, debug]
+              default: production
+
+    DaemonGenerationResponse:
+      type: object
+      properties:
+        daemon_code:
+          type: string
+        metadata:
+          type: object
+          properties:
+            generation_method:
+              type: string
+            inference_speed:
+              type: string
+            memory_footprint:
+              type: string
+            personalization_strength:
+              type: number
+
+    DaemonDeploymentRequest:
+      type: object
+      required: [daemon_code, target_devices]
+      properties:
+        daemon_code:
+          type: string
+        target_devices:
+          type: array
+          items:
+            type: string
+            enum: [mobile, desktop, server, edge]
+
+    DaemonDeploymentResponse:
+      type: object
+      properties:
+        deployment_id:
+          type: string
+          format: uuid
+        deployment_status:
+          type: object
+        hot_swap_enabled:
+          type: boolean
+
+    DaemonUpdateRequest:
+      type: object
+      required: [new_patterns]
+      properties:
+        new_patterns:
+          type: object
+          additionalProperties: true
+        update_type:
+          type: string
+          enum: [incremental, major, optimization]
+
+    DaemonUpdateResponse:
+      type: object
+      properties:
+        update_applied:
+          type: boolean
+        update_metadata:
+          type: object
+        performance_change:
+          type: string
+
+    # GFlowNet Schemas
+    ArchitectureDiscoveryRequest:
+      type: object
+      required: [domain]
+      properties:
+        domain:
+          type: string
+        discovery_params:
+          type: object
+          properties:
+            num_samples:
+              type: integer
+              default: 10
+            diversity_requirement:
+              type: string
+              enum: [low, medium, high]
+
+    ArchitectureDiscoveryResponse:
+      type: object
+      properties:
+        diverse_architectures:
+          type: array
+          items:
+            type: object
+            properties:
+              rank:
+                type: integer
+              layers:
+                type: integer
+              attention_heads:
+                type: integer
+              effectiveness_score:
+                type: number
+              diversity_score:
+                type: number
+
+    GFlowNetCreativeSamplingRequest:
+      type: object
+      required: [domain, context]
+      properties:
+        domain:
+          type: string
+        context:
+          type: object
+          properties:
+            input:
+              type: string
+            target:
+              type: string
+            num_reasoning_chains:
+              type: integer
+              default: 10
+
+    GFlowNetCreativeSamplingResponse:
+      type: object
+      properties:
+        diverse_ideas:
+          type: array
+          items:
+            type: object
+            properties:
+              chain_id:
+                type: string
+              reasoning_steps:
+                type: array
+                items:
+                  type: string
+              creativity_score:
+                type: number
+              coherence_score:
+                type: number
+
+    # Amortized Inference Schemas
+    PosteriorSamplingRequest:
+      type: object
+      required: [input_x]
+      properties:
+        input_x:
+          type: string
+        target_y:
+          type: string
+        num_samples:
+          type: integer
+          default: 10
+        options:
+          type: object
+
+    PosteriorSamplingResponse:
+      type: object
+      properties:
+        posterior_samples:
+          type: array
+          items:
+            type: object
+            properties:
+              sample_id:
+                type: string
+              reasoning_chain_z:
+                type: array
+                items:
+                  type: string
+              posterior_probability:
+                type: string
+              user_style_applied:
+                type: boolean
+
+    BayesianAveragingRequest:
+      type: object
+      required: [reasoning_chains]
+      properties:
+        reasoning_chains:
+          type: array
+          items:
+            type: object
+        weights:
+          type: array
+          items:
+            type: number
+
+    BayesianAveragingResponse:
+      type: object
+      properties:
+        averaged_result:
+          type: object
+          properties:
+            aggregation_method:
+              type: string
+            final_output:
+              type: string
+            confidence_score:
+              type: number
+            diversity_score:
+              type: number
+
+    # System Monitoring Schemas
+    SystemMetricsResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        performance_metrics:
+          type: object
+        health_metrics:
+          type: object
+        lora_forest_metrics:
+          type: object
+        inference_metrics:
+          type: object
+        collected_at:
+          type: string
+          format: date-time
+
+    PatternAnalysisRequest:
+      type: object
+      required: [analysis_type]
+      properties:
+        analysis_type:
+          type: string
+          enum: [creativity, personalization, effectiveness, diversity]
+        time_range:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+
+    PatternAnalysisResponse:
+      type: object
+      properties:
+        analysis_result:
+          type: object
+          properties:
+            pattern_strength:
+              type: number
+            trends:
+              type: array
+              items:
+                type: object
+            insights:
+              type: array
+              items:
+                type: string
+            recommendations:
+              type: array
+              items:
+                type: string
+
+    # Federation Schemas
+    FederationScalingRequest:
+      type: object
+      required: [scaling_params]
+      properties:
+        scaling_params:
+          type: object
+          properties:
+            target_nodes:
+              type: integer
+            scaling_strategy:
+              type: string
+              enum: [performance, capacity, redundancy]
+
+    FederationScalingResponse:
+      type: object
+      properties:
+        scaling_job_id:
+          type: string
+          format: uuid
+        nodes_allocated:
+          type: integer
+        expected_completion:
+          type: string
+          format: date-time
+
+    CorporateSharingRequest:
+      type: object
+      required: [sharing_config]
+      properties:
+        sharing_config:
+          type: object
+          properties:
+            sharing_level:
+              type: string
+              enum: [none, metadata, patterns, full]
+            allowed_domains:
+              type: array
+              items:
+                type: string
+            restrictions:
+              type: object
+
+    CorporateSharingResponse:
+      type: object
+      properties:
+        sharing_configured:
+          type: boolean
+        policy_id:
+          type: string
+          format: uuid
+        compliance_status:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

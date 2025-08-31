@@ -1,0 +1,1071 @@
+openapi: 3.0.3
+info:
+  title: GFlowNet Architecture Discovery API
+  description: |
+    Generative Flow Networks API for diverse neural architecture discovery and optimization.
+    Enables sampling of diverse, high-reward architectures for LoRA adaptations with
+    mathematical guarantees for exploration coverage and reward optimization.
+    
+    Based on GFlowNet (Generative Flow Networks) theory for structured exploration
+    of discrete combinatorial spaces with provable diversity guarantees.
+  version: "1.0.0"
+  contact:
+    name: ELIAS GFlowNet Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://gflownet.elias.brain
+    description: Production GFlowNet API
+  - url: https://staging-gflownet.elias.brain
+    description: Staging environment
+  - url: http://localhost:4003
+    description: Local development server
+
+tags:
+  - name: architecture-discovery
+    description: Neural architecture discovery and sampling operations
+  - name: diversity-optimization
+    description: Diverse solution generation with reward optimization
+  - name: flow-training
+    description: GFlowNet flow training and optimization
+  - name: sampling-strategies
+    description: Advanced sampling strategies and exploration
+  - name: reward-modeling
+    description: Reward function definition and optimization
+
+paths:
+  # ============================================================================
+  # ARCHITECTURE DISCOVERY ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/gflownet/architectures/discover:
+    post:
+      tags: [architecture-discovery]
+      summary: Discover optimal architectures using GFlowNet sampling
+      description: |
+        Use GFlowNet to discover diverse, high-reward neural architectures for
+        specific domains and constraints. Provides mathematical guarantees for
+        exploration diversity and reward optimization.
+      operationId: discoverArchitectures
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchitectureDiscoveryRequest'
+      responses:
+        '200':
+          description: Architecture discovery completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchitectureDiscoveryResponse'
+        '400':
+          description: Invalid discovery parameters
+        '422':
+          description: Constraint validation failed
+        '429':
+          description: Discovery queue full
+
+  /api/v1/gflownet/architectures/sample:
+    post:
+      tags: [architecture-discovery]
+      summary: Sample architectures from trained GFlowNet
+      description: |
+        Sample diverse architectures from pre-trained GFlowNet for specific
+        domain and requirements. Uses trained flow to generate high-quality
+        architectures efficiently.
+      operationId: sampleArchitectures
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchitectureSamplingRequest'
+      responses:
+        '200':
+          description: Architecture sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchitectureSamplingResponse'
+
+  /api/v1/gflownet/architectures/evaluate:
+    post:
+      tags: [architecture-discovery]
+      summary: Evaluate architecture candidates
+      description: |
+        Evaluate sampled architectures using multi-objective reward functions.
+        Provides comprehensive scoring across effectiveness, efficiency, and
+        domain-specific metrics.
+      operationId: evaluateArchitectures
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchitectureEvaluationRequest'
+      responses:
+        '200':
+          description: Architecture evaluation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchitectureEvaluationResponse'
+
+  # ============================================================================
+  # DIVERSITY OPTIMIZATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/gflownet/diversity/optimize:
+    post:
+      tags: [diversity-optimization]
+      summary: Optimize for diverse solution generation
+      description: |
+        Configure GFlowNet for maximum diversity while maintaining reward quality.
+        Balances exploration vs exploitation for optimal architecture discovery.
+      operationId: optimizeDiversity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiversityOptimizationRequest'
+      responses:
+        '200':
+          description: Diversity optimization configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiversityOptimizationResponse'
+
+  /api/v1/gflownet/diversity/measure:
+    post:
+      tags: [diversity-optimization]
+      summary: Measure diversity of architecture set
+      description: |
+        Quantify diversity of generated architecture set using multiple metrics.
+        Provides insights into exploration coverage and solution variety.
+      operationId: measureDiversity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiversityMeasurementRequest'
+      responses:
+        '200':
+          description: Diversity measurement completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiversityMeasurementResponse'
+
+  # ============================================================================
+  # FLOW TRAINING ENDPOINTS
+  # ============================================================================
+
+  /api/v1/gflownet/flow/train:
+    post:
+      tags: [flow-training]
+      summary: Train GFlowNet flow function
+      description: |
+        Train GFlowNet flow function for specific domain and reward structure.
+        Learns to generate diverse, high-reward architectures through flow matching.
+      operationId: trainGFlowNetFlow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowTrainingRequest'
+      responses:
+        '202':
+          description: Flow training initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowTrainingResponse'
+
+  /api/v1/gflownet/flow/status/{training_id}:
+    get:
+      tags: [flow-training]
+      summary: Get flow training status
+      description: Monitor GFlowNet flow training progress and metrics
+      operationId: getFlowTrainingStatus
+      parameters:
+        - name: training_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Flow training job ID
+      responses:
+        '200':
+          description: Training status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowTrainingStatus'
+        '404':
+          description: Training job not found
+
+  /api/v1/gflownet/flow/update:
+    post:
+      tags: [flow-training]
+      summary: Update flow function with new data
+      description: |
+        Incrementally update trained GFlowNet flow with new architecture
+        evaluations and reward feedback for continuous improvement.
+      operationId: updateFlowFunction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowUpdateRequest'
+      responses:
+        '200':
+          description: Flow function updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowUpdateResponse'
+
+  # ============================================================================
+  # SAMPLING STRATEGY ENDPOINTS
+  # ============================================================================
+
+  /api/v1/gflownet/sampling/configure:
+    post:
+      tags: [sampling-strategies]
+      summary: Configure advanced sampling strategies
+      description: |
+        Configure sophisticated sampling strategies for architecture discovery
+        including temperature control, diversity constraints, and reward shaping.
+      operationId: configureSamplingStrategy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamplingStrategyRequest'
+      responses:
+        '200':
+          description: Sampling strategy configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamplingStrategyResponse'
+
+  /api/v1/gflownet/sampling/batch:
+    post:
+      tags: [sampling-strategies]
+      summary: Batch sampling with diversity constraints
+      description: |
+        Generate batch of diverse architectures with specific diversity and
+        quality constraints. Optimizes for both individual quality and set diversity.
+      operationId: batchSampleWithConstraints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchSamplingRequest'
+      responses:
+        '200':
+          description: Batch sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchSamplingResponse'
+
+  # ============================================================================
+  # REWARD MODELING ENDPOINTS  
+  # ============================================================================
+
+  /api/v1/gflownet/rewards/define:
+    post:
+      tags: [reward-modeling]
+      summary: Define multi-objective reward function
+      description: |
+        Define comprehensive reward function for architecture evaluation
+        incorporating effectiveness, efficiency, and domain-specific objectives.
+      operationId: defineRewardFunction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardDefinitionRequest'
+      responses:
+        '200':
+          description: Reward function defined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardDefinitionResponse'
+
+  /api/v1/gflownet/rewards/optimize:
+    post:
+      tags: [reward-modeling]
+      summary: Optimize reward function parameters
+      description: |
+        Automatically optimize reward function parameters based on user
+        feedback and architecture performance history.
+      operationId: optimizeRewardFunction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardOptimizationRequest'
+      responses:
+        '200':
+          description: Reward optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardOptimizationResponse'
+
+  # ============================================================================
+  # DOMAIN-SPECIFIC ENDPOINTS
+  # ============================================================================
+
+  /api/v1/gflownet/domains/{domain}/discover:
+    post:
+      tags: [architecture-discovery]
+      summary: Domain-specific architecture discovery
+      description: |
+        Discover architectures optimized for specific domain requirements
+        using domain-aware GFlowNet with specialized reward functions.
+      operationId: discoverDomainArchitectures
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [creative, business, technical, general]
+          description: Target domain for architecture discovery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainArchitectureRequest'
+      responses:
+        '200':
+          description: Domain architecture discovery completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainArchitectureResponse'
+
+  /api/v1/gflownet/loras/{lora_id}/discover:
+    post:
+      tags: [architecture-discovery]
+      summary: LoRA-specific architecture optimization
+      description: |
+        Discover optimal architectures for specific LoRA adaptation
+        considering current performance and improvement opportunities.
+      operationId: discoverLoraArchitecture
+      parameters:
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: LoRA ID for architecture optimization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraArchitectureRequest'
+      responses:
+        '200':
+          description: LoRA architecture discovery completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraArchitectureResponse'
+
+components:
+  schemas:
+    # Architecture Discovery Schemas
+    ArchitectureDiscoveryRequest:
+      type: object
+      required: [domain, constraints, discovery_config]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+          description: Target domain for architecture discovery
+        constraints:
+          type: object
+          required: [parameter_range, computational_budget]
+          properties:
+            parameter_range:
+              type: object
+              properties:
+                min_parameters:
+                  type: integer
+                  minimum: 1000
+                max_parameters:
+                  type: integer
+                  maximum: 10000000
+            computational_budget:
+              type: object
+              properties:
+                max_memory_mb:
+                  type: integer
+                  default: 512
+                max_inference_latency_ms:
+                  type: integer
+                  default: 100
+                max_training_hours:
+                  type: number
+                  default: 4.0
+            architecture_constraints:
+              type: object
+              properties:
+                min_layers:
+                  type: integer
+                  default: 2
+                max_layers:
+                  type: integer
+                  default: 12
+                allowed_layer_types:
+                  type: array
+                  items:
+                    type: string
+                    enum: [attention, mlp, conv, norm, residual]
+                  default: [attention, mlp, norm]
+        discovery_config:
+          type: object
+          properties:
+            num_samples:
+              type: integer
+              minimum: 10
+              maximum: 1000
+              default: 50
+              description: Number of architectures to discover
+            diversity_weight:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.3
+              description: Weight for diversity vs reward optimization
+            exploration_temperature:
+              type: number
+              minimum: 0.1
+              maximum: 2.0
+              default: 1.0
+              description: Temperature for exploration control
+            reward_shaping:
+              type: object
+              properties:
+                effectiveness_weight:
+                  type: number
+                  default: 0.4
+                efficiency_weight:
+                  type: number
+                  default: 0.3
+                novelty_weight:
+                  type: number
+                  default: 0.3
+
+    ArchitectureDiscoveryResponse:
+      type: object
+      properties:
+        discovery_id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        discovered_architectures:
+          type: array
+          items:
+            type: object
+            properties:
+              architecture_id:
+                type: string
+              architecture_spec:
+                type: object
+                properties:
+                  layers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: [attention, mlp, conv, norm, residual]
+                        config:
+                          type: object
+                  parameters:
+                    type: integer
+                  memory_footprint:
+                    type: string
+                  estimated_performance:
+                    type: object
+              reward_scores:
+                type: object
+                properties:
+                  effectiveness:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                  efficiency:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                  novelty:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                  composite_score:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+              diversity_contribution:
+                type: number
+                description: Contribution to overall set diversity
+        diversity_metrics:
+          type: object
+          properties:
+            coverage:
+              type: number
+              description: Exploration coverage of architecture space
+            uniqueness:
+              type: number
+              description: Average uniqueness of discovered architectures
+            pareto_frontier_size:
+              type: integer
+              description: Number of Pareto-optimal solutions
+        discovery_statistics:
+          type: object
+          properties:
+            total_evaluations:
+              type: integer
+            discovery_time:
+              type: string
+            success_rate:
+              type: number
+            best_composite_score:
+              type: number
+        recommendations:
+          type: array
+          items:
+            type: string
+          example: ["arch_1 recommended for creativity", "arch_3 optimal for efficiency"]
+        discovered_at:
+          type: string
+          format: date-time
+
+    # Sampling Schemas
+    ArchitectureSamplingRequest:
+      type: object
+      required: [domain, sampling_config]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        gflownet_model_id:
+          type: string
+          description: Pre-trained GFlowNet model to use for sampling
+        sampling_config:
+          type: object
+          properties:
+            num_samples:
+              type: integer
+              minimum: 1
+              maximum: 100
+              default: 10
+            temperature:
+              type: number
+              minimum: 0.1
+              maximum: 2.0
+              default: 1.0
+            diversity_boost:
+              type: boolean
+              default: true
+            constraint_satisfaction:
+              type: object
+              properties:
+                hard_constraints:
+                  type: array
+                  items:
+                    type: string
+                soft_constraints:
+                  type: array
+                  items:
+                    type: object
+        evaluation_config:
+          type: object
+          properties:
+            evaluate_samples:
+              type: boolean
+              default: true
+            evaluation_metrics:
+              type: array
+              items:
+                type: string
+                enum: [effectiveness, efficiency, novelty, diversity]
+
+    ArchitectureSamplingResponse:
+      type: object
+      properties:
+        sampling_id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        sampled_architectures:
+          type: array
+          items:
+            type: object
+            properties:
+              architecture_id:
+                type: string
+              architecture_spec:
+                type: object
+              sampling_probability:
+                type: number
+                description: GFlowNet sampling probability
+              reward_prediction:
+                type: number
+                description: Predicted reward from GFlowNet
+        sampling_quality:
+          type: object
+          properties:
+            diversity_achieved:
+              type: number
+            average_reward:
+              type: number
+            exploration_efficiency:
+              type: number
+        gflownet_metrics:
+          type: object
+          properties:
+            flow_consistency:
+              type: number
+              description: Flow conservation measure
+            mode_coverage:
+              type: number
+              description: Coverage of reward modes
+        sampled_at:
+          type: string
+          format: date-time
+
+    # Flow Training Schemas
+    FlowTrainingRequest:
+      type: object
+      required: [domain, training_data, training_config]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        training_data:
+          type: object
+          properties:
+            architecture_samples:
+              type: array
+              items:
+                type: object
+                properties:
+                  architecture_spec:
+                    type: object
+                  reward_score:
+                    type: number
+                  evaluation_metadata:
+                    type: object
+            reward_function:
+              type: object
+              description: Multi-objective reward function definition
+        training_config:
+          type: object
+          properties:
+            num_epochs:
+              type: integer
+              default: 100
+            batch_size:
+              type: integer
+              default: 32
+            learning_rate:
+              type: number
+              default: 0.001
+            flow_matching_weight:
+              type: number
+              default: 1.0
+              description: Weight for flow matching loss
+            diversity_regularization:
+              type: number
+              default: 0.1
+              description: Regularization for diversity
+            early_stopping:
+              type: object
+              properties:
+                patience:
+                  type: integer
+                  default: 10
+                min_improvement:
+                  type: number
+                  default: 0.001
+
+    FlowTrainingResponse:
+      type: object
+      properties:
+        training_id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        training_status:
+          type: string
+          enum: [queued, running, completed, failed]
+        estimated_completion:
+          type: string
+          format: date-time
+        training_config:
+          type: object
+        progress_tracking:
+          type: object
+          properties:
+            monitoring_url:
+              type: string
+              format: uri
+            expected_improvements:
+              type: array
+              items:
+                type: string
+        resource_allocation:
+          type: object
+          properties:
+            gpu_type:
+              type: string
+            memory_allocated:
+              type: string
+            estimated_cost:
+              type: string
+
+    # Diversity Optimization Schemas
+    DiversityOptimizationRequest:
+      type: object
+      required: [optimization_objective, diversity_constraints]
+      properties:
+        optimization_objective:
+          type: string
+          enum: [maximize_diversity, balanced_diversity_reward, reward_constrained_diversity]
+        diversity_constraints:
+          type: object
+          properties:
+            min_diversity_score:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+            diversity_metric:
+              type: string
+              enum: [structural_diversity, functional_diversity, performance_diversity]
+            constraint_tolerance:
+              type: number
+              default: 0.05
+        reward_constraints:
+          type: object
+          properties:
+            min_reward_threshold:
+              type: number
+            reward_distribution:
+              type: string
+              enum: [uniform, pareto_optimal, top_k]
+        exploration_strategy:
+          type: object
+          properties:
+            exploration_bonus:
+              type: number
+              default: 0.1
+            novelty_detection:
+              type: boolean
+              default: true
+            adaptive_temperature:
+              type: boolean
+              default: true
+
+    DiversityOptimizationResponse:
+      type: object
+      properties:
+        optimization_id:
+          type: string
+          format: uuid
+        optimization_config:
+          type: object
+        expected_outcomes:
+          type: object
+          properties:
+            diversity_improvement:
+              type: string
+            exploration_efficiency:
+              type: string
+            solution_quality:
+              type: string
+        configuration_applied:
+          type: object
+        recommendations:
+          type: array
+          items:
+            type: string
+        configured_at:
+          type: string
+          format: date-time
+
+    # Reward Modeling Schemas
+    RewardDefinitionRequest:
+      type: object
+      required: [domain, reward_objectives]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        reward_objectives:
+          type: array
+          items:
+            type: object
+            properties:
+              objective_name:
+                type: string
+              weight:
+                type: number
+                minimum: 0.0
+                maximum: 1.0
+              metric_definition:
+                type: object
+              optimization_direction:
+                type: string
+                enum: [maximize, minimize]
+        reward_function_type:
+          type: string
+          enum: [linear, nonlinear, learned, hybrid]
+        constraints:
+          type: object
+          properties:
+            hard_constraints:
+              type: array
+              items:
+                type: object
+            soft_constraints:
+              type: array
+              items:
+                type: object
+        evaluation_criteria:
+          type: object
+          properties:
+            effectiveness_metrics:
+              type: array
+              items:
+                type: string
+            efficiency_metrics:
+              type: array
+              items:
+                type: string
+            domain_specific_metrics:
+              type: array
+              items:
+                type: string
+
+    RewardDefinitionResponse:
+      type: object
+      properties:
+        reward_function_id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        reward_specification:
+          type: object
+        validation_results:
+          type: object
+          properties:
+            mathematical_validity:
+              type: boolean
+            constraint_consistency:
+              type: boolean
+            optimization_feasibility:
+              type: boolean
+        expected_behavior:
+          type: object
+          properties:
+            primary_optimization_target:
+              type: string
+            trade_offs:
+              type: array
+              items:
+                type: string
+            convergence_properties:
+              type: object
+        usage_recommendations:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # Domain and LoRA Specific Schemas
+    DomainArchitectureRequest:
+      type: object
+      required: [domain_requirements, discovery_config]
+      properties:
+        domain_requirements:
+          type: object
+          properties:
+            task_complexity:
+              type: string
+              enum: [simple, moderate, complex, expert]
+            performance_priorities:
+              type: array
+              items:
+                type: string
+            resource_constraints:
+              type: object
+            domain_knowledge:
+              type: object
+        current_performance:
+          type: object
+          properties:
+            baseline_architectures:
+              type: array
+              items:
+                type: object
+            performance_gaps:
+              type: array
+              items:
+                type: string
+        discovery_config:
+          $ref: '#/components/schemas/ArchitectureDiscoveryRequest/properties/discovery_config'
+
+    DomainArchitectureResponse:
+      type: object
+      properties:
+        domain:
+          type: string
+        discovered_architectures:
+          type: array
+          items:
+            type: object
+        domain_specific_insights:
+          type: object
+          properties:
+            architecture_patterns:
+              type: array
+              items:
+                type: string
+            performance_characteristics:
+              type: object
+            optimization_opportunities:
+              type: array
+              items:
+                type: string
+        recommendations:
+          type: object
+          properties:
+            best_for_domain:
+              type: string
+            trade_off_analysis:
+              type: object
+            implementation_guidance:
+              type: array
+              items:
+                type: string
+        discovered_at:
+          type: string
+          format: date-time
+
+    LoraArchitectureRequest:
+      type: object
+      required: [current_lora_spec, optimization_goals]
+      properties:
+        current_lora_spec:
+          type: object
+          properties:
+            architecture:
+              type: object
+            performance_metrics:
+              type: object
+            usage_patterns:
+              type: object
+        optimization_goals:
+          type: object
+          properties:
+            target_improvements:
+              type: array
+              items:
+                type: string
+            constraint_priorities:
+              type: object
+            acceptable_trade_offs:
+              type: array
+              items:
+                type: string
+        discovery_constraints:
+          type: object
+          properties:
+            preserve_compatibility:
+              type: boolean
+              default: true
+            max_architecture_change:
+              type: string
+              enum: [minimal, moderate, substantial]
+            performance_requirements:
+              type: object
+
+    LoraArchitectureResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        optimization_results:
+          type: object
+          properties:
+            recommended_architecture:
+              type: object
+            expected_improvements:
+              type: object
+            implementation_plan:
+              type: object
+        alternative_architectures:
+          type: array
+          items:
+            type: object
+        migration_strategy:
+          type: object
+          properties:
+            migration_steps:
+              type: array
+              items:
+                type: string
+            risk_assessment:
+              type: object
+            rollback_plan:
+              type: object
+        optimization_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

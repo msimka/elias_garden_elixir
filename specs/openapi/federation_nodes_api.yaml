@@ -1,0 +1,1082 @@
+openapi: 3.0.3
+info:
+  title: ELIAS Federation Nodes API
+  description: |
+    Complete federation layer API for client-to-node and node-to-node communication.
+    Handles distributed micro-LoRA forest management, cross-federation scaling,
+    and enterprise-level coordination.
+  version: "1.0.0"
+  contact:
+    name: ELIAS Federation Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+
+servers:
+  - url: https://fed-primary.elias.brain
+    description: Primary federation node
+  - url: https://fed-{region}.elias.brain
+    description: Regional federation nodes
+  - url: http://localhost:5000
+    description: Local development federation node
+
+tags:
+  - name: client-federation
+    description: Client to federation node communication
+  - name: node-coordination
+    description: Inter-node coordination and synchronization
+  - name: lora-distribution
+    description: Distributed LoRA forest management
+  - name: scaling-orchestration
+    description: Cross-federation scaling operations
+  - name: corporate-federation
+    description: Enterprise multi-tenant federation
+  - name: health-monitoring
+    description: Federation health and performance monitoring
+
+paths:
+  # ============================================================================
+  # CLIENT-TO-FEDERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/federation/clients/{client_id}/register:
+    post:
+      tags: [client-federation]
+      summary: Register client with federation
+      description: |
+        Register a client daemon with the federation network.
+        Establishes secure communication channel and resource allocation.
+      operationId: registerClientWithFederation
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRegistrationRequest'
+      responses:
+        '201':
+          description: Client registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientRegistrationResponse'
+        '409':
+          description: Client already registered
+
+  /api/v1/federation/clients/{client_id}/heartbeat:
+    post:
+      tags: [client-federation]
+      summary: Client heartbeat
+      description: |
+        Periodic heartbeat from client to maintain federation connection.
+        Includes performance metrics and resource status.
+      operationId: clientHeartbeat
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientHeartbeatRequest'
+      responses:
+        '200':
+          description: Heartbeat received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientHeartbeatResponse'
+
+  /api/v1/federation/clients/{client_id}/lora-sync:
+    post:
+      tags: [client-federation, lora-distribution]
+      summary: Synchronize LoRA forest with federation
+      description: |
+        Synchronize client's LoRA forest with federation nodes.
+        Handles incremental updates and conflict resolution.
+      operationId: syncLoraForestWithFederation
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraForestSyncRequest'
+      responses:
+        '200':
+          description: LoRA forest synchronized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraForestSyncResponse'
+
+  /api/v1/federation/clients/{client_id}/scale-request:
+    post:
+      tags: [client-federation, scaling-orchestration]
+      summary: Request federation scaling
+      description: |
+        Request additional compute resources from federation.
+        Triggers cross-node resource allocation and load balancing.
+      operationId: requestFederationScaling
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederationScalingRequest'
+      responses:
+        '202':
+          description: Scaling request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederationScalingResponse'
+
+  # ============================================================================
+  # NODE-TO-NODE COORDINATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/nodes/{node_id}/register:
+    post:
+      tags: [node-coordination]
+      summary: Register node with federation
+      description: |
+        Register a new federation node with the network.
+        Establishes peer-to-peer communication and consensus participation.
+      operationId: registerNodeWithFederation
+      parameters:
+        - name: node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeRegistrationRequest'
+      responses:
+        '201':
+          description: Node registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeRegistrationResponse'
+
+  /api/v1/nodes/{node_id}/consensus:
+    post:
+      tags: [node-coordination]
+      summary: Participate in consensus protocol
+      description: |
+        Participate in distributed consensus for federation decisions.
+        Handles voting on scaling, updates, and resource allocation.
+      operationId: participateInConsensus
+      parameters:
+        - name: node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsensusParticipationRequest'
+      responses:
+        '200':
+          description: Consensus vote recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsensusParticipationResponse'
+
+  /api/v1/nodes/{node_id}/sync:
+    post:
+      tags: [node-coordination]
+      summary: Synchronize node state
+      description: |
+        Synchronize node state with peer nodes.
+        Maintains consistency across the federation network.
+      operationId: synchronizeNodeState
+      parameters:
+        - name: node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeStateSyncRequest'
+      responses:
+        '200':
+          description: Node state synchronized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeStateSyncResponse'
+
+  # ============================================================================
+  # DISTRIBUTED LORA MANAGEMENT ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/lora-distribution/replicate:
+    post:
+      tags: [lora-distribution]
+      summary: Replicate LoRA across nodes
+      description: |
+        Replicate a LoRA adaptation across multiple federation nodes.
+        Ensures high availability and fault tolerance.
+      operationId: replicateLoraAcrossNodes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraReplicationRequest'
+      responses:
+        '202':
+          description: LoRA replication initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraReplicationResponse'
+
+  /api/v1/lora-distribution/migrate:
+    post:
+      tags: [lora-distribution]
+      summary: Migrate LoRA between nodes
+      description: |
+        Migrate LoRA adaptations between federation nodes.
+        Handles load balancing and resource optimization.
+      operationId: migrateLoRaBetweenNodes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoRaMigrationRequest'
+      responses:
+        '202':
+          description: LoRA migration initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoRaMigrationResponse'
+
+  /api/v1/lora-distribution/forest/{user_id}/distribute:
+    post:
+      tags: [lora-distribution]
+      summary: Distribute user's LoRA forest
+      description: |
+        Distribute user's complete LoRA forest across federation nodes.
+        Optimizes placement for performance and availability.
+      operationId: distributeUserLoraForest
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForestDistributionRequest'
+      responses:
+        '202':
+          description: Forest distribution initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForestDistributionResponse'
+
+  # ============================================================================
+  # SCALING ORCHESTRATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/scaling/orchestrate:
+    post:
+      tags: [scaling-orchestration]
+      summary: Orchestrate cross-federation scaling
+      description: |
+        Orchestrate scaling operations across multiple federation nodes.
+        Coordinates resource allocation and load distribution.
+      operationId: orchestrateFederationScaling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScalingOrchestrationRequest'
+      responses:
+        '202':
+          description: Scaling orchestration initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalingOrchestrationResponse'
+
+  /api/v1/scaling/rebalance:
+    post:
+      tags: [scaling-orchestration]
+      summary: Rebalance federation load
+      description: |
+        Rebalance computational load across federation nodes.
+        Optimizes resource utilization and performance.
+      operationId: rebalanceFederationLoad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadRebalancingRequest'
+      responses:
+        '202':
+          description: Load rebalancing initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadRebalancingResponse'
+
+  # ============================================================================
+  # CORPORATE FEDERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/corporate/{org_id}/provision:
+    post:
+      tags: [corporate-federation]
+      summary: Provision corporate federation
+      description: |
+        Provision dedicated federation resources for enterprise organization.
+        Sets up isolated compute pools and security boundaries.
+      operationId: provisionCorporateFederation
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorporateProvisioningRequest'
+      responses:
+        '201':
+          description: Corporate federation provisioned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorporateProvisioningResponse'
+
+  /api/v1/corporate/{org_id}/governance:
+    post:
+      tags: [corporate-federation]
+      summary: Apply governance policies
+      description: |
+        Apply corporate governance policies to federation resources.
+        Enforces compliance, security, and access controls.
+      operationId: applyCorporateGovernance
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GovernancePolicyRequest'
+      responses:
+        '200':
+          description: Governance policies applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernancePolicyResponse'
+
+  # ============================================================================
+  # FEDERATION HEALTH MONITORING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/health/federation:
+    get:
+      tags: [health-monitoring]
+      summary: Get federation health status
+      description: |
+        Get comprehensive health status of the federation network.
+        Includes node health, connectivity, and performance metrics.
+      operationId: getFederationHealth
+      responses:
+        '200':
+          description: Federation health retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederationHealthResponse'
+
+  /api/v1/health/nodes:
+    get:
+      tags: [health-monitoring]
+      summary: Get all node health status
+      description: |
+        Get health status of all nodes in the federation.
+        Provides detailed per-node performance and availability metrics.
+      operationId: getAllNodeHealth
+      responses:
+        '200':
+          description: Node health status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeHealthResponse'
+
+  /api/v1/health/lora-distribution:
+    get:
+      tags: [health-monitoring, lora-distribution]
+      summary: Get LoRA distribution health
+      description: |
+        Get health status of LoRA distribution across federation.
+        Monitors replication factor, availability, and consistency.
+      operationId: getLoraDistributionHealth
+      responses:
+        '200':
+          description: LoRA distribution health retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraDistributionHealthResponse'
+
+components:
+  schemas:
+    # Client Federation Schemas
+    ClientRegistrationRequest:
+      type: object
+      required: [client_info, capabilities]
+      properties:
+        client_info:
+          type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+            device_type:
+              type: string
+              enum: [mobile, desktop, server, edge]
+            location:
+              type: object
+              properties:
+                region:
+                  type: string
+                availability_zone:
+                  type: string
+        capabilities:
+          type: object
+          properties:
+            compute_capacity:
+              type: object
+              properties:
+                cpu_cores:
+                  type: integer
+                memory_gb:
+                  type: number
+                gpu_available:
+                  type: boolean
+            network_bandwidth:
+              type: string
+            storage_capacity:
+              type: string
+        security_credentials:
+          type: object
+          properties:
+            public_key:
+              type: string
+            device_attestation:
+              type: string
+
+    ClientRegistrationResponse:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        federation_node_assigned:
+          type: string
+        security_tokens:
+          type: object
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            certificate:
+              type: string
+        configuration:
+          type: object
+          properties:
+            heartbeat_interval:
+              type: integer
+            sync_frequency:
+              type: integer
+            resource_allocation:
+              type: object
+
+    ClientHeartbeatRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        performance_metrics:
+          type: object
+          properties:
+            cpu_usage:
+              type: number
+            memory_usage:
+              type: number
+            inference_latency:
+              type: number
+            throughput:
+              type: number
+        lora_forest_status:
+          type: object
+          properties:
+            active_loras:
+              type: integer
+            forest_health_score:
+              type: number
+            last_update:
+              type: string
+              format: date-time
+        resource_requests:
+          type: array
+          items:
+            type: object
+
+    ClientHeartbeatResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, critical]
+        instructions:
+          type: array
+          items:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+        resource_allocations:
+          type: object
+        next_heartbeat:
+          type: integer
+
+    LoraForestSyncRequest:
+      type: object
+      required: [forest_snapshot]
+      properties:
+        forest_snapshot:
+          type: object
+          properties:
+            version:
+              type: string
+            loras:
+              type: array
+              items:
+                type: object
+                properties:
+                  lora_id:
+                    type: string
+                  domain:
+                    type: string
+                  weights_hash:
+                    type: string
+                  last_modified:
+                    type: string
+                    format: date-time
+        sync_options:
+          type: object
+          properties:
+            conflict_resolution:
+              type: string
+              enum: [client_wins, federation_wins, merge]
+            incremental:
+              type: boolean
+
+    LoraForestSyncResponse:
+      type: object
+      properties:
+        sync_result:
+          type: string
+          enum: [success, partial, conflicts]
+        conflicts:
+          type: array
+          items:
+            type: object
+        updated_loras:
+          type: array
+          items:
+            type: string
+        federation_version:
+          type: string
+        next_sync_time:
+          type: string
+          format: date-time
+
+    # Node Coordination Schemas
+    NodeRegistrationRequest:
+      type: object
+      required: [node_info, capabilities]
+      properties:
+        node_info:
+          type: object
+          properties:
+            node_type:
+              type: string
+              enum: [compute, storage, edge, gateway]
+            region:
+              type: string
+            availability_zone:
+              type: string
+            operator:
+              type: string
+        capabilities:
+          type: object
+          properties:
+            max_concurrent_clients:
+              type: integer
+            compute_resources:
+              type: object
+            storage_capacity:
+              type: string
+            network_bandwidth:
+              type: string
+            specializations:
+              type: array
+              items:
+                type: string
+        consensus_participation:
+          type: object
+          properties:
+            voting_power:
+              type: number
+            stake:
+              type: number
+            reputation_score:
+              type: number
+
+    NodeRegistrationResponse:
+      type: object
+      properties:
+        node_id:
+          type: string
+          format: uuid
+        federation_role:
+          type: string
+        peer_nodes:
+          type: array
+          items:
+            type: object
+        consensus_configuration:
+          type: object
+        resource_pool_assignment:
+          type: string
+
+    ConsensusParticipationRequest:
+      type: object
+      required: [proposal_id, vote]
+      properties:
+        proposal_id:
+          type: string
+          format: uuid
+        vote:
+          type: string
+          enum: [approve, reject, abstain]
+        reasoning:
+          type: string
+        stake_weight:
+          type: number
+        timestamp:
+          type: string
+          format: date-time
+
+    ConsensusParticipationResponse:
+      type: object
+      properties:
+        vote_recorded:
+          type: boolean
+        current_tally:
+          type: object
+          properties:
+            approve_votes:
+              type: integer
+            reject_votes:
+              type: integer
+            abstain_votes:
+              type: integer
+            total_stake:
+              type: number
+        consensus_reached:
+          type: boolean
+        final_decision:
+          type: string
+
+    # LoRA Distribution Schemas
+    LoraReplicationRequest:
+      type: object
+      required: [lora_id, replication_factor]
+      properties:
+        lora_id:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        replication_factor:
+          type: integer
+          minimum: 1
+          maximum: 10
+        preferred_zones:
+          type: array
+          items:
+            type: string
+        consistency_level:
+          type: string
+          enum: [eventual, strong, bounded]
+
+    LoraReplicationResponse:
+      type: object
+      properties:
+        replication_job_id:
+          type: string
+          format: uuid
+        target_nodes:
+          type: array
+          items:
+            type: string
+        estimated_completion:
+          type: string
+          format: date-time
+        replication_status:
+          type: string
+          enum: [initiated, in_progress, completed, failed]
+
+    ForestDistributionRequest:
+      type: object
+      required: [distribution_strategy]
+      properties:
+        distribution_strategy:
+          type: string
+          enum: [performance_optimized, availability_optimized, cost_optimized]
+        constraints:
+          type: object
+          properties:
+            max_latency:
+              type: number
+            min_availability:
+              type: number
+            budget_limit:
+              type: number
+        preferences:
+          type: object
+          properties:
+            preferred_regions:
+              type: array
+              items:
+                type: string
+            avoid_regions:
+              type: array
+              items:
+                type: string
+
+    ForestDistributionResponse:
+      type: object
+      properties:
+        distribution_plan:
+          type: object
+          properties:
+            lora_placement:
+              type: array
+              items:
+                type: object
+                properties:
+                  lora_id:
+                    type: string
+                  assigned_nodes:
+                    type: array
+                    items:
+                      type: string
+            estimated_performance:
+              type: object
+            estimated_cost:
+              type: number
+        execution_timeline:
+          type: array
+          items:
+            type: object
+
+    # Scaling Orchestration Schemas
+    ScalingOrchestrationRequest:
+      type: object
+      required: [scaling_trigger, target_metrics]
+      properties:
+        scaling_trigger:
+          type: string
+          enum: [load_spike, capacity_planning, fault_tolerance, performance_optimization]
+        target_metrics:
+          type: object
+          properties:
+            target_throughput:
+              type: number
+            max_latency:
+              type: number
+            availability_target:
+              type: number
+        scaling_constraints:
+          type: object
+          properties:
+            max_nodes:
+              type: integer
+            budget_limit:
+              type: number
+            time_limit:
+              type: string
+              format: duration
+
+    ScalingOrchestrationResponse:
+      type: object
+      properties:
+        orchestration_id:
+          type: string
+          format: uuid
+        scaling_plan:
+          type: object
+          properties:
+            phases:
+              type: array
+              items:
+                type: object
+            total_nodes_to_add:
+              type: integer
+            estimated_duration:
+              type: string
+              format: duration
+        resource_requirements:
+          type: object
+        cost_estimate:
+          type: number
+
+    # Corporate Federation Schemas
+    CorporateProvisioningRequest:
+      type: object
+      required: [organization_requirements]
+      properties:
+        organization_requirements:
+          type: object
+          properties:
+            user_capacity:
+              type: integer
+            compute_requirements:
+              type: object
+            storage_requirements:
+              type: object
+            compliance_requirements:
+              type: array
+              items:
+                type: string
+            isolation_level:
+              type: string
+              enum: [shared, dedicated, air_gapped]
+        governance_model:
+          type: object
+          properties:
+            approval_workflows:
+              type: array
+              items:
+                type: object
+            access_controls:
+              type: object
+            audit_requirements:
+              type: object
+
+    CorporateProvisioningResponse:
+      type: object
+      properties:
+        corporate_federation_id:
+          type: string
+          format: uuid
+        provisioned_resources:
+          type: object
+          properties:
+            dedicated_nodes:
+              type: array
+              items:
+                type: string
+            resource_pools:
+              type: array
+              items:
+                type: object
+            network_isolation:
+              type: object
+        governance_endpoints:
+          type: object
+          properties:
+            admin_api:
+              type: string
+            audit_api:
+              type: string
+            compliance_api:
+              type: string
+        estimated_monthly_cost:
+          type: number
+
+    # Health Monitoring Schemas
+    FederationHealthResponse:
+      type: object
+      properties:
+        overall_health:
+          type: string
+          enum: [healthy, degraded, critical]
+        total_nodes:
+          type: integer
+        healthy_nodes:
+          type: integer
+        network_connectivity:
+          type: object
+          properties:
+            average_latency:
+              type: number
+            packet_loss_rate:
+              type: number
+            bandwidth_utilization:
+              type: number
+        performance_metrics:
+          type: object
+          properties:
+            average_throughput:
+              type: number
+            p95_latency:
+              type: number
+            error_rate:
+              type: number
+        resource_utilization:
+          type: object
+          properties:
+            cpu_utilization:
+              type: number
+            memory_utilization:
+              type: number
+            storage_utilization:
+              type: number
+
+    NodeHealthResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              node_id:
+                type: string
+              health_status:
+                type: string
+                enum: [healthy, degraded, critical, offline]
+              uptime:
+                type: string
+                format: duration
+              performance_metrics:
+                type: object
+              resource_utilization:
+                type: object
+              connected_clients:
+                type: integer
+              last_heartbeat:
+                type: string
+                format: date-time
+
+    LoraDistributionHealthResponse:
+      type: object
+      properties:
+        total_loras:
+          type: integer
+        properly_replicated:
+          type: integer
+        under_replicated:
+          type: integer
+        over_replicated:
+          type: integer
+        replication_health:
+          type: number
+          minimum: 0
+          maximum: 1
+        consistency_status:
+          type: object
+          properties:
+            strong_consistent:
+              type: integer
+            eventually_consistent:
+              type: integer
+            inconsistent:
+              type: integer
+        geographic_distribution:
+          type: object
+          additionalProperties:
+            type: integer
+
+  securitySchemes:
+    FederationAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Federation-JWT
+    NodeToNodeAuth:
+      type: mutual
+      scheme: tls
+    ClientAuth:
+      type: apiKey
+      in: header
+      name: X-Client-Token
+
+security:
+  - FederationAuth: []
+  - NodeToNodeAuth: []
+  - ClientAuth: []

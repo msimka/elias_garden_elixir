@@ -1,0 +1,1368 @@
+openapi: 3.0.3
+info:
+  title: Individual LoRA Management API
+  description: |
+    Granular API for managing individual LoRA adaptations within user forests.
+    Every single LoRA adapter has its own endpoints for fine-grained control,
+    monitoring, and optimization. Supports thousands of concurrent LoRAs per user.
+  version: "1.0.0"
+  contact:
+    name: ELIAS LoRA Management Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+
+servers:
+  - url: https://lora-api.elias.brain
+    description: Production LoRA management API
+  - url: https://staging-lora-api.elias.brain
+    description: Staging environment
+  - url: http://localhost:4001
+    description: Local development server
+
+tags:
+  - name: lora-lifecycle
+    description: Individual LoRA creation, training, and deletion
+  - name: lora-monitoring
+    description: Performance monitoring and health checks
+  - name: lora-optimization
+    description: Architecture and hyperparameter optimization
+  - name: lora-versioning
+    description: Version control and rollback capabilities
+  - name: lora-federation
+    description: Cross-federation LoRA synchronization
+  - name: lora-analytics
+    description: Usage analytics and pattern analysis
+
+paths:
+  # ============================================================================
+  # INDIVIDUAL LORA LIFECYCLE ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras:
+    get:
+      tags: [lora-lifecycle]
+      summary: List all LoRAs for user
+      description: |
+        Get comprehensive list of all LoRA adaptations for a specific user.
+        Includes metadata, status, and performance metrics.
+      operationId: listUserLoras
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: domain
+          in: query
+          schema:
+            type: string
+          description: Filter by domain
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, training, idle, archived, failed]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: User LoRAs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLorasListResponse'
+    
+    post:
+      tags: [lora-lifecycle]
+      summary: Create new LoRA adaptation
+      description: |
+        Create a new LoRA adaptation for the user in a specific domain.
+        Automatically determines optimal architecture using GFlowNets.
+      operationId: createNewLora
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoraRequest'
+      responses:
+        '201':
+          description: LoRA created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLoraResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}:
+    get:
+      tags: [lora-lifecycle]
+      summary: Get specific LoRA details
+      description: |
+        Get detailed information about a specific LoRA adaptation.
+        Includes architecture, training history, and performance metrics.
+      operationId: getLoraDetails
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LoRA details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraDetailsResponse'
+        '404':
+          description: LoRA not found
+    
+    patch:
+      tags: [lora-lifecycle]
+      summary: Update LoRA configuration
+      description: |
+        Update LoRA configuration and hyperparameters.
+        Supports incremental updates without full retraining.
+      operationId: updateLoraConfiguration
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLoraRequest'
+      responses:
+        '200':
+          description: LoRA updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateLoraResponse'
+    
+    delete:
+      tags: [lora-lifecycle]
+      summary: Delete LoRA adaptation
+      description: |
+        Delete a specific LoRA adaptation and clean up resources.
+        Supports soft delete with recovery option.
+      operationId: deleteLora
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: soft_delete
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '204':
+          description: LoRA deleted successfully
+        '404':
+          description: LoRA not found
+
+  /api/v1/users/{user_id}/loras/{lora_id}/train:
+    post:
+      tags: [lora-lifecycle]
+      summary: Train LoRA adaptation
+      description: |
+        Train or retrain a LoRA adaptation with new data.
+        Supports incremental training and catastrophic forgetting prevention.
+      operationId: trainLora
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainLoraRequest'
+      responses:
+        '202':
+          description: Training initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainLoraResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/inference:
+    post:
+      tags: [lora-lifecycle]
+      summary: Run inference with LoRA
+      description: |
+        Run inference using a specific LoRA adaptation.
+        Returns personalized results based on the LoRA's specialization.
+      operationId: runLoraInference
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraInferenceRequest'
+      responses:
+        '200':
+          description: Inference completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraInferenceResponse'
+
+  # ============================================================================
+  # LORA MONITORING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras/{lora_id}/health:
+    get:
+      tags: [lora-monitoring]
+      summary: Get LoRA health status
+      description: |
+        Get comprehensive health status of a specific LoRA adaptation.
+        Includes performance metrics, resource usage, and effectiveness scores.
+      operationId: getLoraHealth
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LoRA health retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraHealthResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/metrics:
+    get:
+      tags: [lora-monitoring]
+      summary: Get LoRA performance metrics
+      description: |
+        Get detailed performance metrics for a specific LoRA adaptation.
+        Includes training metrics, inference performance, and usage patterns.
+      operationId: getLoraMetrics
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: time_range
+          in: query
+          schema:
+            type: string
+            enum: [1h, 6h, 24h, 7d, 30d]
+            default: 24h
+      responses:
+        '200':
+          description: LoRA metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraMetricsResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/alerts:
+    get:
+      tags: [lora-monitoring]
+      summary: Get LoRA alerts and warnings
+      description: |
+        Get active alerts and warnings for a specific LoRA adaptation.
+        Includes performance degradation, resource issues, and optimization suggestions.
+      operationId: getLoraAlerts
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [info, warning, critical]
+      responses:
+        '200':
+          description: LoRA alerts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraAlertsResponse'
+
+  # ============================================================================
+  # LORA OPTIMIZATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras/{lora_id}/optimize:
+    post:
+      tags: [lora-optimization]
+      summary: Optimize LoRA architecture
+      description: |
+        Optimize LoRA architecture using GFlowNets and μTransfer principles.
+        Automatically finds better architectures and scales hyperparameters.
+      operationId: optimizeLora
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizeLoraRequest'
+      responses:
+        '202':
+          description: Optimization initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizeLoraResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/scale:
+    post:
+      tags: [lora-optimization]
+      summary: Scale LoRA using μTransfer
+      description: |
+        Scale LoRA adaptation using μTransfer principles.
+        Zero-shot hyperparameter transfer with 99% cost reduction.
+      operationId: scaleLoraWithMuTransfer
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScaleLoraRequest'
+      responses:
+        '200':
+          description: LoRA scaled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScaleLoraResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/hyperparameters:
+    get:
+      tags: [lora-optimization]
+      summary: Get LoRA hyperparameters
+      description: |
+        Get current hyperparameters for a specific LoRA adaptation.
+        Includes optimal values determined by μTransfer.
+      operationId: getLoraHyperparameters
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hyperparameters retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraHyperparametersResponse'
+    
+    patch:
+      tags: [lora-optimization]
+      summary: Update LoRA hyperparameters
+      description: |
+        Update hyperparameters for a specific LoRA adaptation.
+        Uses μTransfer validation to ensure optimal scaling.
+      operationId: updateLoraHyperparameters
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHyperparametersRequest'
+      responses:
+        '200':
+          description: Hyperparameters updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateHyperparametersResponse'
+
+  # ============================================================================
+  # LORA VERSIONING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras/{lora_id}/versions:
+    get:
+      tags: [lora-versioning]
+      summary: List LoRA versions
+      description: |
+        Get all versions of a specific LoRA adaptation.
+        Includes version history, changes, and performance comparisons.
+      operationId: listLoraVersions
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LoRA versions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraVersionsResponse'
+    
+    post:
+      tags: [lora-versioning]
+      summary: Create LoRA version snapshot
+      description: |
+        Create a version snapshot of a LoRA adaptation.
+        Captures current state for future rollback or comparison.
+      operationId: createLoraVersion
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVersionRequest'
+      responses:
+        '201':
+          description: Version created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVersionResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/versions/{version_id}:
+    get:
+      tags: [lora-versioning]
+      summary: Get specific LoRA version
+      description: Get details of a specific version of a LoRA adaptation
+      operationId: getLoraVersion
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LoRA version retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraVersionResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/rollback:
+    post:
+      tags: [lora-versioning]
+      summary: Rollback LoRA to previous version
+      description: |
+        Rollback a LoRA adaptation to a previous version.
+        Supports atomic rollback with performance verification.
+      operationId: rollbackLoraVersion
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollbackLoraRequest'
+      responses:
+        '200':
+          description: Rollback completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RollbackLoraResponse'
+
+  # ============================================================================
+  # LORA FEDERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras/{lora_id}/sync:
+    post:
+      tags: [lora-federation]
+      summary: Sync LoRA across federation
+      description: |
+        Synchronize a LoRA adaptation across federation nodes.
+        Ensures consistency and availability across the network.
+      operationId: syncLoraAcrossFederation
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncLoraRequest'
+      responses:
+        '202':
+          description: Sync initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncLoraResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/replicate:
+    post:
+      tags: [lora-federation]
+      summary: Replicate LoRA to additional nodes
+      description: |
+        Replicate a LoRA adaptation to additional federation nodes.
+        Improves availability and reduces inference latency.
+      operationId: replicateLoraToNodes
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplicateLoraRequest'
+      responses:
+        '202':
+          description: Replication initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplicateLoraResponse'
+
+  # ============================================================================
+  # LORA ANALYTICS ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/users/{user_id}/loras/{lora_id}/analytics:
+    get:
+      tags: [lora-analytics]
+      summary: Get LoRA usage analytics
+      description: |
+        Get comprehensive usage analytics for a specific LoRA adaptation.
+        Includes inference patterns, effectiveness trends, and optimization opportunities.
+      operationId: getLoraAnalytics
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: analytics_type
+          in: query
+          schema:
+            type: string
+            enum: [usage, performance, effectiveness, patterns]
+        - name: time_range
+          in: query
+          schema:
+            type: string
+            enum: [1h, 6h, 24h, 7d, 30d]
+            default: 7d
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraAnalyticsResponse'
+
+  /api/v1/users/{user_id}/loras/{lora_id}/patterns:
+    get:
+      tags: [lora-analytics]
+      summary: Analyze LoRA adaptation patterns
+      description: |
+        Analyze patterns learned by a specific LoRA adaptation.
+        Provides insights into specialization and effectiveness.
+      operationId: analyzeLoraPatterns
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pattern analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraPatternAnalysisResponse'
+
+components:
+  schemas:
+    # LoRA Lifecycle Schemas
+    UserLorasListResponse:
+      type: object
+      properties:
+        loras:
+          type: array
+          items:
+            type: object
+            properties:
+              lora_id:
+                type: string
+              domain:
+                type: string
+              status:
+                type: string
+                enum: [active, training, idle, archived, failed]
+              created_at:
+                type: string
+                format: date-time
+              last_updated:
+                type: string
+                format: date-time
+              performance_score:
+                type: number
+              specialization:
+                type: string
+        pagination:
+          type: object
+          properties:
+            total_count:
+              type: integer
+            current_page:
+              type: integer
+            total_pages:
+              type: integer
+            has_next:
+              type: boolean
+
+    CreateLoraRequest:
+      type: object
+      required: [domain, specialization]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        specialization:
+          type: string
+        training_data:
+          type: object
+          properties:
+            samples:
+              type: array
+              items:
+                type: object
+            sample_count:
+              type: integer
+        architecture_preferences:
+          type: object
+          properties:
+            rank:
+              type: integer
+            target_layers:
+              type: array
+              items:
+                type: string
+            optimization_objective:
+              type: string
+              enum: [performance, efficiency, creativity, accuracy]
+
+    CreateLoraResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        domain:
+          type: string
+        specialization:
+          type: string
+        architecture:
+          type: object
+          properties:
+            rank:
+              type: integer
+            layers:
+              type: integer
+            attention_heads:
+              type: integer
+            target_layers:
+              type: array
+              items:
+                type: string
+        training_job_id:
+          type: string
+        estimated_training_time:
+          type: string
+        status:
+          type: string
+
+    LoraDetailsResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        specialization:
+          type: string
+        status:
+          type: string
+        architecture:
+          type: object
+        training_history:
+          type: array
+          items:
+            type: object
+        performance_metrics:
+          type: object
+        resource_usage:
+          type: object
+        federation_status:
+          type: object
+          properties:
+            replicated_nodes:
+              type: array
+              items:
+                type: string
+            consistency_status:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+        last_updated:
+          type: string
+          format: date-time
+
+    TrainLoraRequest:
+      type: object
+      required: [training_data]
+      properties:
+        training_data:
+          type: object
+          properties:
+            samples:
+              type: array
+              items:
+                type: object
+            incremental:
+              type: boolean
+        training_config:
+          type: object
+          properties:
+            epochs:
+              type: integer
+            learning_rate:
+              type: number
+            batch_size:
+              type: integer
+            regularization:
+              type: object
+        prevent_catastrophic_forgetting:
+          type: boolean
+          default: true
+
+    TrainLoraResponse:
+      type: object
+      properties:
+        training_job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, running, completed, failed]
+        estimated_completion:
+          type: string
+          format: date-time
+        training_config:
+          type: object
+        resource_allocation:
+          type: object
+
+    LoraInferenceRequest:
+      type: object
+      required: [input]
+      properties:
+        input:
+          type: object
+        inference_config:
+          type: object
+          properties:
+            temperature:
+              type: number
+            max_tokens:
+              type: integer
+            top_p:
+              type: number
+        return_reasoning:
+          type: boolean
+          default: false
+
+    LoraInferenceResponse:
+      type: object
+      properties:
+        output:
+          type: object
+        inference_time_ms:
+          type: number
+        confidence_score:
+          type: number
+        personalization_applied:
+          type: boolean
+        reasoning_chain:
+          type: array
+          items:
+            type: string
+        lora_contribution:
+          type: object
+          properties:
+            adaptation_strength:
+              type: number
+            specialization_match:
+              type: number
+
+    # LoRA Monitoring Schemas
+    LoraHealthResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        overall_health:
+          type: string
+          enum: [healthy, degraded, critical, failed]
+        health_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        resource_utilization:
+          type: object
+          properties:
+            memory_usage:
+              type: string
+            compute_utilization:
+              type: number
+        performance_indicators:
+          type: object
+          properties:
+            inference_latency:
+              type: number
+            throughput:
+              type: number
+            error_rate:
+              type: number
+            effectiveness_score:
+              type: number
+        federation_health:
+          type: object
+          properties:
+            replication_status:
+              type: string
+            sync_status:
+              type: string
+            node_availability:
+              type: number
+        last_health_check:
+          type: string
+          format: date-time
+
+    LoraMetricsResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        time_range:
+          type: string
+        training_metrics:
+          type: object
+          properties:
+            total_training_time:
+              type: string
+            epochs_completed:
+              type: integer
+            final_loss:
+              type: number
+            convergence_rate:
+              type: number
+        inference_metrics:
+          type: object
+          properties:
+            total_inferences:
+              type: integer
+            average_latency:
+              type: number
+            p95_latency:
+              type: number
+            throughput:
+              type: number
+            error_rate:
+              type: number
+        effectiveness_metrics:
+          type: object
+          properties:
+            user_satisfaction:
+              type: number
+            task_success_rate:
+              type: number
+            personalization_strength:
+              type: number
+        resource_metrics:
+          type: object
+          properties:
+            memory_efficiency:
+              type: number
+            compute_efficiency:
+              type: number
+            cost_per_inference:
+              type: number
+
+    # LoRA Optimization Schemas
+    OptimizeLoraRequest:
+      type: object
+      properties:
+        optimization_objectives:
+          type: array
+          items:
+            type: string
+            enum: [performance, efficiency, accuracy, creativity, memory]
+        constraints:
+          type: object
+          properties:
+            max_parameters:
+              type: integer
+            max_memory:
+              type: string
+            max_latency:
+              type: number
+        gflownet_config:
+          type: object
+          properties:
+            num_samples:
+              type: integer
+            diversity_requirement:
+              type: string
+              enum: [low, medium, high]
+
+    OptimizeLoraResponse:
+      type: object
+      properties:
+        optimization_job_id:
+          type: string
+          format: uuid
+        optimization_plan:
+          type: object
+          properties:
+            current_architecture:
+              type: object
+            proposed_architectures:
+              type: array
+              items:
+                type: object
+            expected_improvements:
+              type: object
+        estimated_completion:
+          type: string
+          format: date-time
+        cost_estimate:
+          type: number
+
+    ScaleLoraRequest:
+      type: object
+      required: [target_size]
+      properties:
+        target_size:
+          type: integer
+        scaling_strategy:
+          type: string
+          enum: [mu_transfer, gradual_scaling, architecture_search]
+        preserve_performance:
+          type: boolean
+          default: true
+
+    ScaleLoraResponse:
+      type: object
+      properties:
+        scaling_job_id:
+          type: string
+          format: uuid
+        scaling_factor:
+          type: number
+        mu_transfer_applied:
+          type: boolean
+        hyperparameter_changes:
+          type: object
+        expected_performance_change:
+          type: string
+        resource_requirements:
+          type: object
+
+    # LoRA Versioning Schemas
+    LoraVersionsResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              version_id:
+                type: string
+              version_number:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+              description:
+                type: string
+              performance_metrics:
+                type: object
+              changes:
+                type: array
+                items:
+                  type: string
+              is_current:
+                type: boolean
+
+    CreateVersionRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        tag:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+    CreateVersionResponse:
+      type: object
+      properties:
+        version_id:
+          type: string
+        version_number:
+          type: string
+        snapshot_created:
+          type: boolean
+        storage_size:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # LoRA Federation Schemas
+    SyncLoraRequest:
+      type: object
+      properties:
+        target_nodes:
+          type: array
+          items:
+            type: string
+        sync_priority:
+          type: string
+          enum: [low, normal, high, urgent]
+        consistency_level:
+          type: string
+          enum: [eventual, strong, bounded]
+
+    SyncLoraResponse:
+      type: object
+      properties:
+        sync_job_id:
+          type: string
+          format: uuid
+        target_nodes:
+          type: array
+          items:
+            type: string
+        estimated_completion:
+          type: string
+          format: date-time
+        sync_strategy:
+          type: string
+
+    # LoRA Analytics Schemas
+    LoraAnalyticsResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        analytics_type:
+          type: string
+        time_range:
+          type: string
+        usage_statistics:
+          type: object
+          properties:
+            total_inferences:
+              type: integer
+            unique_users:
+              type: integer
+            peak_usage_time:
+              type: string
+            usage_trends:
+              type: array
+              items:
+                type: object
+        performance_trends:
+          type: object
+          properties:
+            effectiveness_over_time:
+              type: array
+              items:
+                type: object
+            latency_trends:
+              type: array
+              items:
+                type: object
+            error_rate_trends:
+              type: array
+              items:
+                type: object
+        optimization_opportunities:
+          type: array
+          items:
+            type: object
+            properties:
+              opportunity_type:
+                type: string
+              potential_improvement:
+                type: string
+              implementation_effort:
+                type: string
+                enum: [low, medium, high]
+
+    LoraPatternAnalysisResponse:
+      type: object
+      properties:
+        lora_id:
+          type: string
+        specialization_strength:
+          type: number
+          minimum: 0
+          maximum: 1
+        learned_patterns:
+          type: array
+          items:
+            type: object
+            properties:
+              pattern_type:
+                type: string
+              strength:
+                type: number
+              examples:
+                type: array
+                items:
+                  type: string
+        domain_coverage:
+          type: object
+          additionalProperties:
+            type: number
+        adaptation_quality:
+          type: object
+          properties:
+            coherence:
+              type: number
+            consistency:
+              type: number
+            user_alignment:
+              type: number
+        improvement_suggestions:
+          type: array
+          items:
+            type: string
+
+  securitySchemes:
+    LoraAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: LoRA-JWT
+    UserAuth:
+      type: apiKey
+      in: header
+      name: X-User-Token
+
+security:
+  - LoraAuth: []
+  - UserAuth: []

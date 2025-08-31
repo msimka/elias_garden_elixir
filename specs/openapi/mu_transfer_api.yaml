@@ -1,0 +1,1206 @@
+openapi: 3.0.3
+info:
+  title: μTransfer (Mu Transfer) API
+  description: |
+    Zero-shot hyperparameter transfer API using Maximal Update Parametrization (μP).
+    Enables 99% cost reduction in hyperparameter tuning by mathematically guaranteeing
+    optimal scaling from small proxy models to production-scale deployments.
+    
+    Based on "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot 
+    Hyperparameter Transfer" research for predictable neural network scaling.
+  version: "1.0.0"
+  contact:
+    name: ELIAS μTransfer Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://mu-transfer.elias.brain
+    description: Production μTransfer API
+  - url: https://staging-mu-transfer.elias.brain  
+    description: Staging environment
+  - url: http://localhost:4002
+    description: Local development server
+
+tags:
+  - name: scaling-setup
+    description: μP parameterization setup and configuration
+  - name: hyperparameter-transfer
+    description: Zero-shot hyperparameter transfer operations
+  - name: coordinate-validation
+    description: Coordinate check validation for scaling stability
+  - name: proxy-tuning
+    description: Proxy model hyperparameter tuning
+  - name: scaling-analysis
+    description: Scaling analysis and performance prediction
+
+paths:
+  # ============================================================================
+  # μP SCALING SETUP ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/scaling/setup:
+    post:
+      tags: [scaling-setup]
+      summary: Setup μP parameterization for domain
+      description: |
+        Configure Maximal Update Parametrization (μP) for a specific domain.
+        Returns scaling configuration that enables zero-shot hyperparameter transfer.
+      operationId: setupMuPScaling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuPSetupRequest'
+      responses:
+        '200':
+          description: μP scaling configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MuPSetupResponse'
+        '400':
+          description: Invalid configuration parameters
+        '422':
+          description: Configuration validation failed
+
+  /api/v1/mu-transfer/scaling/validate:
+    post:
+      tags: [scaling-setup]
+      summary: Validate scaling configuration
+      description: |
+        Validate μP scaling configuration against mathematical requirements.
+        Ensures stable scaling behavior before deployment.
+      operationId: validateScalingConfiguration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScalingValidationRequest'
+      responses:
+        '200':
+          description: Configuration validated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalingValidationResponse'
+
+  # ============================================================================
+  # HYPERPARAMETER TRANSFER ENDPOINTS  
+  # ============================================================================
+  
+  /api/v1/mu-transfer/hyperparameters/transfer:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Transfer hyperparameters with μP scaling
+      description: |
+        Transfer hyperparameters from tuned proxy model to target scale.
+        Provides mathematical guarantee of optimality without additional tuning.
+      operationId: transferHyperparameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HyperparameterTransferRequest'
+      responses:
+        '200':
+          description: Hyperparameters transferred successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HyperparameterTransferResponse'
+        '400':
+          description: Invalid proxy hyperparameters
+        '422':
+          description: Transfer validation failed
+
+  /api/v1/mu-transfer/hyperparameters/batch-transfer:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Batch transfer for multiple domains
+      description: |
+        Transfer hyperparameters for multiple domains/models simultaneously.
+        Optimizes resource usage for large-scale deployments.
+      operationId: batchTransferHyperparameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchTransferRequest'
+      responses:
+        '202':
+          description: Batch transfer initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchTransferResponse'
+
+  # ============================================================================
+  # COORDINATE CHECK VALIDATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/coordinate-check:
+    post:
+      tags: [coordinate-validation]
+      summary: Perform coordinate check validation
+      description: |
+        Validate μP implementation using coordinate check methodology.
+        Critical for ensuring correct scaling behavior and stability.
+      operationId: performCoordinateCheck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinateCheckRequest'
+      responses:
+        '200':
+          description: Coordinate check completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoordinateCheckResponse'
+        '422':
+          description: Coordinate check failed
+
+  /api/v1/mu-transfer/coordinate-check/batch:
+    post:
+      tags: [coordinate-validation]
+      summary: Batch coordinate validation
+      description: |
+        Perform coordinate checks for multiple models/configurations.
+        Efficient validation for large-scale deployments.
+      operationId: batchCoordinateCheck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCoordinateCheckRequest'
+      responses:
+        '202':
+          description: Batch coordinate check initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchCoordinateCheckResponse'
+
+  # ============================================================================
+  # PROXY MODEL TUNING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/proxy/create-config:
+    post:
+      tags: [proxy-tuning]
+      summary: Create proxy tuning configuration
+      description: |
+        Create hyperparameter tuning configuration for proxy models.
+        Only needs to be done once per domain type for optimal efficiency.
+      operationId: createProxyTuningConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProxyConfigRequest'
+      responses:
+        '200':
+          description: Proxy configuration created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyConfigResponse'
+
+  /api/v1/mu-transfer/proxy/tune:
+    post:
+      tags: [proxy-tuning]
+      summary: Tune proxy model hyperparameters
+      description: |
+        Perform hyperparameter tuning on small proxy model.
+        Results can be transferred to any larger scale with μP guarantee.
+      operationId: tuneProxyModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProxyTuningRequest'
+      responses:
+        '202':
+          description: Proxy tuning initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyTuningResponse'
+
+  /api/v1/mu-transfer/proxy/results/{job_id}:
+    get:
+      tags: [proxy-tuning]
+      summary: Get proxy tuning results
+      description: Get results of proxy model hyperparameter tuning
+      operationId: getProxyTuningResults
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Proxy tuning job ID
+      responses:
+        '200':
+          description: Proxy tuning results retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyTuningResults'
+        '202':
+          description: Tuning still in progress
+        '404':
+          description: Job not found
+
+  # ============================================================================
+  # SCALING ANALYSIS ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/analysis/predict-performance:
+    post:
+      tags: [scaling-analysis]
+      summary: Predict scaling performance
+      description: |
+        Predict performance characteristics when scaling to target size.
+        Uses μP theory to estimate compute requirements and effectiveness.
+      operationId: predictScalingPerformance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerformancePredictionRequest'
+      responses:
+        '200':
+          description: Performance prediction completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformancePredictionResponse'
+
+  /api/v1/mu-transfer/analysis/cost-benefit:
+    post:
+      tags: [scaling-analysis]
+      summary: Analyze scaling cost-benefit
+      description: |
+        Analyze cost-benefit of different scaling strategies.
+        Compares μTransfer approach vs traditional hyperparameter tuning.
+      operationId: analyzeScalingCostBenefit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostBenefitAnalysisRequest'
+      responses:
+        '200':
+          description: Cost-benefit analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostBenefitAnalysisResponse'
+
+  # ============================================================================
+  # LORA SCALING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/mu-transfer/lora/{lora_id}/scale:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Scale LoRA with μTransfer
+      description: |
+        Scale specific LoRA adaptation using μTransfer principles.
+        Maintains effectiveness while changing model size.
+      operationId: scaleLoraWithMuTransfer
+      parameters:
+        - name: lora_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: LoRA identifier to scale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoraScalingRequest'
+      responses:
+        '200':
+          description: LoRA scaling initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoraScalingResponse'
+
+  /api/v1/mu-transfer/lora-forest/{user_id}/scale:
+    post:
+      tags: [hyperparameter-transfer]
+      summary: Scale entire LoRA forest
+      description: |
+        Scale user's complete LoRA forest using μTransfer.
+        Maintains relationships and effectiveness across all adaptations.
+      operationId: scaleLoraForest
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID owning the LoRA forest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForestScalingRequest'
+      responses:
+        '202':
+          description: Forest scaling initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForestScalingResponse'
+
+components:
+  schemas:
+    # μP Setup Schemas
+    MuPSetupRequest:
+      type: object
+      required: [domain, base_config, target_config]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+          description: Domain for μP configuration
+        base_config:
+          type: object
+          required: [width, depth]
+          properties:
+            width:
+              type: integer
+              minimum: 64
+              maximum: 2048
+              description: Base model width (embedding dimension)
+            depth:
+              type: integer
+              minimum: 2
+              maximum: 48
+              description: Number of layers in base model
+            attention_heads:
+              type: integer
+              minimum: 1
+              maximum: 32
+              description: Number of attention heads
+            sequence_length:
+              type: integer
+              default: 2048
+              description: Maximum sequence length
+        target_config:
+          type: object
+          required: [width]
+          properties:
+            width:
+              type: integer
+              minimum: 128
+              description: Target model width (must be larger than base)
+            depth:
+              type: integer
+              description: Target depth (optional, scales automatically)
+        mu_p_settings:
+          type: object
+          properties:
+            coordinate_check:
+              type: boolean
+              default: true
+              description: Enable coordinate check validation
+            stability_threshold:
+              type: number
+              default: 0.1
+              description: Stability threshold for validation
+            scaling_method:
+              type: string
+              enum: [standard, conservative, aggressive]
+              default: standard
+
+    MuPSetupResponse:
+      type: object
+      properties:
+        domain:
+          type: string
+        scaling_config:
+          type: object
+          properties:
+            base_width:
+              type: integer
+            target_width:
+              type: integer
+            scaling_factor:
+              type: number
+            lr_scaling:
+              type: number
+              description: Learning rate scaling factor
+            init_scaling:
+              type: number
+              description: Initialization scaling factor
+            attention_scaling:
+              type: number
+              description: Attention scaling factor
+            coordinate_check_required:
+              type: boolean
+            mup_validated:
+              type: boolean
+        estimated_cost_reduction:
+          type: string
+          example: "99% vs traditional hyperparameter search"
+        mathematical_guarantees:
+          type: array
+          items:
+            type: string
+          example: ["optimal_transfer", "stable_training", "predictable_scaling"]
+        setup_completed_at:
+          type: string
+          format: date-time
+
+    # Hyperparameter Transfer Schemas
+    HyperparameterTransferRequest:
+      type: object
+      required: [domain, proxy_hyperparameters, scaling_config]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        proxy_hyperparameters:
+          type: object
+          required: [learning_rate]
+          properties:
+            learning_rate:
+              type: number
+              minimum: 1e-6
+              maximum: 1e-1
+              description: Optimal learning rate from proxy model
+            batch_size:
+              type: integer
+              minimum: 1
+              maximum: 1024
+              description: Optimal batch size from proxy
+            weight_decay:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: Weight decay coefficient
+            warmup_steps:
+              type: integer
+              minimum: 0
+              description: Learning rate warmup steps
+            optimizer_settings:
+              type: object
+              properties:
+                beta1:
+                  type: number
+                  default: 0.9
+                beta2:
+                  type: number
+                  default: 0.999
+                epsilon:
+                  type: number
+                  default: 1e-8
+        scaling_config:
+          $ref: '#/components/schemas/ScalingConfig'
+        transfer_options:
+          type: object
+          properties:
+            validate_transfer:
+              type: boolean
+              default: true
+              description: Run validation after transfer
+            safety_checks:
+              type: boolean
+              default: true
+              description: Enable safety validation
+            preserve_ratios:
+              type: boolean
+              default: true
+              description: Preserve hyperparameter ratios
+
+    HyperparameterTransferResponse:
+      type: object
+      properties:
+        domain:
+          type: string
+        transfer_result:
+          type: string
+          enum: [success, validated_success, failed, requires_validation]
+        transferred_hyperparameters:
+          type: object
+          properties:
+            learning_rate:
+              type: number
+              description: Scaled learning rate for target model
+            batch_size:
+              type: integer
+              description: Optimal batch size for target scale
+            weight_decay:
+              type: number
+            warmup_steps:
+              type: integer
+            attention_scale:
+              type: number
+            output_multiplier:
+              type: number
+        scaling_applied:
+          type: object
+          properties:
+            lr_scaling_factor:
+              type: number
+            batch_scaling_factor:
+              type: number
+            attention_scaling_factor:
+              type: number
+        performance_guarantees:
+          type: object
+          properties:
+            mathematical_optimality:
+              type: boolean
+            no_additional_tuning:
+              type: boolean
+            performance_preservation:
+              type: string
+              example: "99% confidence interval"
+        validation_results:
+          type: object
+          properties:
+            coordinate_check_passed:
+              type: boolean
+            stability_verified:
+              type: boolean
+            convergence_predicted:
+              type: boolean
+        transferred_at:
+          type: string
+          format: date-time
+
+    # Coordinate Check Schemas
+    CoordinateCheckRequest:
+      type: object
+      required: [model_config, scaling_parameters]
+      properties:
+        model_config:
+          type: object
+          required: [width, depth]
+          properties:
+            width:
+              type: integer
+              description: Model width (embedding dimension)
+            depth:
+              type: integer
+              description: Number of layers
+            architecture_type:
+              type: string
+              enum: [transformer, mlp, cnn]
+              default: transformer
+        scaling_parameters:
+          type: object
+          required: [scaling_factor]
+          properties:
+            scaling_factor:
+              type: number
+              minimum: 1.1
+              description: Width scaling factor
+            hyperparameters:
+              type: object
+              properties:
+                learning_rate:
+                  type: number
+                initialization_scale:
+                  type: number
+        validation_config:
+          type: object
+          properties:
+            num_random_seeds:
+              type: integer
+              default: 5
+              description: Number of random initializations
+            check_steps:
+              type: array
+              items:
+                type: integer
+              default: [100, 500, 1000]
+              description: Training steps to check
+            tolerance:
+              type: number
+              default: 0.1
+              description: Acceptable deviation threshold
+
+    CoordinateCheckResponse:
+      type: object
+      properties:
+        validation_status:
+          type: string
+          enum: [passed, failed, warning, inconclusive]
+        validation_results:
+          type: object
+          properties:
+            activation_stability:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [stable, unstable, marginal]
+                variance_ratio:
+                  type: number
+                  description: Ratio of activation variance across scales
+            gradient_stability:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [stable, unstable, marginal]
+                norm_ratio:
+                  type: number
+                  description: Ratio of gradient norms across scales
+            loss_convergence:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [converged, diverged, uncertain]
+                convergence_rate:
+                  type: number
+                  description: Rate of loss convergence
+        detailed_metrics:
+          type: object
+          properties:
+            activation_statistics:
+              type: array
+              items:
+                type: object
+            gradient_statistics:
+              type: array
+              items:
+                type: object
+            loss_trajectories:
+              type: array
+              items:
+                type: number
+        recommendations:
+          type: array
+          items:
+            type: string
+          example: ["Reduce learning rate scaling", "Increase initialization scale"]
+        coordinate_check_passed:
+          type: boolean
+        validation_timestamp:
+          type: string
+          format: date-time
+
+    # Proxy Tuning Schemas
+    ProxyConfigRequest:
+      type: object
+      required: [domain, proxy_size]
+      properties:
+        domain:
+          type: string
+          enum: [creative, business, technical, general]
+        proxy_size:
+          type: object
+          required: [width]
+          properties:
+            width:
+              type: integer
+              minimum: 64
+              maximum: 512
+              description: Proxy model width (small for fast tuning)
+            depth:
+              type: integer
+              minimum: 2
+              maximum: 12
+              description: Number of layers
+            rank:
+              type: integer
+              minimum: 4
+              maximum: 64
+              description: LoRA rank for adaptation
+        tuning_config:
+          type: object
+          properties:
+            search_space:
+              type: object
+              properties:
+                learning_rate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      default: 1e-5
+                    max:
+                      type: number
+                      default: 1e-2
+                    scale:
+                      type: string
+                      enum: [linear, log]
+                      default: log
+                batch_size:
+                  type: array
+                  items:
+                    type: integer
+                  default: [16, 32, 64, 128]
+                weight_decay:
+                  type: array
+                  items:
+                    type: number
+                  default: [0.0, 1e-5, 1e-4, 1e-3]
+            optimization:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum: [grid_search, random_search, bayesian, hyperband]
+                  default: bayesian
+                max_trials:
+                  type: integer
+                  default: 50
+                  minimum: 10
+                  maximum: 200
+                max_epochs:
+                  type: integer
+                  default: 100
+            early_stopping:
+              type: object
+              properties:
+                patience:
+                  type: integer
+                  default: 10
+                min_delta:
+                  type: number
+                  default: 0.001
+
+    ProxyConfigResponse:
+      type: object
+      properties:
+        domain:
+          type: string
+        proxy_config_id:
+          type: string
+          format: uuid
+        proxy_model_spec:
+          type: object
+          properties:
+            width:
+              type: integer
+            depth:
+              type: integer
+            parameters:
+              type: integer
+              description: Total number of parameters
+            memory_requirement:
+              type: string
+              example: "2.1GB"
+            estimated_training_time:
+              type: string
+              example: "< 2 hours"
+        search_space:
+          type: object
+        optimization_config:
+          type: object
+        mu_p_applied:
+          type: boolean
+        transfer_applicability:
+          type: string
+          example: "All larger scales with mathematical guarantee"
+        created_at:
+          type: string
+          format: date-time
+
+    # Scaling Analysis Schemas  
+    PerformancePredictionRequest:
+      type: object
+      required: [current_config, target_config, proxy_results]
+      properties:
+        current_config:
+          type: object
+          properties:
+            width:
+              type: integer
+            depth:
+              type: integer
+            performance_metrics:
+              type: object
+        target_config:
+          type: object
+          properties:
+            width:
+              type: integer
+            depth:
+              type: integer
+        proxy_results:
+          type: object
+          properties:
+            optimal_hyperparameters:
+              type: object
+            performance_achieved:
+              type: object
+        prediction_scope:
+          type: object
+          properties:
+            metrics_to_predict:
+              type: array
+              items:
+                type: string
+                enum: [effectiveness, training_time, inference_speed, memory_usage]
+            confidence_level:
+              type: number
+              minimum: 0.5
+              maximum: 0.99
+              default: 0.95
+
+    PerformancePredictionResponse:
+      type: object
+      properties:
+        prediction_results:
+          type: object
+          properties:
+            effectiveness:
+              type: object
+              properties:
+                predicted_value:
+                  type: number
+                confidence_interval:
+                  type: object
+                  properties:
+                    lower:
+                      type: number
+                    upper:
+                      type: number
+                prediction_quality:
+                  type: string
+                  enum: [high, medium, low]
+            training_time:
+              type: object
+              properties:
+                predicted_hours:
+                  type: number
+                scaling_factor:
+                  type: number
+                resource_requirements:
+                  type: object
+            inference_speed:
+              type: object
+              properties:
+                predicted_latency_ms:
+                  type: number
+                throughput_scaling:
+                  type: number
+            memory_usage:
+              type: object
+              properties:
+                predicted_memory_gb:
+                  type: number
+                memory_efficiency:
+                  type: number
+        scaling_analysis:
+          type: object
+          properties:
+            scaling_efficiency:
+              type: string
+              enum: [excellent, good, fair, poor]
+            bottlenecks_identified:
+              type: array
+              items:
+                type: string
+            optimization_suggestions:
+              type: array
+              items:
+                type: string
+        prediction_metadata:
+          type: object
+          properties:
+            model_used:
+              type: string
+            confidence_score:
+              type: number
+            prediction_basis:
+              type: string
+            limitations:
+              type: array
+              items:
+                type: string
+        predicted_at:
+          type: string
+          format: date-time
+
+    # LoRA Scaling Schemas
+    LoraScalingRequest:
+      type: object
+      required: [target_size, scaling_strategy]
+      properties:
+        target_size:
+          type: integer
+          minimum: 128
+          description: Target model width
+        scaling_strategy:
+          type: string
+          enum: [mu_transfer, gradual_scaling, architecture_search]
+          default: mu_transfer
+        preserve_performance:
+          type: boolean
+          default: true
+        scaling_options:
+          type: object
+          properties:
+            coordinate_validation:
+              type: boolean
+              default: true
+            safety_checks:
+              type: boolean
+              default: true
+            rollback_on_failure:
+              type: boolean
+              default: true
+        quality_thresholds:
+          type: object
+          properties:
+            min_effectiveness_retention:
+              type: number
+              minimum: 0.5
+              maximum: 1.0
+              default: 0.95
+            max_performance_degradation:
+              type: number
+              minimum: 0.0
+              maximum: 0.5
+              default: 0.05
+
+    LoraScalingResponse:
+      type: object
+      properties:
+        scaling_job_id:
+          type: string
+          format: uuid
+        lora_id:
+          type: string
+        scaling_plan:
+          type: object
+          properties:
+            current_size:
+              type: integer
+            target_size:
+              type: integer
+            scaling_factor:
+              type: number
+            parameter_changes:
+              type: object
+        mu_transfer_applied:
+          type: boolean
+        hyperparameter_updates:
+          type: object
+          properties:
+            learning_rate:
+              type: number
+            attention_scale:
+              type: number
+            initialization_scale:
+              type: number
+            output_multiplier:
+              type: number
+        performance_guarantees:
+          type: object
+          properties:
+            mathematical_optimality:
+              type: boolean
+            no_additional_tuning_required:
+              type: boolean
+            performance_preservation_confidence:
+              type: number
+        estimated_completion:
+          type: string
+          format: date-time
+        cost_savings:
+          type: object
+          properties:
+            vs_traditional_tuning:
+              type: string
+              example: "99% cost reduction"
+            estimated_hours_saved:
+              type: number
+
+    # Utility Schemas
+    ScalingConfig:
+      type: object
+      properties:
+        scaling_factor:
+          type: number
+          description: Width scaling factor
+        lr_scaling:
+          type: number
+          description: Learning rate scaling factor
+        init_scaling:
+          type: number
+          description: Initialization scaling factor
+        attention_scaling:
+          type: number
+          description: Attention scaling factor
+        mup_validated:
+          type: boolean
+          description: Whether μP validation passed
+
+    BatchTransferRequest:
+      type: object
+      required: [transfers]
+      properties:
+        transfers:
+          type: array
+          items:
+            type: object
+            properties:
+              domain:
+                type: string
+              proxy_hyperparameters:
+                type: object
+              scaling_config:
+                $ref: '#/components/schemas/ScalingConfig'
+          minItems: 1
+          maxItems: 100
+        batch_options:
+          type: object
+          properties:
+            parallel_processing:
+              type: boolean
+              default: true
+            fail_fast:
+              type: boolean
+              default: false
+            validation_level:
+              type: string
+              enum: [none, basic, full]
+              default: basic
+
+    BatchTransferResponse:
+      type: object
+      properties:
+        batch_job_id:
+          type: string
+          format: uuid
+        total_transfers:
+          type: integer
+        estimated_completion:
+          type: string
+          format: date-time
+        processing_status:
+          type: string
+          enum: [queued, processing, completed, failed]
+        individual_jobs:
+          type: array
+          items:
+            type: object
+            properties:
+              transfer_id:
+                type: string
+              domain:
+                type: string
+              status:
+                type: string
+                enum: [queued, processing, completed, failed]
+
+    # Additional schemas for comprehensive coverage
+    ForestScalingRequest:
+      type: object
+      required: [scaling_strategy]
+      properties:
+        scaling_strategy:
+          type: object
+          properties:
+            target_scale_factor:
+              type: number
+              minimum: 1.1
+              description: Overall scaling factor for forest
+            preserve_relationships:
+              type: boolean
+              default: true
+              description: Maintain LoRA interdependencies
+            parallel_scaling:
+              type: boolean
+              default: true
+              description: Scale LoRAs in parallel
+        lora_selection:
+          type: object
+          properties:
+            include_domains:
+              type: array
+              items:
+                type: string
+            exclude_loras:
+              type: array
+              items:
+                type: string
+            effectiveness_threshold:
+              type: number
+              default: 0.7
+              description: Only scale LoRAs above this effectiveness
+        scaling_options:
+          $ref: '#/components/schemas/LoraScalingRequest/properties/scaling_options'
+
+    ForestScalingResponse:
+      type: object
+      properties:
+        forest_scaling_job_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        scaling_summary:
+          type: object
+          properties:
+            total_loras:
+              type: integer
+            loras_to_scale:
+              type: integer
+            estimated_improvement:
+              type: string
+            total_cost_savings:
+              type: string
+        individual_scaling_jobs:
+          type: array
+          items:
+            type: object
+            properties:
+              lora_id:
+                type: string
+              scaling_job_id:
+                type: string
+              current_size:
+                type: integer
+              target_size:
+                type: integer
+        estimated_completion:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

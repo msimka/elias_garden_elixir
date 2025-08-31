@@ -1,0 +1,1187 @@
+openapi: 3.0.3
+info:
+  title: StructCoder - Tree-Structured Code Generation API
+  description: |
+    StructCoder API for tree-structured code generation using JAX and advanced
+    tree neural networks. Generates syntactically correct, semantically meaningful
+    code through hierarchical tree modeling with mathematical guarantees for
+    structural correctness and optimal performance.
+    
+    Leverages JAX for efficient tree operations, supports multiple programming
+    languages, and provides specialized code generation for complex software
+    architectures, API implementations, and system integrations.
+  version: "1.0.0"
+  contact:
+    name: ELIAS StructCoder Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://structcoder.elias.brain
+    description: Production StructCoder API
+  - url: https://staging-structcoder.elias.brain
+    description: Staging environment
+  - url: http://localhost:4006
+    description: Local development server
+
+tags:
+  - name: tree-generation
+    description: Hierarchical tree-structured code generation
+  - name: syntax-analysis
+    description: Advanced syntax tree analysis and manipulation
+  - name: semantic-modeling
+    description: Semantic understanding and code reasoning
+  - name: multi-language
+    description: Multi-language code generation support
+  - name: architecture-synthesis
+    description: Software architecture and system design generation
+
+paths:
+  # ============================================================================
+  # TREE-STRUCTURED CODE GENERATION ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/structcoder/generate/tree:
+    post:
+      tags: [tree-generation]
+      summary: Generate code using tree-structured neural models
+      description: |
+        Generate syntactically correct and semantically meaningful code using
+        advanced tree neural networks. Supports multiple programming languages
+        with guaranteed structural correctness and optimal performance.
+      operationId: generateTreeStructuredCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreeCodeGenerationRequest'
+      responses:
+        '200':
+          description: Code generation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreeCodeGenerationResponse'
+        '400':
+          description: Invalid generation parameters
+        '422':
+          description: Code generation constraints not satisfiable
+
+  /api/v1/structcoder/generate/function:
+    post:
+      tags: [tree-generation]
+      summary: Generate individual functions with tree modeling
+      description: |
+        Generate complete functions using tree-structured understanding of
+        programming language semantics. Includes type inference, documentation,
+        and optimization recommendations.
+      operationId: generateTreeFunction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunctionGenerationRequest'
+      responses:
+        '200':
+          description: Function generation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionGenerationResponse'
+
+  /api/v1/structcoder/generate/class:
+    post:
+      tags: [tree-generation]
+      summary: Generate complete classes with hierarchical structure
+      description: |
+        Generate complete class definitions with methods, properties, and
+        inheritance relationships using tree-structured modeling for optimal
+        object-oriented design patterns.
+      operationId: generateTreeClass
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassGenerationRequest'
+      responses:
+        '200':
+          description: Class generation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassGenerationResponse'
+
+  # ============================================================================
+  # SYNTAX ANALYSIS ENDPOINTS
+  # ============================================================================
+
+  /api/v1/structcoder/analyze/syntax:
+    post:
+      tags: [syntax-analysis]
+      summary: Analyze code syntax tree structure
+      description: |
+        Perform deep syntax tree analysis using JAX-optimized tree neural
+        networks. Identifies structural patterns, optimization opportunities,
+        and potential issues in code organization.
+      operationId: analyzeSyntaxTree
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyntaxAnalysisRequest'
+      responses:
+        '200':
+          description: Syntax analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyntaxAnalysisResponse'
+
+  /api/v1/structcoder/analyze/complexity:
+    post:
+      tags: [syntax-analysis]
+      summary: Analyze code complexity using tree metrics
+      description: |
+        Compute complexity metrics using advanced tree-based analysis.
+        Provides cyclomatic complexity, tree depth analysis, and structural
+        complexity measures for code quality assessment.
+      operationId: analyzeTreeComplexity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplexityAnalysisRequest'
+      responses:
+        '200':
+          description: Complexity analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplexityAnalysisResponse'
+
+  /api/v1/structcoder/refactor/tree:
+    post:
+      tags: [syntax-analysis]
+      summary: Refactor code using tree-based transformations
+      description: |
+        Apply intelligent refactoring using tree transformation algorithms.
+        Preserves functionality while optimizing code structure, readability,
+        and performance through tree-aware refactoring patterns.
+      operationId: refactorWithTreeTransforms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreeRefactoringRequest'
+      responses:
+        '200':
+          description: Refactoring completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreeRefactoringResponse'
+
+  # ============================================================================
+  # SEMANTIC MODELING ENDPOINTS
+  # ============================================================================
+
+  /api/v1/structcoder/semantic/understand:
+    post:
+      tags: [semantic-modeling]
+      summary: Deep semantic understanding of code intent
+      description: |
+        Analyze code semantics using advanced tree neural networks to
+        understand intent, behavior, and relationships. Provides semantic
+        embeddings and intent classification for intelligent code assistance.
+      operationId: understandCodeSemantics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticAnalysisRequest'
+      responses:
+        '200':
+          description: Semantic analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticAnalysisResponse'
+
+  /api/v1/structcoder/semantic/similarity:
+    post:
+      tags: [semantic-modeling]
+      summary: Compute semantic similarity between code structures
+      description: |
+        Calculate semantic similarity between code fragments using tree-based
+        embeddings. Enables code search, duplicate detection, and pattern
+        recognition across large codebases.
+      operationId: computeSemanticSimilarity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticSimilarityRequest'
+      responses:
+        '200':
+          description: Similarity computation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticSimilarityResponse'
+
+  /api/v1/structcoder/semantic/embed:
+    post:
+      tags: [semantic-modeling]
+      summary: Generate semantic embeddings for code structures
+      description: |
+        Create high-dimensional semantic embeddings for code using tree neural
+        networks. Embeddings capture semantic meaning and structural patterns
+        for advanced code analysis and generation tasks.
+      operationId: generateSemanticEmbeddings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticEmbeddingRequest'
+      responses:
+        '200':
+          description: Embedding generation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticEmbeddingResponse'
+
+  # ============================================================================
+  # MULTI-LANGUAGE SUPPORT ENDPOINTS
+  # ============================================================================
+
+  /api/v1/structcoder/translate/language:
+    post:
+      tags: [multi-language]
+      summary: Translate code between programming languages
+      description: |
+        Translate code from one programming language to another while
+        preserving semantics and optimizing for target language idioms.
+        Uses tree-structured understanding for accurate translations.
+      operationId: translateCodeLanguage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageTranslationRequest'
+      responses:
+        '200':
+          description: Language translation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageTranslationResponse'
+
+  /api/v1/structcoder/optimize/language:
+    post:
+      tags: [multi-language]
+      summary: Optimize code for specific language patterns
+      description: |
+        Optimize code for language-specific patterns, idioms, and performance
+        characteristics. Uses deep understanding of language semantics and
+        best practices for each supported programming language.
+      operationId: optimizeForLanguage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageOptimizationRequest'
+      responses:
+        '200':
+          description: Language optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageOptimizationResponse'
+
+  /api/v1/structcoder/languages/support:
+    get:
+      tags: [multi-language]
+      summary: List supported programming languages
+      description: Get comprehensive list of supported programming languages and their capabilities
+      operationId: getSupportedLanguages
+      responses:
+        '200':
+          description: Supported languages retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportedLanguagesResponse'
+
+  # ============================================================================
+  # ARCHITECTURE SYNTHESIS ENDPOINTS
+  # ============================================================================
+
+  /api/v1/structcoder/architecture/design:
+    post:
+      tags: [architecture-synthesis]
+      summary: Generate software architecture designs
+      description: |
+        Generate complete software architecture designs using tree-structured
+        modeling of system relationships, dependencies, and patterns. Creates
+        comprehensive architectural blueprints with implementation guidance.
+      operationId: designSoftwareArchitecture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchitectureDesignRequest'
+      responses:
+        '200':
+          description: Architecture design completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchitectureDesignResponse'
+
+  /api/v1/structcoder/architecture/api:
+    post:
+      tags: [architecture-synthesis]
+      summary: Generate API implementations from specifications
+      description: |
+        Generate complete API implementations from specifications using
+        tree-structured understanding of API patterns, HTTP semantics,
+        and integration requirements. Supports REST, GraphQL, and RPC APIs.
+      operationId: generateApiImplementation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiImplementationRequest'
+      responses:
+        '200':
+          description: API implementation generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiImplementationResponse'
+
+  /api/v1/structcoder/architecture/microservices:
+    post:
+      tags: [architecture-synthesis]
+      summary: Design microservices architecture
+      description: |
+        Generate microservices architecture with service definitions,
+        communication patterns, and deployment configurations. Uses tree
+        modeling to optimize service boundaries and dependencies.
+      operationId: designMicroservicesArchitecture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MicroservicesDesignRequest'
+      responses:
+        '200':
+          description: Microservices architecture generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MicroservicesDesignResponse'
+
+  # ============================================================================
+  # JAX OPTIMIZATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/structcoder/jax/optimize:
+    post:
+      tags: [tree-generation]
+      summary: Optimize code generation using JAX acceleration
+      description: |
+        Leverage JAX for accelerated tree operations and code generation.
+        Provides significant performance improvements for large-scale code
+        generation tasks through XLA compilation and GPU acceleration.
+      operationId: optimizeWithJAX
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JAXOptimizationRequest'
+      responses:
+        '200':
+          description: JAX optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JAXOptimizationResponse'
+
+  /api/v1/structcoder/jax/benchmark:
+    post:
+      tags: [tree-generation]
+      summary: Benchmark tree operations with JAX acceleration
+      description: |
+        Compare performance of tree operations with and without JAX
+        acceleration. Provides detailed benchmarking results for
+        optimization decision-making.
+      operationId: benchmarkJAXPerformance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JAXBenchmarkRequest'
+      responses:
+        '200':
+          description: Benchmarking completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JAXBenchmarkResponse'
+
+components:
+  schemas:
+    # Tree Code Generation Schemas
+    TreeCodeGenerationRequest:
+      type: object
+      required: [specification, target_language, generation_config]
+      properties:
+        specification:
+          type: object
+          properties:
+            description:
+              type: string
+              description: Natural language description of desired code
+            requirements:
+              type: array
+              items:
+                type: string
+              description: Specific functional requirements
+            constraints:
+              type: array
+              items:
+                type: string
+              description: Technical constraints and limitations
+            examples:
+              type: array
+              items:
+                type: object
+              description: Example inputs/outputs for guidance
+        target_language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+          description: Target programming language
+        generation_config:
+          type: object
+          properties:
+            complexity_level:
+              type: string
+              enum: [simple, moderate, complex, expert]
+              default: moderate
+            optimization_level:
+              type: string
+              enum: [none, basic, aggressive, maximum]
+              default: basic
+            code_style:
+              type: string
+              enum: [minimal, standard, verbose, enterprise]
+              default: standard
+            include_documentation:
+              type: boolean
+              default: true
+            include_tests:
+              type: boolean
+              default: false
+            tree_depth_limit:
+              type: integer
+              minimum: 5
+              maximum: 50
+              default: 20
+        architectural_constraints:
+          type: object
+          properties:
+            design_patterns:
+              type: array
+              items:
+                type: string
+              description: Required or preferred design patterns
+            performance_requirements:
+              type: object
+              properties:
+                max_time_complexity:
+                  type: string
+                max_space_complexity:
+                  type: string
+                target_performance:
+                  type: string
+            integration_requirements:
+              type: object
+              properties:
+                external_apis:
+                  type: array
+                  items:
+                    type: string
+                databases:
+                  type: array
+                  items:
+                    type: string
+                frameworks:
+                  type: array
+                  items:
+                    type: string
+
+    TreeCodeGenerationResponse:
+      type: object
+      properties:
+        generation_id:
+          type: string
+          format: uuid
+        generated_code:
+          type: string
+          description: Complete generated code
+        syntax_tree:
+          type: object
+          description: Abstract syntax tree representation
+        semantic_analysis:
+          type: object
+          properties:
+            complexity_metrics:
+              type: object
+              properties:
+                cyclomatic_complexity:
+                  type: integer
+                cognitive_complexity:
+                  type: integer
+                tree_depth:
+                  type: integer
+                node_count:
+                  type: integer
+            quality_score:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: Overall code quality assessment
+            maintainability_index:
+              type: number
+              description: Code maintainability score
+        optimization_suggestions:
+          type: array
+          items:
+            type: object
+            properties:
+              suggestion_type:
+                type: string
+                enum: [performance, readability, maintainability, security]
+              description:
+                type: string
+              impact:
+                type: string
+                enum: [low, medium, high]
+              implementation_effort:
+                type: string
+                enum: [low, medium, high]
+        tree_generation_metadata:
+          type: object
+          properties:
+            tree_operations_count:
+              type: integer
+            jax_acceleration_used:
+              type: boolean
+            generation_time_ms:
+              type: number
+            memory_usage_mb:
+              type: number
+        documentation:
+          type: object
+          properties:
+            api_documentation:
+              type: string
+            usage_examples:
+              type: array
+              items:
+                type: string
+            integration_guide:
+              type: string
+        generated_at:
+          type: string
+          format: date-time
+
+    # Function Generation Schemas
+    FunctionGenerationRequest:
+      type: object
+      required: [function_spec, language]
+      properties:
+        function_spec:
+          type: object
+          properties:
+            function_name:
+              type: string
+            description:
+              type: string
+            parameters:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  description:
+                    type: string
+                  optional:
+                    type: boolean
+                    default: false
+            return_type:
+              type: string
+            return_description:
+              type: string
+            preconditions:
+              type: array
+              items:
+                type: string
+            postconditions:
+              type: array
+              items:
+                type: string
+        language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+        generation_options:
+          type: object
+          properties:
+            include_type_hints:
+              type: boolean
+              default: true
+            include_docstring:
+              type: boolean
+              default: true
+            include_error_handling:
+              type: boolean
+              default: true
+            optimization_level:
+              type: string
+              enum: [readable, balanced, performance]
+              default: balanced
+
+    FunctionGenerationResponse:
+      type: object
+      properties:
+        function_id:
+          type: string
+          format: uuid
+        generated_function:
+          type: string
+          description: Complete function implementation
+        function_signature:
+          type: string
+          description: Function signature with types
+        tree_structure:
+          type: object
+          description: Function's syntax tree structure
+        complexity_analysis:
+          type: object
+          properties:
+            cyclomatic_complexity:
+              type: integer
+            cognitive_load:
+              type: integer
+            estimated_performance:
+              type: string
+        quality_metrics:
+          type: object
+          properties:
+            readability_score:
+              type: number
+            maintainability_score:
+              type: number
+            testability_score:
+              type: number
+        suggested_tests:
+          type: array
+          items:
+            type: object
+            properties:
+              test_name:
+                type: string
+              test_code:
+                type: string
+              test_description:
+                type: string
+        generated_at:
+          type: string
+          format: date-time
+
+    # Syntax Analysis Schemas
+    SyntaxAnalysisRequest:
+      type: object
+      required: [code, language]
+      properties:
+        code:
+          type: string
+          description: Source code to analyze
+        language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+        analysis_options:
+          type: object
+          properties:
+            deep_analysis:
+              type: boolean
+              default: true
+              description: Enable comprehensive tree analysis
+            include_metrics:
+              type: boolean
+              default: true
+            include_suggestions:
+              type: boolean
+              default: true
+            performance_analysis:
+              type: boolean
+              default: false
+
+    SyntaxAnalysisResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+          format: uuid
+        syntax_tree:
+          type: object
+          description: Complete abstract syntax tree
+        tree_metrics:
+          type: object
+          properties:
+            total_nodes:
+              type: integer
+            max_depth:
+              type: integer
+            average_branching_factor:
+              type: number
+            leaf_node_count:
+              type: integer
+        structural_patterns:
+          type: array
+          items:
+            type: object
+            properties:
+              pattern_type:
+                type: string
+              pattern_description:
+                type: string
+              occurrences:
+                type: integer
+              significance:
+                type: string
+                enum: [low, medium, high]
+        complexity_assessment:
+          type: object
+          properties:
+            structural_complexity:
+              type: number
+            semantic_complexity:
+              type: number
+            maintainability_index:
+              type: number
+        optimization_opportunities:
+          type: array
+          items:
+            type: object
+            properties:
+              optimization_type:
+                type: string
+              description:
+                type: string
+              potential_impact:
+                type: string
+                enum: [low, medium, high]
+              implementation_difficulty:
+                type: string
+                enum: [easy, moderate, hard]
+        analyzed_at:
+          type: string
+          format: date-time
+
+    # Semantic Analysis Schemas
+    SemanticAnalysisRequest:
+      type: object
+      required: [code, language, analysis_type]
+      properties:
+        code:
+          type: string
+        language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+        analysis_type:
+          type: string
+          enum: [intent_analysis, behavior_analysis, relationship_analysis, comprehensive]
+        semantic_options:
+          type: object
+          properties:
+            embedding_model:
+              type: string
+              enum: [standard, enhanced, domain_specific]
+              default: standard
+            context_window:
+              type: integer
+              default: 1000
+            include_dependencies:
+              type: boolean
+              default: true
+
+    SemanticAnalysisResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+          format: uuid
+        semantic_understanding:
+          type: object
+          properties:
+            primary_intent:
+              type: string
+            behavior_classification:
+              type: string
+            complexity_category:
+              type: string
+            domain_classification:
+              type: string
+        semantic_embeddings:
+          type: array
+          items:
+            type: number
+          description: High-dimensional semantic representation
+        relationships:
+          type: array
+          items:
+            type: object
+            properties:
+              relationship_type:
+                type: string
+              source_entity:
+                type: string
+              target_entity:
+                type: string
+              strength:
+                type: number
+        intent_confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        behavioral_patterns:
+          type: array
+          items:
+            type: object
+            properties:
+              pattern_name:
+                type: string
+              confidence:
+                type: number
+              description:
+                type: string
+        analyzed_at:
+          type: string
+          format: date-time
+
+    # Language Translation Schemas
+    LanguageTranslationRequest:
+      type: object
+      required: [source_code, source_language, target_language]
+      properties:
+        source_code:
+          type: string
+        source_language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+        target_language:
+          type: string
+          enum: [python, javascript, java, cpp, rust, go, elixir, typescript]
+        translation_options:
+          type: object
+          properties:
+            preserve_comments:
+              type: boolean
+              default: true
+            optimize_for_target:
+              type: boolean
+              default: true
+            maintain_structure:
+              type: boolean
+              default: false
+            include_explanations:
+              type: boolean
+              default: true
+
+    LanguageTranslationResponse:
+      type: object
+      properties:
+        translation_id:
+          type: string
+          format: uuid
+        translated_code:
+          type: string
+        translation_quality:
+          type: object
+          properties:
+            semantic_preservation:
+              type: number
+              minimum: 0
+              maximum: 1
+            syntactic_correctness:
+              type: number
+              minimum: 0
+              maximum: 1
+            idiomatic_quality:
+              type: number
+              minimum: 0
+              maximum: 1
+        translation_notes:
+          type: array
+          items:
+            type: object
+            properties:
+              note_type:
+                type: string
+                enum: [semantic_change, optimization, limitation, enhancement]
+              description:
+                type: string
+              line_reference:
+                type: integer
+        performance_comparison:
+          type: object
+          properties:
+            source_estimated_performance:
+              type: string
+            target_estimated_performance:
+              type: string
+            performance_delta:
+              type: string
+        translated_at:
+          type: string
+          format: date-time
+
+    # Architecture Design Schemas
+    ArchitectureDesignRequest:
+      type: object
+      required: [requirements, system_type, constraints]
+      properties:
+        requirements:
+          type: object
+          properties:
+            functional_requirements:
+              type: array
+              items:
+                type: string
+            non_functional_requirements:
+              type: array
+              items:
+                type: string
+            business_requirements:
+              type: array
+              items:
+                type: string
+        system_type:
+          type: string
+          enum: [web_application, mobile_app, desktop_app, microservices, monolith, distributed_system]
+        constraints:
+          type: object
+          properties:
+            technology_stack:
+              type: array
+              items:
+                type: string
+            budget_constraints:
+              type: string
+            timeline_constraints:
+              type: string
+            scalability_requirements:
+              type: string
+            security_requirements:
+              type: array
+              items:
+                type: string
+        design_preferences:
+          type: object
+          properties:
+            architectural_patterns:
+              type: array
+              items:
+                type: string
+            design_principles:
+              type: array
+              items:
+                type: string
+            complexity_preference:
+              type: string
+              enum: [simple, moderate, complex]
+
+    ArchitectureDesignResponse:
+      type: object
+      properties:
+        design_id:
+          type: string
+          format: uuid
+        architecture_overview:
+          type: object
+          properties:
+            system_architecture:
+              type: string
+            architectural_style:
+              type: string
+            key_components:
+              type: array
+              items:
+                type: string
+            integration_patterns:
+              type: array
+              items:
+                type: string
+        component_specifications:
+          type: array
+          items:
+            type: object
+            properties:
+              component_name:
+                type: string
+              component_type:
+                type: string
+              responsibilities:
+                type: array
+                items:
+                  type: string
+              interfaces:
+                type: array
+                items:
+                  type: string
+              dependencies:
+                type: array
+                items:
+                  type: string
+        implementation_guidance:
+          type: object
+          properties:
+            development_phases:
+              type: array
+              items:
+                type: string
+            technology_recommendations:
+              type: object
+            deployment_strategy:
+              type: string
+            testing_strategy:
+              type: string
+        quality_attributes:
+          type: object
+          properties:
+            scalability_assessment:
+              type: string
+            maintainability_score:
+              type: number
+            security_level:
+              type: string
+            performance_characteristics:
+              type: string
+        generated_at:
+          type: string
+          format: date-time
+
+    # JAX Optimization Schemas
+    JAXOptimizationRequest:
+      type: object
+      required: [optimization_target, tree_operations]
+      properties:
+        optimization_target:
+          type: string
+          enum: [speed, memory, throughput, latency]
+        tree_operations:
+          type: array
+          items:
+            type: string
+          description: Types of tree operations to optimize
+        hardware_config:
+          type: object
+          properties:
+            gpu_available:
+              type: boolean
+            cpu_cores:
+              type: integer
+            memory_gb:
+              type: number
+        optimization_constraints:
+          type: object
+          properties:
+            max_memory_usage:
+              type: string
+            max_compilation_time:
+              type: string
+            precision_requirements:
+              type: string
+
+    JAXOptimizationResponse:
+      type: object
+      properties:
+        optimization_id:
+          type: string
+          format: uuid
+        optimization_results:
+          type: object
+          properties:
+            performance_improvement:
+              type: string
+            memory_efficiency:
+              type: string
+            compilation_overhead:
+              type: string
+        optimized_operations:
+          type: array
+          items:
+            type: object
+            properties:
+              operation_name:
+                type: string
+              original_performance:
+                type: string
+              optimized_performance:
+                type: string
+              improvement_factor:
+                type: number
+        hardware_utilization:
+          type: object
+          properties:
+            gpu_utilization:
+              type: number
+            memory_utilization:
+              type: number
+            computational_efficiency:
+              type: number
+        recommendations:
+          type: array
+          items:
+            type: string
+        optimized_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

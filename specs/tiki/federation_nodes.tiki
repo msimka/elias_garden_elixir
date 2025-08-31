@@ -1,0 +1,745 @@
+# ELIAS Federation Nodes - Tiki API Specifications
+
+## Overview
+Tiki format specifications for ELIAS Federation Nodes API. Handles distributed client-daemon coordination, inter-node consensus, and cross-federation scaling operations.
+
+---
+
+## 🌐 Client-Federation Communication
+
+### Client Registration
+
+#### `POST /api/v1/federation/clients/{client_id}/register`
+**Purpose**: Register client daemon with federation network for distributed compute access
+
+**Authentication**: Device certificates + Client attestation
+
+**Path Parameters**:
+- `client_id` (UUID, required): Unique client daemon identifier
+
+**Request Body**:
+```json
+{
+  "client_info": {
+    "user_id": "uuid",
+    "device_type": "mobile|desktop|server|edge",
+    "location": {
+      "region": "us-west-2",
+      "availability_zone": "us-west-2a"
+    }
+  },
+  "capabilities": {
+    "compute_capacity": {
+      "cpu_cores": 8,
+      "memory_gb": 16,
+      "gpu_available": true
+    },
+    "network_bandwidth": "1Gbps",
+    "storage_capacity": "512GB"
+  },
+  "security_credentials": {
+    "public_key": "RSA-4096-public-key",
+    "device_attestation": "TPM-signed-attestation"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "client_id": "uuid",
+  "federation_node_assigned": "fed-us-west-2-primary",
+  "security_tokens": {
+    "access_token": "federation-jwt-token",
+    "refresh_token": "refresh-token",
+    "certificate": "x509-client-certificate"
+  },
+  "configuration": {
+    "heartbeat_interval": 30,
+    "sync_frequency": 300,
+    "resource_allocation": {
+      "max_loras": 2000,
+      "inference_quota": "10000/hour"
+    }
+  }
+}
+```
+
+**Business Logic**:
+1. Validate client device attestation via TPM/secure element
+2. Perform geolocation-based node assignment for optimal latency
+3. Generate mTLS certificates for secure communication
+4. Initialize client in distributed federation registry
+5. Configure resource quotas based on client tier and capabilities
+6. Set up monitoring and health check parameters
+
+**Error Handling**:
+- `400`: Invalid device attestation or malformed capabilities
+- `409`: Client ID already registered with different device
+- `503`: No available federation nodes in client's region
+- `429`: Registration rate limit exceeded
+
+---
+
+#### `POST /api/v1/federation/clients/{client_id}/heartbeat`
+**Purpose**: Maintain federation connection with performance metrics and health status
+
+**Request Body**:
+```json
+{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "performance_metrics": {
+    "cpu_usage": 0.45,
+    "memory_usage": 0.67,
+    "inference_latency": 42,
+    "throughput": 150,
+    "gpu_utilization": 0.78
+  },
+  "lora_forest_status": {
+    "active_loras": 1180,
+    "forest_health_score": 0.91,
+    "last_update": "2024-01-15T09:30:00Z",
+    "sync_conflicts": 0
+  },
+  "resource_requests": [
+    {
+      "type": "additional_compute",
+      "justification": "Training 200 new LoRAs",
+      "duration": "2 hours"
+    }
+  ]
+}
+```
+
+**Response**:
+```json
+{
+  "status": "healthy|degraded|critical",
+  "instructions": [
+    {
+      "action": "optimize_memory",
+      "parameters": {"target_usage": 0.60},
+      "priority": "medium"
+    },
+    {
+      "action": "scale_inference",
+      "parameters": {"additional_nodes": 2},
+      "priority": "high"
+    }
+  ],
+  "resource_allocations": {
+    "compute_credits": 500,
+    "storage_quota": "10GB",
+    "bandwidth_limit": "100MB/s"
+  },
+  "next_heartbeat": 30,
+  "federation_status": {
+    "total_nodes": 47,
+    "healthy_nodes": 45,
+    "your_node_rank": 12
+  }
+}
+```
+
+**Business Logic**:
+1. Update client health metrics in real-time federation database
+2. Analyze performance trends for predictive scaling
+3. Generate optimization recommendations based on usage patterns
+4. Allocate additional resources if justified and available
+5. Detect anomalies and trigger alerts for investigation
+6. Provide federation-wide status for context
+
+---
+
+### LoRA Forest Synchronization
+
+#### `POST /api/v1/federation/clients/{client_id}/lora-sync`
+**Purpose**: Synchronize client's LoRA forest with federation for availability and consistency
+
+**Request Body**:
+```json
+{
+  "forest_snapshot": {
+    "version": "v1.2.47",
+    "total_loras": 1180,
+    "loras": [
+      {
+        "lora_id": "creative_writing_v3",
+        "domain": "creative",
+        "weights_hash": "sha256:abc123...",
+        "last_modified": "2024-01-15T08:15:00Z",
+        "effectiveness_score": 0.94,
+        "size_bytes": 2048576
+      }
+    ],
+    "forest_health": 0.91,
+    "total_size": "1.2GB"
+  },
+  "sync_options": {
+    "conflict_resolution": "client_wins|federation_wins|merge",
+    "incremental": true,
+    "compression": "lz4",
+    "encryption": "aes256"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "sync_result": "success|partial|conflicts",
+  "sync_id": "uuid",
+  "conflicts": [
+    {
+      "lora_id": "business_writing_v2",
+      "conflict_type": "concurrent_modification",
+      "resolution": "merge_required",
+      "client_version": "2024-01-15T10:00:00Z",
+      "federation_version": "2024-01-15T10:05:00Z"
+    }
+  ],
+  "updated_loras": [
+    "creative_writing_v3",
+    "technical_docs_v1"
+  ],
+  "federation_version": "v1.2.48",
+  "next_sync_time": "2024-01-15T10:35:00Z",
+  "replication_status": {
+    "replicated_nodes": 3,
+    "target_replicas": 3,
+    "consistency_level": "eventual"
+  }
+}
+```
+
+**Business Logic**:
+1. Compare forest versions using vector clocks for conflict detection
+2. Apply three-way merge algorithm for concurrent modifications
+3. Replicate critical LoRAs across multiple federation nodes
+4. Compress and encrypt data during transmission
+5. Validate integrity using cryptographic hashes
+6. Schedule automatic conflict resolution for minor differences
+
+---
+
+## 🤝 Node-to-Node Coordination
+
+### Consensus Participation
+
+#### `POST /api/v1/nodes/{node_id}/consensus`
+**Purpose**: Participate in distributed consensus for federation-wide decisions
+
+**Request Body**:
+```json
+{
+  "proposal_id": "uuid",
+  "vote": "approve|reject|abstain",
+  "reasoning": "Performance optimization shows 23% latency improvement with minimal cost increase",
+  "stake_weight": 0.15,
+  "timestamp": "2024-01-15T10:30:00Z",
+  "supporting_data": {
+    "performance_metrics": {},
+    "cost_analysis": {},
+    "risk_assessment": "low"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "vote_recorded": true,
+  "vote_id": "uuid",
+  "current_tally": {
+    "approve_votes": 12,
+    "reject_votes": 3,  
+    "abstain_votes": 1,
+    "total_stake": 0.78,
+    "threshold_required": 0.67
+  },
+  "consensus_reached": true,
+  "final_decision": "approved",
+  "execution_timeline": {
+    "immediate": ["update_routing_tables"],
+    "scheduled": [
+      {
+        "action": "deploy_optimization",
+        "time": "2024-01-15T12:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+**Business Logic**:
+1. Apply Byzantine Fault Tolerant consensus (PBFT) for critical decisions
+2. Weight votes by node stake, reputation, and historical accuracy
+3. Require supermajority (67%) for execution of proposals
+4. Log all votes with cryptographic signatures for auditability
+5. Automatically execute approved decisions via smart contracts
+6. Provide rollback capabilities for failed implementations
+
+---
+
+### State Synchronization
+
+#### `POST /api/v1/nodes/{node_id}/sync`
+**Purpose**: Synchronize node state with peer nodes for consistency
+
+**Request Body**:
+```json
+{
+  "node_state": {
+    "version": "v1.4.2",
+    "last_sync": "2024-01-15T10:25:00Z",
+    "client_count": 247,
+    "active_loras": 45782,
+    "resource_utilization": {
+      "cpu": 0.67,
+      "memory": 0.54,
+      "storage": 0.82,
+      "network": 0.31
+    },
+    "service_health": {
+      "lora_training": "healthy",
+      "inference_engine": "healthy", 
+      "federation_gateway": "degraded"
+    }
+  },
+  "state_hash": "sha256:def456...",
+  "sync_vector": {
+    "node1": 147,
+    "node2": 151,
+    "node3": 149
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "sync_status": "synchronized|divergent|conflict",
+  "state_updates": [
+    {
+      "update_type": "client_migration",
+      "data": {
+        "client_id": "uuid", 
+        "from_node": "node2",
+        "to_node": "node1",
+        "reason": "load_balancing"
+      }
+    }
+  ],
+  "conflict_resolution": {
+    "conflicts_found": 2,
+    "resolution_strategy": "last_writer_wins",
+    "manual_intervention_required": false
+  },
+  "next_sync": "2024-01-15T10:35:00Z",
+  "sync_vector_updated": {
+    "node1": 148,
+    "node2": 151, 
+    "node3": 149,
+    "this_node": 150
+  }
+}
+```
+
+**Business Logic**:
+1. Use vector clocks for distributed state synchronization
+2. Apply CRDTs (Conflict-free Replicated Data Types) for automatic conflict resolution
+3. Detect network partitions and maintain availability during splits
+4. Implement eventual consistency with configurable consistency levels
+5. Migrate clients automatically during node failures or maintenance
+6. Maintain audit logs of all state changes with cryptographic integrity
+
+---
+
+## 🔄 LoRA Distribution Management
+
+### Cross-Node Replication
+
+#### `POST /api/v1/lora-distribution/replicate`
+**Purpose**: Replicate LoRA adaptations across federation nodes for availability
+
+**Request Body**:
+```json
+{
+  "lora_id": "advanced_coding_patterns_v5",
+  "user_id": "uuid",
+  "replication_factor": 3,
+  "preferred_zones": ["us-west-2", "us-east-1", "eu-west-1"],
+  "consistency_level": "strong|eventual|bounded",
+  "replication_strategy": {
+    "placement": "geographic_diversity",
+    "priority": "availability_over_latency",
+    "backup_schedule": "incremental_hourly"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "replication_job_id": "uuid",
+  "target_nodes": [
+    {
+      "node_id": "fed-us-west-2-3",
+      "zone": "us-west-2a",
+      "estimated_completion": "2024-01-15T10:35:00Z"
+    },
+    {
+      "node_id": "fed-us-east-1-7", 
+      "zone": "us-east-1b",
+      "estimated_completion": "2024-01-15T10:37:00Z"
+    }
+  ],
+  "replication_status": "initiated|in_progress|completed|failed",
+  "data_integrity": {
+    "checksum": "sha256:789abc...",
+    "encryption": "aes256_gcm",
+    "compression": "lz4_hc"
+  }
+}
+```
+
+**Business Logic**:
+1. Select optimal nodes based on geographic diversity and resource availability
+2. Use erasure coding for storage efficiency and fault tolerance
+3. Implement progressive replication with integrity verification at each step
+4. Monitor replication progress and handle network failures gracefully
+5. Maintain metadata about replica locations for efficient access routing
+6. Automatically repair corrupted or missing replicas
+
+---
+
+### Load Balancing & Migration
+
+#### `POST /api/v1/lora-distribution/migrate`
+**Purpose**: Migrate LoRA between nodes for load balancing and optimization
+
+**Request Body**:
+```json
+{
+  "migration_plan": {
+    "lora_id": "creative_writing_specialist_v4",
+    "source_node": "fed-us-west-2-1",
+    "target_node": "fed-us-west-2-3",
+    "migration_reason": "load_balancing",
+    "priority": "normal|high|urgent"
+  },
+  "migration_options": {
+    "maintain_availability": true,
+    "zero_downtime": true,
+    "rollback_on_failure": true,
+    "verification_level": "full|basic|skip"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "migration_job_id": "uuid",
+  "migration_phases": [
+    {
+      "phase": "pre_migration_checks",
+      "status": "completed",
+      "duration": "30s"
+    },
+    {
+      "phase": "data_copy",
+      "status": "in_progress",
+      "progress": "67%",
+      "eta": "2024-01-15T10:40:00Z"
+    },
+    {
+      "phase": "traffic_cutover",
+      "status": "pending",
+      "estimated_duration": "5s"
+    }
+  ],
+  "performance_impact": {
+    "source_node_load_reduction": "15%",
+    "target_node_load_increase": "8%",
+    "user_latency_change": "-12ms"
+  }
+}
+```
+
+**Business Logic**:
+1. Analyze current load patterns and predict optimal placement
+2. Use live migration techniques to maintain zero downtime
+3. Implement traffic redirection with gradual cutover
+4. Verify data integrity before completing migration
+5. Monitor performance metrics during and after migration
+6. Automatically rollback if migration degrades performance
+
+---
+
+## 🏢 Enterprise Federation Management
+
+### Corporate Provisioning
+
+#### `POST /api/v1/corporate/{org_id}/provision`
+**Purpose**: Provision dedicated federation resources for enterprise organizations
+
+**Request Body**:
+```json
+{
+  "organization_requirements": {
+    "user_capacity": 10000,
+    "compute_requirements": {
+      "cpu_cores": 5000,
+      "memory_tb": 50,
+      "gpu_nodes": 100,
+      "storage_tb": 500
+    },
+    "compliance_requirements": [
+      "SOC2_TYPE2",
+      "GDPR",
+      "HIPAA",
+      "FedRAMP_MODERATE"
+    ],
+    "isolation_level": "dedicated|shared|air_gapped",
+    "geographic_constraints": {
+      "allowed_regions": ["us-east-1", "us-west-2"],
+      "data_residency": "us_only"
+    }
+  },
+  "governance_model": {
+    "approval_workflows": [
+      {
+        "action": "new_user_registration",
+        "approvers": ["security_team", "manager"],
+        "timeout": "24h"
+      }
+    ],
+    "access_controls": {
+      "sso_provider": "okta",
+      "mfa_required": true,
+      "session_timeout": "8h"
+    }
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "corporate_federation_id": "uuid",
+  "provisioning_status": "in_progress|completed|failed",
+  "provisioned_resources": {
+    "dedicated_nodes": [
+      {
+        "node_id": "corp-us-east-1-1",
+        "capabilities": {
+          "cpu_cores": 128,
+          "memory_gb": 1024,
+          "gpu_count": 8
+        },
+        "compliance_certifications": ["SOC2", "GDPR"]
+      }
+    ],
+    "network_isolation": {
+      "vpc_id": "vpc-12345",
+      "private_subnets": ["10.0.1.0/24", "10.0.2.0/24"],
+      "vpn_endpoints": 2
+    }
+  },
+  "governance_endpoints": {
+    "admin_api": "https://corp-api.elias.brain/admin",
+    "audit_api": "https://corp-api.elias.brain/audit",
+    "compliance_dashboard": "https://corp.elias.brain/compliance"
+  },
+  "estimated_monthly_cost": 75000.00,
+  "billing_model": "reserved_capacity_with_overages"
+}
+```
+
+**Business Logic**:
+1. Validate compliance requirements against available certifications
+2. Provision isolated compute pools with dedicated hardware
+3. Set up network isolation with VPN connectivity to corporate networks
+4. Configure governance workflows with integration to corporate SSO
+5. Implement audit logging and compliance monitoring
+6. Provide cost optimization recommendations and usage analytics
+
+---
+
+## 🔍 Health Monitoring & Diagnostics
+
+### Federation Health Status
+
+#### `GET /api/v1/health/federation`
+**Purpose**: Get comprehensive health status of the federation network
+
+**Query Parameters**:
+- `include_details` (boolean): Include per-node detailed metrics
+- `time_range` (string): Historical data range (1h, 6h, 24h, 7d)
+
+**Response**:
+```json
+{
+  "overall_health": "healthy|degraded|critical",
+  "health_score": 0.94,
+  "last_updated": "2024-01-15T10:30:00Z",
+  "federation_metrics": {
+    "total_nodes": 47,
+    "healthy_nodes": 45,
+    "degraded_nodes": 2,
+    "offline_nodes": 0,
+    "average_uptime": "99.7%"
+  },
+  "network_connectivity": {
+    "average_latency": 15.2,
+    "packet_loss_rate": 0.001,
+    "bandwidth_utilization": 0.34,
+    "connection_quality": "excellent"
+  },
+  "performance_metrics": {
+    "average_throughput": 15420,
+    "p95_latency": 45,
+    "error_rate": 0.0001,
+    "successful_requests_24h": 2847592
+  },
+  "resource_utilization": {
+    "cpu_utilization": 0.67,
+    "memory_utilization": 0.54,
+    "storage_utilization": 0.78,
+    "gpu_utilization": 0.82
+  },
+  "alerts": [
+    {
+      "severity": "warning",
+      "message": "Node fed-eu-west-1-3 experiencing high memory usage",
+      "timestamp": "2024-01-15T10:25:00Z",
+      "auto_resolution": "scaling_additional_resources"
+    }
+  ]
+}
+```
+
+**Business Logic**:
+1. Aggregate health metrics from all federation nodes in real-time
+2. Calculate composite health scores using weighted metrics
+3. Detect anomalies and predict potential failures
+4. Provide actionable insights for performance optimization
+5. Generate automatic alerts for critical issues
+6. Maintain historical trends for capacity planning
+
+---
+
+## 🔒 Security & Access Control
+
+### Authentication Flow
+All federation API endpoints use a multi-layer authentication approach:
+
+```yaml
+Authentication Layers:
+  1. Device Attestation: TPM/Secure Element verification
+  2. mTLS Certificates: Node-to-node authentication
+  3. JWT Tokens: User session management
+  4. API Keys: Service-to-service communication
+  5. Biometric: Optional for high-security operations
+
+Token Rotation:
+  Access Tokens: 1 hour expiry
+  Refresh Tokens: 30 day expiry  
+  mTLS Certificates: 90 day rotation
+  API Keys: 1 year rotation with monitoring
+```
+
+### Authorization Policies
+
+```yaml
+Role-Based Access Control:
+  Client Roles:
+    - basic: Own data access only
+    - premium: Enhanced features + API access
+    - enterprise: Team management + admin features
+    
+  Node Roles:
+    - edge: Limited local operations
+    - regional: Full federation participation
+    - primary: Consensus leadership + coordination
+    
+  Federation Roles:
+    - participant: Vote on proposals
+    - coordinator: Initiate proposals
+    - administrator: Emergency operations
+```
+
+### Data Privacy Controls
+
+```yaml
+Privacy Levels:
+  public: 
+    - Federation health metrics
+    - Anonymous usage statistics
+    
+  internal:
+    - Performance metrics
+    - Error logs (sanitized)
+    - Resource utilization
+    
+  confidential:
+    - User LoRA weights  
+    - Personal usage patterns
+    - Communication content
+    
+  restricted:
+    - Authentication credentials
+    - Encryption keys
+    - Node private data
+
+Encryption Standards:
+  In Transit: TLS 1.3 + ChaCha20-Poly1305
+  At Rest: AES-256-GCM + Key rotation
+  Federation Sync: End-to-end encryption
+  Consensus Messages: Cryptographic signatures
+```
+
+---
+
+## 📊 Performance & Scaling
+
+### Load Balancing Strategies
+
+```yaml
+Client Assignment:
+  Primary: Latency-based (RTT < 20ms)
+  Secondary: Resource availability
+  Tertiary: Geographic diversity
+  
+Load Balancing Algorithms:
+  Weighted Round Robin: For similar node capabilities
+  Least Connections: For varying workload patterns  
+  Consistent Hashing: For LoRA placement stability
+  
+Auto-Scaling Triggers:
+  Scale Up: CPU > 80% for 5 minutes
+  Scale Down: CPU < 30% for 30 minutes
+  Emergency: Error rate > 1% for 1 minute
+```
+
+### Performance Optimization
+
+```yaml
+Caching Strategy:
+  L1 (Node Local): 10GB SSD cache
+  L2 (Regional): 100GB distributed cache
+  L3 (Federation): 1TB cold storage
+  
+Connection Pooling:
+  Client-to-Node: 100 persistent connections
+  Node-to-Node: 50 persistent connections
+  Database: 20 connection pool per service
+  
+Request Optimization:
+  Batching: Group requests by user/domain
+  Compression: LZ4 for real-time, ZSTD for storage
+  Pipelining: HTTP/2 multiplexing for efficiency
+```
+
+This Tiki specification provides comprehensive human-readable documentation for every Federation API endpoint, ensuring developers understand the distributed coordination, consensus mechanisms, and enterprise-grade features that power the ELIAS federation network.

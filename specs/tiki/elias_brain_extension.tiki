@@ -1,0 +1,691 @@
+# ELIAS Brain Extension - Tiki API Specifications
+
+## Overview
+Tiki format specifications for all ELIAS Brain Extension APIs. These provide human-readable documentation alongside machine-readable OpenAPI specs.
+
+---
+
+## 🧠 Core Brain Extension API
+
+### User Interaction Endpoints
+
+#### `POST /api/v1/users/{user_id}/input`
+**Purpose**: Process user input (voice, text, multimodal) and return personalized response
+
+**Authentication**: JWT Bearer token + User ownership validation
+
+**Path Parameters**:
+- `user_id` (UUID, required): Unique user identifier
+
+**Request Body**:
+```json
+{
+  "input_type": "text|voice|multimodal",
+  "content": "User's input content",
+  "context": {
+    "previous_conversation": "Optional conversation context",
+    "user_preferences": {}
+  },
+  "options": {
+    "response_speed": "fast|balanced|thorough",
+    "creativity_level": 0.8
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "response": "Personalized AI response",
+  "response_time_ms": 45,
+  "confidence": 0.92,
+  "personalization_applied": true,
+  "reasoning_chains": [
+    {
+      "chain_id": "reasoning_1",
+      "steps": ["analyze", "synthesize", "personalize"],
+      "confidence": 0.89
+    }
+  ]
+}
+```
+
+**Business Logic**:
+1. Route to user's personalized daemon (local if available)
+2. Apply micro-LoRA forest for personalization
+3. Use amortized inference for diverse reasoning chains
+4. Bayesian model averaging for final response
+5. Ensure <100ms response time via local execution
+
+**Error Handling**:
+- `400`: Invalid input format or missing required fields
+- `404`: User not found or daemon not deployed
+- `429`: Rate limit exceeded (1000 req/min per user)
+- `500`: Internal processing error with daemon fallback
+
+---
+
+#### `POST /api/v1/users/{user_id}/creative/generate`
+**Purpose**: Generate diverse creative content using amortized inference
+
+**Request Body**:
+```json
+{
+  "domain": "creative|business|technical|general",
+  "prompt": "Creative generation prompt",
+  "options": {
+    "num_variants": 5,
+    "creativity": "high",
+    "style": "user_preferred"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "diverse_outputs": [
+    {
+      "variant_id": "1",
+      "content": "Creative output variant 1",
+      "creativity_score": 0.87,
+      "novelty_score": 0.73,
+      "user_style_match": 0.91
+    }
+  ],
+  "generation_metadata": {
+    "method": "amortized_bayesian_gflownet",
+    "reasoning_chains_used": 10,
+    "diversity_achieved": 0.82
+  }
+}
+```
+
+**Business Logic**:
+1. Use GFlowNet (JAX-compiled) for diverse creative sampling
+2. Apply user's creative domain micro-LoRAs
+3. Amortized inference for multiple reasoning paths
+4. Prevent mode collapse through proportional sampling
+5. Bayesian averaging for robust final outputs
+
+---
+
+### Micro-LoRA Forest Management
+
+#### `GET /api/v1/users/{user_id}/lora-forest`
+**Purpose**: Get comprehensive status of user's micro-LoRA forest
+
+**Response**:
+```json
+{
+  "user_id": "uuid",
+  "total_loras": 1247,
+  "active_loras": 1180,
+  "domains": ["creative", "business", "technical", "personal"],
+  "forest_health": {
+    "overall_score": 0.91,
+    "memory_usage": "342MB",
+    "inference_speed": "38ms avg"
+  },
+  "last_updated": "2024-01-15T10:30:00Z"
+}
+```
+
+**Business Logic**:
+1. Aggregate status across all user LoRAs
+2. Calculate health metrics (effectiveness, resource usage)
+3. Check federation replication status
+4. Return performance indicators
+
+---
+
+#### `POST /api/v1/users/{user_id}/lora-forest/train`
+**Purpose**: Train thousands of micro-LoRAs concurrently using mLoRA pipeline
+
+**Request Body**:
+```json
+{
+  "training_data": {
+    "user_interactions": [],
+    "domain_samples": {},
+    "incremental": true
+  },
+  "domains": ["creative", "business", "technical"],
+  "training_config": {
+    "concurrent_loras": 1000,
+    "training_epochs": 50,
+    "prevent_forgetting": true
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "training_job_id": "uuid",
+  "estimated_completion": "2024-01-15T12:30:00Z",
+  "concurrent_loras": 1000,
+  "training_method": "concurrent_mlora_pytorch"
+}
+```
+
+**Business Logic**:
+1. Use PyTorch PEFT library for concurrent LoRA training
+2. Apply mLoRA architecture for zero-interference training
+3. Distribute across GPU cluster with FSDP
+4. Use μTransfer for optimal hyperparameters
+5. Stream training progress via Kafka
+
+---
+
+### Daemon Generation & Deployment
+
+#### `POST /api/v1/users/{user_id}/daemon/generate`
+**Purpose**: Generate personalized daemon code from micro-LoRA forest
+
+**Request Body**:
+```json
+{
+  "generation_options": {
+    "platform": "javascript|python|elixir",
+    "domains": ["creative", "business"],
+    "optimization_level": "production"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "daemon_code": "// Generated personalized daemon...",
+  "metadata": {
+    "generation_method": "amortized_bayesian_gflownet",
+    "inference_speed": "<100ms guaranteed",
+    "memory_footprint": "15MB optimized",
+    "personalization_strength": 0.94
+  }
+}
+```
+
+**Business Logic**:
+1. Sample coding patterns using amortized inference (PyTorch)
+2. Synthesize patterns via Bayesian model averaging
+3. Generate code using GFlowNet creative sampling (JAX)
+4. Optimize for target platform and deployment constraints
+5. Validate code safety and performance requirements
+
+---
+
+#### `POST /api/v1/users/{user_id}/daemon/deploy`
+**Purpose**: Deploy daemon to user devices with hot-swappable updates
+
+**Request Body**:
+```json
+{
+  "daemon_code": "Generated daemon code",
+  "target_devices": ["mobile", "desktop", "server"]
+}
+```
+
+**Response**:
+```json
+{
+  "deployment_id": "uuid",
+  "deployment_status": {
+    "mobile": "deploying",
+    "desktop": "completed",
+    "server": "queued"
+  },
+  "hot_swap_enabled": true
+}
+```
+
+**Business Logic**:
+1. Package daemon for each target platform
+2. Deploy via secure channels with integrity checks
+3. Enable hot-swappable updates without service interruption
+4. Monitor deployment status across devices
+5. Provide rollback capabilities
+
+---
+
+## 🌐 Federation Nodes API
+
+### Client-Federation Communication
+
+#### `POST /api/v1/federation/clients/{client_id}/register`
+**Purpose**: Register client daemon with federation network
+
+**Request Body**:
+```json
+{
+  "client_info": {
+    "user_id": "uuid",
+    "device_type": "mobile|desktop|server|edge",
+    "location": {
+      "region": "us-west-2",
+      "availability_zone": "us-west-2a"
+    }
+  },
+  "capabilities": {
+    "compute_capacity": {
+      "cpu_cores": 8,
+      "memory_gb": 16,
+      "gpu_available": true
+    },
+    "network_bandwidth": "1Gbps",
+    "storage_capacity": "512GB"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "client_id": "uuid",
+  "federation_node_assigned": "fed-us-west-2-primary",
+  "security_tokens": {
+    "access_token": "jwt_token",
+    "refresh_token": "refresh_token",
+    "certificate": "x509_cert"
+  },
+  "configuration": {
+    "heartbeat_interval": 30,
+    "sync_frequency": 300,
+    "resource_allocation": {}
+  }
+}
+```
+
+**Business Logic**:
+1. Validate client capabilities and authentication
+2. Assign optimal federation node based on location/load
+3. Generate security credentials and certificates
+4. Configure heartbeat and sync parameters
+5. Initialize client in federation registry
+
+---
+
+#### `POST /api/v1/federation/clients/{client_id}/heartbeat`
+**Purpose**: Periodic heartbeat to maintain federation connection
+
+**Request Body**:
+```json
+{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "performance_metrics": {
+    "cpu_usage": 0.45,
+    "memory_usage": 0.67,
+    "inference_latency": 42,
+    "throughput": 150
+  },
+  "lora_forest_status": {
+    "active_loras": 1180,
+    "forest_health_score": 0.91,
+    "last_update": "2024-01-15T09:30:00Z"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "status": "healthy",
+  "instructions": [
+    {
+      "action": "optimize_memory",
+      "parameters": {"target_usage": 0.60}
+    }
+  ],
+  "resource_allocations": {},
+  "next_heartbeat": 30
+}
+```
+
+**Business Logic**:
+1. Update client health status in federation
+2. Analyze performance metrics for optimization
+3. Provide operational instructions
+4. Adjust resource allocations based on load
+5. Detect and handle client failures
+
+---
+
+### Node-to-Node Coordination
+
+#### `POST /api/v1/nodes/{node_id}/consensus`
+**Purpose**: Participate in distributed consensus for federation decisions
+
+**Request Body**:
+```json
+{
+  "proposal_id": "uuid",
+  "vote": "approve|reject|abstain",
+  "reasoning": "Performance optimization proposal looks sound",
+  "stake_weight": 0.15,
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+**Response**:
+```json
+{
+  "vote_recorded": true,
+  "current_tally": {
+    "approve_votes": 12,
+    "reject_votes": 3,
+    "abstain_votes": 1,
+    "total_stake": 0.78
+  },
+  "consensus_reached": true,
+  "final_decision": "approved"
+}
+```
+
+**Business Logic**:
+1. Record vote with stake weighting
+2. Update consensus tally in real-time
+3. Check for consensus threshold (67% stake)
+4. Execute approved decisions automatically
+5. Handle consensus failures and retries
+
+---
+
+## 🔬 Individual LoRA Management API
+
+### LoRA Lifecycle Management
+
+#### `POST /api/v1/users/{user_id}/loras`
+**Purpose**: Create new LoRA adaptation with GFlowNet architecture discovery
+
+**Request Body**:
+```json
+{
+  "domain": "creative",
+  "specialization": "creative_writing",
+  "training_data": {
+    "samples": [],
+    "sample_count": 150
+  },
+  "architecture_preferences": {
+    "optimization_objective": "creativity"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "lora_id": "lora_creative_writing_1234",
+  "architecture": {
+    "rank": 8,
+    "layers": 6,
+    "attention_heads": 12,
+    "target_layers": ["attention", "mlp"]
+  },
+  "training_job_id": "uuid",
+  "estimated_training_time": "45 minutes"
+}
+```
+
+**Business Logic**:
+1. Use GFlowNet (JAX) to discover optimal architecture
+2. Apply μTransfer for hyperparameter scaling
+3. Initialize LoRA with PEFT library (PyTorch)
+4. Queue for concurrent training in mLoRA pipeline
+5. Return architecture and training estimates
+
+---
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/inference`
+**Purpose**: Run inference with specific LoRA adaptation
+
+**Request Body**:
+```json
+{
+  "input": {
+    "text": "Write a creative story about AI",
+    "context": {}
+  },
+  "inference_config": {
+    "temperature": 0.8,
+    "max_tokens": 200
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "output": {
+    "generated_text": "Once upon a time, in a world where...",
+    "metadata": {}
+  },
+  "inference_time_ms": 38,
+  "confidence_score": 0.89,
+  "lora_contribution": {
+    "adaptation_strength": 0.73,
+    "specialization_match": 0.91
+  }
+}
+```
+
+**Business Logic**:
+1. Load specific LoRA weights for inference
+2. Apply adaptation to base model
+3. Run inference with PyTorch/TorchServe
+4. Measure LoRA's contribution to output
+5. Return results with performance metrics
+
+---
+
+### LoRA Optimization & Scaling
+
+#### `POST /api/v1/users/{user_id}/loras/{lora_id}/scale`
+**Purpose**: Scale LoRA using μTransfer principles
+
+**Request Body**:
+```json
+{
+  "target_size": 2048,
+  "scaling_strategy": "mu_transfer",
+  "preserve_performance": true
+}
+```
+
+**Response**:
+```json
+{
+  "scaling_job_id": "uuid",
+  "scaling_factor": 4.0,
+  "mu_transfer_applied": true,
+  "hyperparameter_changes": {
+    "learning_rate": 0.0001,
+    "attention_scale": 0.0005
+  },
+  "expected_performance_change": "maintained or improved"
+}
+```
+
+**Business Logic**:
+1. Apply μTransfer scaling laws for hyperparameters
+2. Validate coordinate check for stability
+3. Scale LoRA architecture predictably
+4. Maintain or improve performance guarantees
+5. Update federation replicas with scaled version
+
+---
+
+### LoRA Analytics & Monitoring
+
+#### `GET /api/v1/users/{user_id}/loras/{lora_id}/analytics`
+**Purpose**: Get comprehensive usage analytics for LoRA
+
+**Query Parameters**:
+- `analytics_type`: `usage|performance|effectiveness|patterns`
+- `time_range`: `1h|6h|24h|7d|30d`
+
+**Response**:
+```json
+{
+  "lora_id": "lora_creative_writing_1234",
+  "analytics_type": "effectiveness",
+  "usage_statistics": {
+    "total_inferences": 2847,
+    "unique_sessions": 134,
+    "peak_usage_time": "14:00-16:00 UTC",
+    "usage_trends": []
+  },
+  "effectiveness_trends": {
+    "user_satisfaction": 0.91,
+    "task_success_rate": 0.87,
+    "improvement_over_time": "+12% this week"
+  },
+  "optimization_opportunities": [
+    {
+      "opportunity_type": "rank_optimization",
+      "potential_improvement": "15% memory reduction",
+      "implementation_effort": "low"
+    }
+  ]
+}
+```
+
+**Business Logic**:
+1. Aggregate usage metrics from all inference calls
+2. Calculate effectiveness scores based on user feedback
+3. Identify trends and patterns in LoRA usage
+4. Generate optimization recommendations
+5. Compare performance against similar LoRAs
+
+---
+
+## 🔧 Inter-Service Communication Protocols
+
+### Service-to-Service Authentication
+All internal service communications use mutual TLS (mTLS) with service certificates:
+
+```yaml
+Authentication Flow:
+  1. Service A requests access to Service B
+  2. mTLS handshake with certificate validation
+  3. JWT token exchange for API authorization
+  4. Rate limiting applied per service identity
+  5. Request processed with service context
+```
+
+### Message Queue Patterns
+
+#### Training Job Queue (Kafka)
+```yaml
+Topic: mlora.training.jobs
+Partitioning: By user_id for ordering
+Message Format:
+  key: user_id
+  value: TrainingJobMessage (Protobuf)
+  headers:
+    - correlation_id
+    - priority_level
+    - retry_count
+```
+
+#### Real-time Updates (WebSocket)
+```yaml
+Connection: WSS with JWT authentication
+Message Types:
+  - training_progress: LoRA training updates
+  - inference_result: Real-time inference responses  
+  - system_alert: Health and performance alerts
+  - daemon_update: New daemon deployments
+```
+
+### Error Handling Standards
+
+#### Circuit Breaker Configuration
+```yaml
+Default Settings:
+  failure_threshold: 5
+  timeout_duration: 30s
+  recovery_timeout: 60s
+  
+Service-Specific Overrides:
+  gflownet_service:
+    failure_threshold: 3  # Mathematical operations fail fast
+    timeout_duration: 300s  # Architecture discovery takes time
+  
+  lora_training:
+    failure_threshold: 10  # Training can have temporary failures
+    timeout_duration: 3600s  # Training takes long time
+```
+
+#### Retry Policies
+```yaml
+Exponential Backoff:
+  initial_delay: 100ms
+  max_delay: 30s
+  max_attempts: 3
+  jitter: 25%
+
+Retry Conditions:
+  - Network timeouts
+  - HTTP 5xx errors  
+  - gRPC UNAVAILABLE/DEADLINE_EXCEEDED
+  - Kafka broker unavailable
+
+Non-Retry Conditions:
+  - Authentication failures (4xx)
+  - Data validation errors
+  - Resource quota exceeded
+  - Malformed requests
+```
+
+---
+
+## 🛡️ Security & Compliance
+
+### API Security Headers
+All API endpoints include standardized security headers:
+
+```yaml
+Required Headers:
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Content-Security-Policy: default-src 'self'
+  X-API-Version: v1
+  X-Request-ID: <uuid>
+```
+
+### Rate Limiting Tiers
+```yaml
+User Tiers:
+  free: 100 req/min, 1000 req/day
+  premium: 1000 req/min, 100000 req/day
+  enterprise: 10000 req/min, unlimited daily
+
+Service-to-Service:
+  internal: 10000 req/min per service
+  federation: 1000 req/min per node
+  
+Special Endpoints:
+  training: 10 req/min (resource intensive)
+  daemon_generation: 5 req/hour per user
+```
+
+### Data Privacy Controls
+```yaml
+User Data Classification:
+  public: Usage statistics (anonymized)
+  internal: Performance metrics, system logs
+  confidential: User content, LoRA weights
+  restricted: Authentication credentials, keys
+
+Retention Policies:
+  logs: 30 days
+  metrics: 90 days  
+  user_content: user-controlled
+  training_data: user-controlled with right to deletion
+```
+
+This Tiki specification provides human-readable documentation that complements the OpenAPI machine-readable specs, ensuring developers understand both the technical implementation and business logic behind every API endpoint.

@@ -1,0 +1,1019 @@
+openapi: 3.0.3
+info:
+  title: Amortized Inference API
+  description: |
+    Amortized Inference API for efficient posterior sampling and inference through learned
+    representations. Enables tractable probabilistic reasoning over complex latent spaces
+    using neural networks to approximate intractable posterior distributions.
+    
+    Supports X → Z → Y modeling where X is input, Z is latent space, and Y is output,
+    with efficient amortized sampling that scales to thousands of concurrent inferences.
+  version: "1.0.0"
+  contact:
+    name: ELIAS Amortized Inference Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://inference.elias.brain
+    description: Production Amortized Inference API
+  - url: https://staging-inference.elias.brain
+    description: Staging environment
+  - url: http://localhost:4004
+    description: Local development server
+
+tags:
+  - name: posterior-sampling
+    description: Efficient posterior distribution sampling operations
+  - name: latent-modeling
+    description: Latent space modeling and representation learning
+  - name: inference-networks
+    description: Inference network training and optimization
+  - name: variational-methods
+    description: Variational inference and approximation methods
+  - name: amortization
+    description: Amortized computation and efficiency optimization
+
+paths:
+  # ============================================================================
+  # POSTERIOR SAMPLING ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/inference/posterior/sample:
+    post:
+      tags: [posterior-sampling]
+      summary: Sample from learned posterior distribution
+      description: |
+        Generate samples from learned posterior distribution P(Z|X) using
+        amortized inference networks. Enables efficient sampling without
+        expensive MCMC or variational optimization for each query.
+      operationId: samplePosterior
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PosteriorSamplingRequest'
+      responses:
+        '200':
+          description: Posterior sampling completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosteriorSamplingResponse'
+        '400':
+          description: Invalid sampling parameters
+        '422':
+          description: Inference model validation failed
+
+  /api/v1/inference/posterior/evaluate:
+    post:
+      tags: [posterior-sampling]
+      summary: Evaluate posterior distribution properties
+      description: |
+        Evaluate properties of learned posterior distribution including
+        entropy, mutual information, and distribution moments for analysis
+        and validation of amortized inference quality.
+      operationId: evaluatePosterior
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PosteriorEvaluationRequest'
+      responses:
+        '200':
+          description: Posterior evaluation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosteriorEvaluationResponse'
+
+  /api/v1/inference/posterior/conditional:
+    post:
+      tags: [posterior-sampling]
+      summary: Generate conditional posterior samples
+      description: |
+        Sample from conditional posterior P(Z|X,Y) for guided generation
+        and constrained inference scenarios. Supports partial observations
+        and conditional constraints.
+      operationId: sampleConditionalPosterior
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConditionalSamplingRequest'
+      responses:
+        '200':
+          description: Conditional sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionalSamplingResponse'
+
+  # ============================================================================
+  # LATENT MODELING ENDPOINTS
+  # ============================================================================
+
+  /api/v1/inference/latent/encode:
+    post:
+      tags: [latent-modeling]
+      summary: Encode observations to latent space
+      description: |
+        Encode input observations X into latent representation Z using
+        learned inference network q(Z|X). Provides efficient approximate
+        posterior inference without optimization.
+      operationId: encodeToLatent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LatentEncodingRequest'
+      responses:
+        '200':
+          description: Latent encoding completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LatentEncodingResponse'
+
+  /api/v1/inference/latent/decode:
+    post:
+      tags: [latent-modeling]
+      summary: Decode latent representations to observations
+      description: |
+        Decode latent representations Z to observation space Y using
+        generative model p(Y|Z). Enables generation and reconstruction
+        from learned latent space.
+      operationId: decodeFromLatent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LatentDecodingRequest'
+      responses:
+        '200':
+          description: Latent decoding completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LatentDecodingResponse'
+
+  /api/v1/inference/latent/interpolate:
+    post:
+      tags: [latent-modeling]
+      summary: Interpolate in latent space
+      description: |
+        Perform smooth interpolation between latent representations
+        for controlled generation and analysis of latent space structure.
+        Supports linear and spherical interpolation methods.
+      operationId: interpolateLatent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LatentInterpolationRequest'
+      responses:
+        '200':
+          description: Latent interpolation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LatentInterpolationResponse'
+
+  # ============================================================================
+  # INFERENCE NETWORK ENDPOINTS
+  # ============================================================================
+
+  /api/v1/inference/networks/train:
+    post:
+      tags: [inference-networks]
+      summary: Train amortized inference networks
+      description: |
+        Train inference networks q(Z|X) and generative networks p(Y|Z) using
+        variational objectives. Optimizes for efficient approximate posterior
+        inference across diverse inputs.
+      operationId: trainInferenceNetworks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InferenceTrainingRequest'
+      responses:
+        '202':
+          description: Inference network training initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceTrainingResponse'
+
+  /api/v1/inference/networks/status/{training_id}:
+    get:
+      tags: [inference-networks]
+      summary: Get inference network training status
+      description: Monitor training progress and convergence metrics
+      operationId: getTrainingStatus
+      parameters:
+        - name: training_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Training job identifier
+      responses:
+        '200':
+          description: Training status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceTrainingStatus'
+
+  /api/v1/inference/networks/optimize:
+    post:
+      tags: [inference-networks]
+      summary: Optimize inference network architecture
+      description: |
+        Optimize inference network architecture for specific domains and
+        performance requirements. Balances approximation quality with
+        computational efficiency.
+      operationId: optimizeInferenceNetwork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetworkOptimizationRequest'
+      responses:
+        '200':
+          description: Network optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkOptimizationResponse'
+
+  # ============================================================================
+  # VARIATIONAL METHODS ENDPOINTS
+  # ============================================================================
+
+  /api/v1/inference/variational/elbo:
+    post:
+      tags: [variational-methods]
+      summary: Compute Evidence Lower BOund (ELBO)
+      description: |
+        Compute ELBO for variational inference validation and optimization.
+        Provides decomposition into reconstruction and KL divergence terms
+        for detailed analysis of inference quality.
+      operationId: computeELBO
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ELBOComputationRequest'
+      responses:
+        '200':
+          description: ELBO computation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ELBOComputationResponse'
+
+  /api/v1/inference/variational/importance-sampling:
+    post:
+      tags: [variational-methods]
+      summary: Importance weighted sampling
+      description: |
+        Perform importance weighted sampling for improved posterior
+        approximation quality. Uses multiple samples and importance
+        weights to reduce variance and improve estimates.
+      operationId: importanceWeightedSampling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportanceSamplingRequest'
+      responses:
+        '200':
+          description: Importance sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportanceSamplingResponse'
+
+  /api/v1/inference/variational/flow:
+    post:
+      tags: [variational-methods]
+      summary: Normalizing flow inference
+      description: |
+        Apply normalizing flows to improve posterior approximation
+        flexibility. Transforms simple base distributions into complex
+        posterior approximations through invertible transformations.
+      operationId: normalizingFlowInference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NormalizingFlowRequest'
+      responses:
+        '200':
+          description: Normalizing flow inference completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NormalizingFlowResponse'
+
+  # ============================================================================
+  # AMORTIZATION OPTIMIZATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/inference/amortization/analyze:
+    post:
+      tags: [amortization]
+      summary: Analyze amortization efficiency
+      description: |
+        Analyze computational efficiency gains from amortized inference
+        compared to per-query optimization methods. Provides cost-benefit
+        analysis and optimization recommendations.
+      operationId: analyzeAmortization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmortizationAnalysisRequest'
+      responses:
+        '200':
+          description: Amortization analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmortizationAnalysisResponse'
+
+  /api/v1/inference/amortization/optimize:
+    post:
+      tags: [amortization]
+      summary: Optimize amortization strategy
+      description: |
+        Optimize amortization strategy for specific query distributions
+        and computational constraints. Balances precomputation costs
+        with query-time efficiency.
+      operationId: optimizeAmortization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmortizationOptimizationRequest'
+      responses:
+        '200':
+          description: Amortization optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmortizationOptimizationResponse'
+
+  # ============================================================================
+  # DOMAIN-SPECIFIC ENDPOINTS
+  # ============================================================================
+
+  /api/v1/inference/creative/generate:
+    post:
+      tags: [posterior-sampling]
+      summary: Creative content generation with amortized inference
+      description: |
+        Generate creative content using amortized inference over learned
+        creative style spaces. Enables efficient personalized content
+        generation without per-user optimization.
+      operationId: generateCreativeContent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreativeGenerationRequest'
+      responses:
+        '200':
+          description: Creative content generation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreativeGenerationResponse'
+
+  /api/v1/inference/reasoning/sample:
+    post:
+      tags: [posterior-sampling]
+      summary: Sample reasoning trajectories
+      description: |
+        Sample diverse reasoning trajectories using amortized inference
+        over reasoning pattern spaces. Enables efficient exploration
+        of solution spaces for complex problems.
+      operationId: sampleReasoningTrajectories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasoningTrajectoryRequest'
+      responses:
+        '200':
+          description: Reasoning trajectory sampling completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReasoningTrajectoryResponse'
+
+components:
+  schemas:
+    # Posterior Sampling Schemas
+    PosteriorSamplingRequest:
+      type: object
+      required: [input_data, inference_config]
+      properties:
+        input_data:
+          type: object
+          description: Input observations X for posterior inference
+          properties:
+            observations:
+              type: array
+              items:
+                type: object
+            input_format:
+              type: string
+              enum: [tensor, text, structured, multimodal]
+            preprocessing_config:
+              type: object
+        inference_config:
+          type: object
+          properties:
+            num_samples:
+              type: integer
+              minimum: 1
+              maximum: 1000
+              default: 10
+              description: Number of posterior samples to generate
+            sampling_method:
+              type: string
+              enum: [standard, importance_weighted, flow_based]
+              default: standard
+            temperature:
+              type: number
+              minimum: 0.1
+              maximum: 2.0
+              default: 1.0
+              description: Sampling temperature for diversity control
+            latent_dimensions:
+              type: integer
+              minimum: 1
+              maximum: 1024
+              description: Dimensionality of latent space Z
+        model_config:
+          type: object
+          properties:
+            inference_network_id:
+              type: string
+              description: Pre-trained inference network identifier
+            generative_network_id:
+              type: string
+              description: Pre-trained generative network identifier
+            domain_adaptation:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  enum: [creative, analytical, multimodal, general]
+                adaptation_strength:
+                  type: number
+                  default: 0.5
+
+    PosteriorSamplingResponse:
+      type: object
+      properties:
+        sampling_id:
+          type: string
+          format: uuid
+        posterior_samples:
+          type: array
+          items:
+            type: object
+            properties:
+              sample_id:
+                type: string
+              latent_representation:
+                type: object
+                description: Latent code Z
+              generated_output:
+                type: object
+                description: Generated observation Y
+              log_probability:
+                type: number
+                description: Log probability of sample
+              sample_quality:
+                type: object
+                properties:
+                  reconstruction_error:
+                    type: number
+                  kl_divergence:
+                    type: number
+                  perplexity:
+                    type: number
+        sampling_statistics:
+          type: object
+          properties:
+            effective_sample_size:
+              type: number
+            sample_diversity:
+              type: number
+              description: Diversity metric for generated samples
+            computational_cost:
+              type: object
+              properties:
+                inference_time_ms:
+                  type: number
+                memory_usage_mb:
+                  type: number
+                flops_estimate:
+                  type: integer
+        amortization_benefits:
+          type: object
+          properties:
+            speedup_vs_mcmc:
+              type: string
+              example: "150x faster"
+            cost_reduction:
+              type: string
+              example: "99.3% cost reduction"
+        sampled_at:
+          type: string
+          format: date-time
+
+    # Latent Modeling Schemas
+    LatentEncodingRequest:
+      type: object
+      required: [input_data, encoding_config]
+      properties:
+        input_data:
+          type: object
+          description: Input observations to encode
+        encoding_config:
+          type: object
+          properties:
+            latent_dimensions:
+              type: integer
+              default: 256
+            encoding_method:
+              type: string
+              enum: [variational, deterministic, stochastic]
+              default: variational
+            uncertainty_estimation:
+              type: boolean
+              default: true
+              description: Whether to estimate encoding uncertainty
+
+    LatentEncodingResponse:
+      type: object
+      properties:
+        encoding_id:
+          type: string
+          format: uuid
+        latent_representations:
+          type: array
+          items:
+            type: object
+            properties:
+              mean:
+                type: array
+                items:
+                  type: number
+              variance:
+                type: array
+                items:
+                  type: number
+              sample:
+                type: array
+                items:
+                  type: number
+        encoding_quality:
+          type: object
+          properties:
+            reconstruction_fidelity:
+              type: number
+            encoding_uncertainty:
+              type: number
+            information_content:
+              type: number
+        encoded_at:
+          type: string
+          format: date-time
+
+    # Inference Network Training Schemas
+    InferenceTrainingRequest:
+      type: object
+      required: [training_data, network_architecture, training_config]
+      properties:
+        training_data:
+          type: object
+          properties:
+            dataset:
+              type: array
+              items:
+                type: object
+                properties:
+                  input:
+                    type: object
+                  target:
+                    type: object
+                  metadata:
+                    type: object
+            validation_split:
+              type: number
+              default: 0.2
+        network_architecture:
+          type: object
+          properties:
+            inference_network:
+              type: object
+              properties:
+                encoder_layers:
+                  type: array
+                  items:
+                    type: integer
+                latent_dimensions:
+                  type: integer
+                activation_function:
+                  type: string
+                  enum: [relu, gelu, swish, tanh]
+            generative_network:
+              type: object
+              properties:
+                decoder_layers:
+                  type: array
+                  items:
+                    type: integer
+                output_distribution:
+                  type: string
+                  enum: [gaussian, bernoulli, categorical, mixture]
+        training_config:
+          type: object
+          properties:
+            optimizer:
+              type: string
+              enum: [adam, adamw, sgd, rmsprop]
+              default: adam
+            learning_rate:
+              type: number
+              default: 0.001
+            batch_size:
+              type: integer
+              default: 32
+            num_epochs:
+              type: integer
+              default: 100
+            variational_beta:
+              type: number
+              default: 1.0
+              description: Weight for KL divergence term
+            early_stopping:
+              type: object
+              properties:
+                patience:
+                  type: integer
+                  default: 10
+                min_improvement:
+                  type: number
+                  default: 0.001
+
+    InferenceTrainingResponse:
+      type: object
+      properties:
+        training_id:
+          type: string
+          format: uuid
+        training_status:
+          type: string
+          enum: [queued, running, completed, failed]
+        estimated_completion:
+          type: string
+          format: date-time
+        model_checkpoints:
+          type: object
+          properties:
+            inference_network_path:
+              type: string
+            generative_network_path:
+              type: string
+        progress_tracking:
+          type: object
+          properties:
+            monitoring_url:
+              type: string
+              format: uri
+            metrics_dashboard:
+              type: string
+              format: uri
+        resource_allocation:
+          type: object
+          properties:
+            gpu_type:
+              type: string
+            memory_allocated:
+              type: string
+            estimated_cost:
+              type: string
+        started_at:
+          type: string
+          format: date-time
+
+    # Variational Methods Schemas
+    ELBOComputationRequest:
+      type: object
+      required: [input_data, model_config]
+      properties:
+        input_data:
+          type: object
+          description: Input observations for ELBO computation
+        model_config:
+          type: object
+          properties:
+            inference_network_id:
+              type: string
+            generative_network_id:
+              type: string
+            num_monte_carlo_samples:
+              type: integer
+              default: 10
+              description: Number of Monte Carlo samples for ELBO estimation
+        computation_config:
+          type: object
+          properties:
+            decompose_terms:
+              type: boolean
+              default: true
+              description: Whether to return decomposed ELBO terms
+            compute_gradients:
+              type: boolean
+              default: false
+              description: Whether to compute ELBO gradients
+
+    ELBOComputationResponse:
+      type: object
+      properties:
+        computation_id:
+          type: string
+          format: uuid
+        elbo_value:
+          type: number
+          description: Evidence Lower BOund value
+        elbo_decomposition:
+          type: object
+          properties:
+            reconstruction_term:
+              type: number
+            kl_divergence_term:
+              type: number
+            total_elbo:
+              type: number
+        per_sample_metrics:
+          type: array
+          items:
+            type: object
+            properties:
+              sample_id:
+                type: string
+              reconstruction_loss:
+                type: number
+              kl_divergence:
+                type: number
+              log_likelihood:
+                type: number
+        statistical_analysis:
+          type: object
+          properties:
+            elbo_variance:
+              type: number
+            confidence_interval:
+              type: object
+              properties:
+                lower_bound:
+                  type: number
+                upper_bound:
+                  type: number
+        computed_at:
+          type: string
+          format: date-time
+
+    # Amortization Analysis Schemas
+    AmortizationAnalysisRequest:
+      type: object
+      required: [query_distribution, computational_constraints]
+      properties:
+        query_distribution:
+          type: object
+          properties:
+            query_types:
+              type: array
+              items:
+                type: string
+            frequency_distribution:
+              type: object
+            complexity_analysis:
+              type: object
+        computational_constraints:
+          type: object
+          properties:
+            max_inference_latency_ms:
+              type: integer
+            memory_budget_mb:
+              type: integer
+            cost_budget:
+              type: number
+            throughput_requirements:
+              type: integer
+              description: Queries per second
+        baseline_methods:
+          type: array
+          items:
+            type: string
+            enum: [mcmc, variational_optimization, exact_inference, grid_search]
+          description: Methods to compare against
+
+    AmortizationAnalysisResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+          format: uuid
+        efficiency_metrics:
+          type: object
+          properties:
+            speedup_factor:
+              type: number
+              description: Speed improvement over baseline methods
+            cost_reduction:
+              type: number
+              description: Cost reduction percentage
+            memory_efficiency:
+              type: number
+              description: Memory usage reduction
+            throughput_improvement:
+              type: number
+              description: Throughput increase factor
+        amortization_benefits:
+          type: object
+          properties:
+            precomputation_cost:
+              type: number
+              description: One-time cost to train inference networks
+            per_query_cost:
+              type: number
+              description: Cost per inference query
+            break_even_queries:
+              type: integer
+              description: Number of queries to break even
+            roi_projection:
+              type: object
+              properties:
+                "1_month":
+                  type: string
+                "6_months":
+                  type: string
+                "1_year":
+                  type: string
+        recommendations:
+          type: object
+          properties:
+            optimal_architecture:
+              type: object
+            suggested_improvements:
+              type: array
+              items:
+                type: string
+            implementation_priority:
+              type: array
+              items:
+                type: object
+                properties:
+                  action:
+                    type: string
+                  impact:
+                    type: string
+                    enum: [high, medium, low]
+                  effort:
+                    type: string
+                    enum: [high, medium, low]
+        analyzed_at:
+          type: string
+          format: date-time
+
+    # Creative Generation Schemas
+    CreativeGenerationRequest:
+      type: object
+      required: [creative_prompt, generation_config]
+      properties:
+        creative_prompt:
+          type: object
+          properties:
+            prompt_text:
+              type: string
+            style_constraints:
+              type: object
+            content_type:
+              type: string
+              enum: [story, poem, dialogue, description, essay]
+        generation_config:
+          type: object
+          properties:
+            creativity_level:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.7
+            style_consistency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.8
+            length_target:
+              type: integer
+              description: Target length in tokens
+            num_variations:
+              type: integer
+              minimum: 1
+              maximum: 10
+              default: 3
+        personalization:
+          type: object
+          properties:
+            user_style_profile:
+              type: string
+              description: User's learned style identifier
+            adaptation_strength:
+              type: number
+              default: 0.5
+
+    CreativeGenerationResponse:
+      type: object
+      properties:
+        generation_id:
+          type: string
+          format: uuid
+        generated_content:
+          type: array
+          items:
+            type: object
+            properties:
+              variation_id:
+                type: string
+              content:
+                type: string
+              creativity_score:
+                type: number
+              style_consistency:
+                type: number
+              latent_trajectory:
+                type: array
+                items:
+                  type: number
+                description: Path through latent creative space
+        generation_analytics:
+          type: object
+          properties:
+            average_creativity:
+              type: number
+            style_adherence:
+              type: number
+            diversity_score:
+              type: number
+            generation_efficiency:
+              type: object
+              properties:
+                time_per_token_ms:
+                  type: number
+                amortization_speedup:
+                  type: string
+        generated_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

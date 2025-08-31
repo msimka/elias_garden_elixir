@@ -1,0 +1,1015 @@
+openapi: 3.0.3
+info:
+  title: Daemon Generator - Personalized AI Code Synthesis API
+  description: |
+    Daemon Generator API for synthesizing personalized AI daemon code from user
+    patterns, LoRA forests, and behavioral data. Creates self-contained AI agents
+    that run locally with <100ms response times while preserving user personality
+    and preferences across all interactions.
+    
+    Leverages amortized inference, mLoRA forests, and StructCoder to generate
+    production-ready daemon code that captures individual user patterns and
+    delivers personalized AI experiences with mathematical guarantees for
+    consistency and performance.
+  version: "1.0.0"
+  contact:
+    name: ELIAS Daemon Generator Team
+    url: https://github.com/mikesimka/elias_garden_elixir
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://daemon-gen.elias.brain
+    description: Production Daemon Generator API
+  - url: https://staging-daemon-gen.elias.brain
+    description: Staging environment
+  - url: http://localhost:4007
+    description: Local development server
+
+tags:
+  - name: daemon-synthesis
+    description: Core daemon code generation and synthesis
+  - name: pattern-analysis
+    description: User pattern analysis and extraction
+  - name: personalization
+    description: Personalization engine and customization
+  - name: deployment
+    description: Daemon deployment and distribution
+  - name: optimization
+    description: Performance optimization and tuning
+
+paths:
+  # ============================================================================
+  # DAEMON SYNTHESIS ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/daemon/generate/complete:
+    post:
+      tags: [daemon-synthesis]
+      summary: Generate complete personalized AI daemon
+      description: |
+        Generate a complete, self-contained AI daemon that captures user
+        personality, preferences, and behavioral patterns. Creates production-ready
+        code that runs locally with <100ms response times and maintains
+        consistency across all user interactions.
+      operationId: generateCompleteDaemon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DaemonGenerationRequest'
+      responses:
+        '200':
+          description: Complete daemon generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DaemonGenerationResponse'
+        '400':
+          description: Invalid generation parameters
+        '422':
+          description: Insufficient user data for personalization
+
+  /api/v1/daemon/generate/incremental:
+    post:
+      tags: [daemon-synthesis]
+      summary: Generate daemon incrementally from user interactions
+      description: |
+        Generate daemon code incrementally as user patterns emerge and evolve.
+        Supports continuous learning and adaptation while maintaining consistency
+        with existing daemon behavior and personality traits.
+      operationId: generateIncrementalDaemon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncrementalGenerationRequest'
+      responses:
+        '200':
+          description: Incremental daemon update completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncrementalGenerationResponse'
+
+  /api/v1/daemon/synthesize/from-loras:
+    post:
+      tags: [daemon-synthesis]
+      summary: Synthesize daemon from LoRA forest
+      description: |
+        Synthesize personalized daemon code from user's mLoRA forest using
+        amortized Bayesian inference. Combines specialized LoRA adaptations
+        into cohesive daemon personality with mathematical guarantees for
+        consistency and performance.
+      operationId: synthesizeDaemonFromLoras
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoRASynthesisRequest'
+      responses:
+        '200':
+          description: Daemon synthesis from LoRAs completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoRASynthesisResponse'
+
+  /api/v1/daemon/generate/specialized:
+    post:
+      tags: [daemon-synthesis]
+      summary: Generate domain-specialized daemon variants
+      description: |
+        Generate specialized daemon variants optimized for specific domains
+        or use cases while maintaining core personality consistency. Creates
+        multiple daemon configurations for different contexts and requirements.
+      operationId: generateSpecializedDaemon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecializedGenerationRequest'
+      responses:
+        '200':
+          description: Specialized daemon variants generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecializedGenerationResponse'
+
+  # ============================================================================
+  # PATTERN ANALYSIS ENDPOINTS
+  # ============================================================================
+
+  /api/v1/daemon/analyze/patterns:
+    post:
+      tags: [pattern-analysis]
+      summary: Analyze user behavioral patterns for daemon generation
+      description: |
+        Perform comprehensive analysis of user behavioral patterns, preferences,
+        communication styles, and decision-making patterns. Extracts key
+        personality traits and behavioral markers for daemon synthesis.
+      operationId: analyzeUserPatterns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatternAnalysisRequest'
+      responses:
+        '200':
+          description: Pattern analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatternAnalysisResponse'
+
+  /api/v1/daemon/analyze/consistency:
+    post:
+      tags: [pattern-analysis]
+      summary: Analyze pattern consistency and evolution
+      description: |
+        Analyze consistency of user patterns over time and identify pattern
+        evolution trends. Ensures daemon generation maintains personality
+        consistency while adapting to pattern changes.
+      operationId: analyzePatternConsistency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsistencyAnalysisRequest'
+      responses:
+        '200':
+          description: Consistency analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsistencyAnalysisResponse'
+
+  /api/v1/daemon/extract/personality:
+    post:
+      tags: [pattern-analysis]
+      summary: Extract personality profile from user data
+      description: |
+        Extract comprehensive personality profile including communication style,
+        decision-making patterns, emotional responses, and behavioral preferences.
+        Creates detailed personality model for daemon generation.
+      operationId: extractPersonalityProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalityExtractionRequest'
+      responses:
+        '200':
+          description: Personality profile extracted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalityExtractionResponse'
+
+  # ============================================================================
+  # PERSONALIZATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/daemon/personalize/behavior:
+    post:
+      tags: [personalization]
+      summary: Customize daemon behavioral parameters
+      description: |
+        Fine-tune daemon behavioral parameters including response style,
+        decision-making approach, creativity levels, and interaction patterns.
+        Enables precise customization of daemon personality traits.
+      operationId: personalizeDaemonBehavior
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BehaviorPersonalizationRequest'
+      responses:
+        '200':
+          description: Behavior personalization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorPersonalizationResponse'
+
+  /api/v1/daemon/personalize/communication:
+    post:
+      tags: [personalization]
+      summary: Customize daemon communication style
+      description: |
+        Customize daemon communication patterns including vocabulary preferences,
+        formality levels, humor style, empathy expression, and conversation flow.
+        Creates natural communication that matches user preferences.
+      operationId: personalizeCommunicationStyle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunicationPersonalizationRequest'
+      responses:
+        '200':
+          description: Communication personalization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationPersonalizationResponse'
+
+  /api/v1/daemon/personalize/preferences:
+    post:
+      tags: [personalization]
+      summary: Set user preference optimization
+      description: |
+        Configure daemon to optimize for user's specific preferences including
+        information density, response length, explanation style, and
+        decision-support approach. Ensures daemon aligns with user needs.
+      operationId: personalizeUserPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencePersonalizationRequest'
+      responses:
+        '200':
+          description: Preference personalization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencePersonalizationResponse'
+
+  # ============================================================================
+  # DEPLOYMENT ENDPOINTS
+  # ============================================================================
+
+  /api/v1/daemon/deploy/local:
+    post:
+      tags: [deployment]
+      summary: Deploy daemon for local execution
+      description: |
+        Deploy generated daemon for local execution with optimized performance
+        and minimal resource usage. Creates self-contained executable with
+        <100ms response times and full offline capability.
+      operationId: deployDaemonLocal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalDeploymentRequest'
+      responses:
+        '200':
+          description: Local deployment completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalDeploymentResponse'
+
+  /api/v1/daemon/deploy/cloud:
+    post:
+      tags: [deployment]
+      summary: Deploy daemon to cloud infrastructure
+      description: |
+        Deploy daemon to cloud infrastructure with auto-scaling, load balancing,
+        and global distribution. Maintains personalization while enabling
+        high-availability and performance optimization.
+      operationId: deployDaemonCloud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudDeploymentRequest'
+      responses:
+        '200':
+          description: Cloud deployment completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudDeploymentResponse'
+
+  /api/v1/daemon/deploy/edge:
+    post:
+      tags: [deployment]
+      summary: Deploy daemon to edge computing nodes
+      description: |
+        Deploy daemon to edge computing infrastructure for ultra-low latency
+        responses and improved privacy. Optimizes for local processing while
+        maintaining connection to central personality models.
+      operationId: deployDaemonEdge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EdgeDeploymentRequest'
+      responses:
+        '200':
+          description: Edge deployment completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdgeDeploymentResponse'
+
+  /api/v1/daemon/package/portable:
+    post:
+      tags: [deployment]
+      summary: Package daemon for portable distribution
+      description: |
+        Package daemon into portable format for distribution across multiple
+        platforms and environments. Creates self-contained packages with
+        installation scripts and configuration tools.
+      operationId: packageDaemonPortable
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortablePackagingRequest'
+      responses:
+        '200':
+          description: Portable packaging completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortablePackagingResponse'
+
+  # ============================================================================
+  # OPTIMIZATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/daemon/optimize/performance:
+    post:
+      tags: [optimization]
+      summary: Optimize daemon performance characteristics
+      description: |
+        Optimize daemon for specific performance characteristics including
+        response time, memory usage, CPU efficiency, and throughput.
+        Applies advanced optimization techniques while preserving personality.
+      operationId: optimizeDaemonPerformance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerformanceOptimizationRequest'
+      responses:
+        '200':
+          description: Performance optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceOptimizationResponse'
+
+  /api/v1/daemon/optimize/memory:
+    post:
+      tags: [optimization]
+      summary: Optimize daemon memory usage
+      description: |
+        Optimize daemon memory footprint through model compression, parameter
+        pruning, and efficient data structures. Maintains quality while
+        reducing resource requirements for deployment flexibility.
+      operationId: optimizeDaemonMemory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryOptimizationRequest'
+      responses:
+        '200':
+          description: Memory optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryOptimizationResponse'
+
+  /api/v1/daemon/optimize/quality:
+    post:
+      tags: [optimization]
+      summary: Optimize daemon response quality
+      description: |
+        Optimize daemon for response quality including accuracy, relevance,
+        consistency, and user satisfaction. Applies quality enhancement
+        techniques while maintaining performance targets.
+      operationId: optimizeDaemonQuality
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QualityOptimizationRequest'
+      responses:
+        '200':
+          description: Quality optimization completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualityOptimizationResponse'
+
+  /api/v1/daemon/benchmark/comprehensive:
+    post:
+      tags: [optimization]
+      summary: Run comprehensive daemon benchmarks
+      description: |
+        Execute comprehensive benchmarking suite including performance,
+        quality, consistency, and user satisfaction metrics. Provides
+        detailed analysis for optimization decision-making.
+      operationId: benchmarkDaemonComprehensive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComprehensiveBenchmarkRequest'
+      responses:
+        '200':
+          description: Comprehensive benchmarking completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComprehensiveBenchmarkResponse'
+
+components:
+  schemas:
+    # Daemon Generation Schemas
+    DaemonGenerationRequest:
+      type: object
+      required: [user_id, generation_type, personalization_config]
+      properties:
+        user_id:
+          type: string
+          description: Unique user identifier
+        generation_type:
+          type: string
+          enum: [complete, lightweight, specialized, distributed]
+          description: Type of daemon to generate
+        personalization_config:
+          type: object
+          properties:
+            personality_strength:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.8
+              description: Strength of personality traits in generated daemon
+            behavioral_consistency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.9
+              description: Required consistency in daemon behavior
+            adaptation_rate:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.3
+              description: Rate of adaptation to new patterns
+            creativity_level:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              default: 0.6
+              description: Level of creative responses
+        data_sources:
+          type: object
+          properties:
+            interaction_history:
+              type: array
+              items:
+                type: object
+              description: Historical user interactions
+            lora_forest:
+              type: array
+              items:
+                type: string
+              description: User's LoRA adaptation identifiers
+            behavioral_patterns:
+              type: array
+              items:
+                type: object
+              description: Analyzed behavioral patterns
+            preference_data:
+              type: object
+              description: User preferences and settings
+        generation_options:
+          type: object
+          properties:
+            target_platform:
+              type: string
+              enum: [local, cloud, edge, mobile, web]
+              default: local
+            performance_target:
+              type: string
+              enum: [ultra_fast, fast, balanced, quality_first]
+              default: balanced
+            memory_limit:
+              type: string
+              enum: [minimal, standard, extended, unlimited]
+              default: standard
+            include_learning:
+              type: boolean
+              default: true
+              description: Include continuous learning capabilities
+            privacy_level:
+              type: string
+              enum: [basic, enhanced, maximum]
+              default: enhanced
+
+    DaemonGenerationResponse:
+      type: object
+      properties:
+        generation_id:
+          type: string
+          format: uuid
+        daemon_package:
+          type: object
+          properties:
+            daemon_code:
+              type: string
+              description: Complete generated daemon code
+            configuration:
+              type: object
+              description: Daemon configuration parameters
+            personality_model:
+              type: object
+              description: Embedded personality model
+            behavioral_parameters:
+              type: object
+              description: Behavioral parameter settings
+        generation_metadata:
+          type: object
+          properties:
+            patterns_analyzed:
+              type: integer
+              description: Number of user patterns analyzed
+            loras_integrated:
+              type: integer
+              description: Number of LoRAs integrated into daemon
+            personalization_score:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              description: Achieved personalization strength
+            consistency_score:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              description: Behavioral consistency score
+            generation_time_ms:
+              type: number
+              description: Time taken for daemon generation
+        performance_characteristics:
+          type: object
+          properties:
+            estimated_response_time_ms:
+              type: number
+              description: Estimated average response time
+            memory_footprint_mb:
+              type: number
+              description: Estimated memory usage
+            cpu_efficiency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              description: CPU efficiency score
+            quality_score:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              description: Overall quality assessment
+        deployment_instructions:
+          type: object
+          properties:
+            local_setup:
+              type: string
+              description: Instructions for local deployment
+            cloud_deployment:
+              type: object
+              description: Cloud deployment configuration
+            dependencies:
+              type: array
+              items:
+                type: string
+              description: Required dependencies
+        generated_at:
+          type: string
+          format: date-time
+
+    # Pattern Analysis Schemas
+    PatternAnalysisRequest:
+      type: object
+      required: [user_id, analysis_scope]
+      properties:
+        user_id:
+          type: string
+        analysis_scope:
+          type: string
+          enum: [comprehensive, behavioral, communication, decision_making, emotional]
+        data_sources:
+          type: object
+          properties:
+            interaction_logs:
+              type: array
+              items:
+                type: object
+            communication_samples:
+              type: array
+              items:
+                type: string
+            decision_records:
+              type: array
+              items:
+                type: object
+            feedback_data:
+              type: array
+              items:
+                type: object
+        analysis_options:
+          type: object
+          properties:
+            temporal_analysis:
+              type: boolean
+              default: true
+              description: Analyze pattern changes over time
+            cross_domain_analysis:
+              type: boolean
+              default: true
+              description: Analyze patterns across different domains
+            deep_personality_analysis:
+              type: boolean
+              default: false
+              description: Perform deep personality trait analysis
+            predictive_modeling:
+              type: boolean
+              default: true
+              description: Build predictive models for future behavior
+
+    PatternAnalysisResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+          format: uuid
+        behavioral_patterns:
+          type: object
+          properties:
+            communication_style:
+              type: object
+              properties:
+                formality_level:
+                  type: number
+                verbosity_preference:
+                  type: number
+                emotional_expression:
+                  type: number
+                humor_usage:
+                  type: number
+            decision_making_patterns:
+              type: object
+              properties:
+                analytical_approach:
+                  type: number
+                risk_tolerance:
+                  type: number
+                speed_vs_accuracy:
+                  type: number
+                collaboration_preference:
+                  type: number
+            learning_patterns:
+              type: object
+              properties:
+                information_processing_style:
+                  type: string
+                feedback_responsiveness:
+                  type: number
+                adaptation_speed:
+                  type: number
+            interaction_patterns:
+              type: object
+              properties:
+                preferred_interaction_length:
+                  type: string
+                context_switching_ability:
+                  type: number
+                multitasking_preference:
+                  type: number
+        personality_profile:
+          type: object
+          properties:
+            big_five_traits:
+              type: object
+              properties:
+                openness:
+                  type: number
+                conscientiousness:
+                  type: number
+                extraversion:
+                  type: number
+                agreeableness:
+                  type: number
+                neuroticism:
+                  type: number
+            cognitive_style:
+              type: object
+              properties:
+                analytical_vs_intuitive:
+                  type: number
+                detail_vs_big_picture:
+                  type: number
+                structured_vs_flexible:
+                  type: number
+        pattern_consistency:
+          type: object
+          properties:
+            overall_consistency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+            temporal_stability:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+            cross_domain_consistency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+        predictive_models:
+          type: object
+          properties:
+            response_style_prediction:
+              type: object
+            decision_outcome_prediction:
+              type: object
+            preference_evolution_prediction:
+              type: object
+        analyzed_at:
+          type: string
+          format: date-time
+
+    # Deployment Schemas
+    LocalDeploymentRequest:
+      type: object
+      required: [daemon_id, deployment_config]
+      properties:
+        daemon_id:
+          type: string
+          description: Generated daemon identifier
+        deployment_config:
+          type: object
+          properties:
+            target_os:
+              type: string
+              enum: [windows, macos, linux, cross_platform]
+              default: cross_platform
+            resource_limits:
+              type: object
+              properties:
+                max_memory_mb:
+                  type: integer
+                  default: 512
+                max_cpu_percent:
+                  type: integer
+                  default: 30
+                disk_space_mb:
+                  type: integer
+                  default: 100
+            security_config:
+              type: object
+              properties:
+                encryption_at_rest:
+                  type: boolean
+                  default: true
+                secure_communication:
+                  type: boolean
+                  default: true
+                audit_logging:
+                  type: boolean
+                  default: false
+            integration_options:
+              type: object
+              properties:
+                api_endpoints:
+                  type: boolean
+                  default: true
+                cli_interface:
+                  type: boolean
+                  default: false
+                gui_interface:
+                  type: boolean
+                  default: false
+                system_integration:
+                  type: boolean
+                  default: false
+
+    LocalDeploymentResponse:
+      type: object
+      properties:
+        deployment_id:
+          type: string
+          format: uuid
+        deployment_package:
+          type: object
+          properties:
+            executable_path:
+              type: string
+            configuration_files:
+              type: array
+              items:
+                type: string
+            installation_script:
+              type: string
+            documentation:
+              type: string
+        deployment_instructions:
+          type: object
+          properties:
+            installation_steps:
+              type: array
+              items:
+                type: string
+            configuration_guide:
+              type: string
+            troubleshooting_guide:
+              type: string
+        performance_estimates:
+          type: object
+          properties:
+            startup_time_ms:
+              type: number
+            average_response_time_ms:
+              type: number
+            memory_usage_mb:
+              type: number
+            cpu_usage_percent:
+              type: number
+        monitoring_setup:
+          type: object
+          properties:
+            health_check_endpoint:
+              type: string
+            metrics_endpoint:
+              type: string
+            log_configuration:
+              type: object
+        deployed_at:
+          type: string
+          format: date-time
+
+    # Optimization Schemas  
+    PerformanceOptimizationRequest:
+      type: object
+      required: [daemon_id, optimization_targets]
+      properties:
+        daemon_id:
+          type: string
+        optimization_targets:
+          type: object
+          properties:
+            target_response_time_ms:
+              type: number
+              description: Target maximum response time
+            target_memory_usage_mb:
+              type: number
+              description: Target maximum memory usage
+            target_cpu_efficiency:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              description: Target CPU efficiency score
+            target_throughput_rps:
+              type: number
+              description: Target requests per second
+        optimization_strategy:
+          type: string
+          enum: [aggressive, balanced, conservative]
+          default: balanced
+        constraints:
+          type: object
+          properties:
+            preserve_personality:
+              type: boolean
+              default: true
+            maintain_quality:
+              type: boolean
+              default: true
+            preserve_features:
+              type: array
+              items:
+                type: string
+
+    PerformanceOptimizationResponse:
+      type: object
+      properties:
+        optimization_id:
+          type: string
+          format: uuid
+        optimization_results:
+          type: object
+          properties:
+            achieved_response_time_ms:
+              type: number
+            achieved_memory_usage_mb:
+              type: number  
+            achieved_cpu_efficiency:
+              type: number
+            achieved_throughput_rps:
+              type: number
+        optimization_techniques_applied:
+          type: array
+          items:
+            type: object
+            properties:
+              technique:
+                type: string
+              impact:
+                type: string
+              trade_offs:
+                type: string
+        performance_comparison:
+          type: object
+          properties:
+            response_time_improvement:
+              type: string
+            memory_reduction:
+              type: string
+            cpu_efficiency_gain:
+              type: string
+            throughput_increase:
+              type: string
+        optimized_daemon:
+          type: object
+          properties:
+            daemon_code:
+              type: string
+            configuration:
+              type: object
+            deployment_instructions:
+              type: object
+        optimized_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
